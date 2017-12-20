@@ -55,10 +55,6 @@
   transition: .3s;
 }
 
-.player-move {
-	transform: rotateY( 180deg );
-}
-
 .tile:hover {
   transition: .1s;
   border-width: 5px;
