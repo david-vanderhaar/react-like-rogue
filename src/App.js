@@ -32,7 +32,7 @@ class App extends Component {
       maxRoomSize: maxRoomSize,
       minRoomSize: minRoomSize,
       tileMap: Array(mapHeight).fill(Array(mapWidth).fill('g')),
-      tileTypes: Array(mapHeight).fill(Array(mapWidth).fill({type: 'tile tile-WALL'})),
+      tileTypes: Array(mapHeight).fill(Array(mapWidth).fill({type: 'tile tile-WALL', canPass: false})),
       playerPosX: playerPosX,
       playerPosY: playerPosY,
       playerControls: {
@@ -50,16 +50,16 @@ class App extends Component {
 		let tileTypes = this.state.tileTypes;
     switch (event.keyCode) {
       case playerControls['LEFT']:
-        (playerPosX > 0 && tileTypes[playerPosY][playerPosX - 1].type !== 'tile tile-WALL') ? playerPosX -= 1 : playerPosX += 0;
+        (playerPosX > 0 && tileTypes[playerPosY][playerPosX - 1].canPass) ? playerPosX -= 1 : playerPosX += 0;
         break;
       case playerControls['UP']:
-        playerPosY > 0 && tileTypes[playerPosY - 1][playerPosX].type !== 'tile tile-WALL' ? playerPosY -= 1 : playerPosY += 0;
+        playerPosY > 0 && tileTypes[playerPosY - 1][playerPosX].canPass ? playerPosY -= 1 : playerPosY += 0;
         break;
       case playerControls['RIGHT']:
-        playerPosX < this.state.mapWidth - 1 && tileTypes[playerPosY][playerPosX + 1].type !== 'tile tile-WALL' ? playerPosX += 1 : playerPosX += 0;
+        playerPosX < this.state.mapWidth - 1 && tileTypes[playerPosY][playerPosX + 1].canPass ? playerPosX += 1 : playerPosX += 0;
         break;
       case playerControls['DOWN']:
-        playerPosY < this.state.mapHeight - 1 && tileTypes[playerPosY + 1][playerPosX].type !== 'tile tile-WALL' ? playerPosY += 1 : playerPosY += 0;
+        playerPosY < this.state.mapHeight - 1 && tileTypes[playerPosY + 1][playerPosX].canPass ? playerPosY += 1 : playerPosY += 0;
         break;
       default:
         break;
@@ -71,29 +71,8 @@ class App extends Component {
     });
   }
 
-  generateWalls() {
-    let tileMap = this.state.tileMap;
-    let tiles = [];
-
-    for (let i = 0; i < tileMap.length; i++) {
-      // console.log(i)
-      tiles.push([]);
-      for (let j = 0; j < tileMap[i].length; j ++) {
-        // tileMap[i][j] = i.toString() + ', ' + j.toString();
-        tiles[i].push('');
-        // tiles[i].push(i.toString() + ',' + j.toString());
-        // console.log(tileMap[i][j])
-      }
-    }
-
-    this.setState({
-      tileMap: tiles,
-    });
-  }
-
   generateRooms() {
       let rooms = this.state.rooms;
-      let tileTypes = this.state.tileTypes;
       for (let i = 0; i < this.state.roomCount; i++) {
           let room = {};
 
@@ -106,7 +85,6 @@ class App extends Component {
 
       }
       this.setState({
-        tileTypes: tileTypes,
         rooms: rooms
       });
   }
@@ -120,7 +98,7 @@ class App extends Component {
 			for (let q = 0; q < this.state.tileTypes.length; q++) {
 				tileTs.push([]);
 				for (let w = 0; w < this.state.tileTypes[q].length; w++) {
-					tileTs[q].push({type: 'tile tile-WALL'});
+					tileTs[q].push({type: 'tile tile-WALL', canPass: false});
 				}
 			}
 
@@ -133,7 +111,7 @@ class App extends Component {
 						console.log(j, k);
             if (j < this.state.mapHeight && j > 0) {
               if (k < this.state.mapWidth && k > 0) {
-								tileTs[j][k] = {type: 'tile tile-GROUND'};
+								tileTs[j][k] = {type: 'tile tile-GROUND', canPass: true};
 
 								// Set player position within the last ground tile of the room
 								playerPosX = k;
@@ -153,7 +131,6 @@ class App extends Component {
 
   componentDidMount() {
     document.addEventListener('keyup', this.handlePlayerMove.bind(this));
-    this.generateWalls()
     this.generateRooms();
     this.carveRooms();
   }
