@@ -10,7 +10,7 @@ class App extends Component {
     // Map width/height control determine number of cells across/down the page
     const mapWidth = 48;
     const mapHeight = 16;
-    const cellSize = 30; // pixel width/height of each cell
+    const cellSize = 50; // pixel width/height of each cell
     const cellGutter = 4; // pixels between each cell
 
     //Dungeon Vars
@@ -35,6 +35,7 @@ class App extends Component {
       tileTypes: Array(mapHeight).fill(Array(mapWidth).fill({type: 'tile tile-WALL', canPass: false})),
       playerPosX: playerPosX,
       playerPosY: playerPosY,
+			playerMove: 0,
       playerControls: {
         LEFT: 37,
         RIGHT: 39,
@@ -47,6 +48,7 @@ class App extends Component {
     let playerControls = this.state.playerControls;
     let playerPosX = this.state.playerPosX;
     let playerPosY = this.state.playerPosY;
+		let playerMove = this.state.playerMove;
 		let tileTypes = this.state.tileTypes;
     switch (event.keyCode) {
       case playerControls['LEFT']:
@@ -68,6 +70,7 @@ class App extends Component {
     this.setState({
       playerPosX: playerPosX,
       playerPosY: playerPosY,
+			playerMove: playerMove + 360,
     });
   }
 
@@ -140,7 +143,7 @@ class App extends Component {
       <div className="App">
         <div className="game-container">
           <Map mapWidth = {this.state.mapWidth} tileTypes = {this.state.tileTypes} tileMap = {this.state.tileMap} cellSize = {this.state.cellSize} cellGutter = {this.state.cellGutter}/>
-          <Player playerPosX = {this.state.playerPosX} playerPosY = {this.state.playerPosY} cellSize = {this.state.cellSize} cellGutter = {this.state.cellGutter}/>
+          <Player playerMove= {'rotateY( ' + this.state.playerMove.toString() + 'deg )'} playerPosX = {this.state.playerPosX} playerPosY = {this.state.playerPosY} cellSize = {this.state.cellSize} cellGutter = {this.state.cellGutter}/>
         </div>
       </div>
     );

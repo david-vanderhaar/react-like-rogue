@@ -15,7 +15,7 @@ class Player extends Component {
       left: this.props.playerPosX * (this.props.cellSize + this.props.cellGutter),
       width: this.props.cellSize,
       height: this.props.cellSize,
-      opacity: this.props.playerOpac
+      transform: this.props.playerMove,
     };
     return (
       <div className="Player">
