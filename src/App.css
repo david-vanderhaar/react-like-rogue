@@ -1,0 +1,66 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.game-container {
+  position: relative;
+  top: 10vh;
+  left: 10vw;
+  width: 80vw;
+  height: 80vh;
+  background-color: slategrey;
+  overflow: scroll;
+}
+
+.tile {
+  position: absolute;
+  border: solid;
+  border-radius: 6px;
+  border-width: 0px;
+  border-color: #106f77;
+  transition: .1s;
+}
+
+/* SET background colors and images here*/
+.tile-GROUND {
+  background-color: #009688;
+}
+
+.tile-WALL {
+  background-color: #106f77;
+}
+
+.player {
+  position: absolute;
+  border: solid;
+  border-radius: 6px;
+  border-width: 0px;
+  border-color: #106f77;
+  transition: .1s;
+}
+
+.tile:hover {
+  transition: .1s;
+  border-width: 5px;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
