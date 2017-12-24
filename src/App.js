@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Map from './Map';
 import Player from './Player';
 import './App.css';
+import { getRandomIntInclusive, findClosestRoom, doesCollide } from './Helper'
 
 class App extends Component {
 
@@ -9,12 +10,12 @@ class App extends Component {
     super();
     // Map width/height control determine number of cells across/down the page
     const mapWidth = 48;
-    const mapHeight = 16;
+    const mapHeight = 26;
     const cellSize = 50; // pixel width/height of each cell
     const cellGutter = 4; // pixels between each cell
 
     //Dungeon Vars
-    const roomCount = 8;
+    const roomCount = 12;
     const rooms = []; // holds all room info
     const maxRoomSize = 8;
     const minRoomSize = 4;
@@ -35,7 +36,10 @@ class App extends Component {
       tileTypes: Array(mapHeight).fill(Array(mapWidth).fill({type: 'tile tile-WALL', canPass: false})),
       playerPosX: playerPosX,
       playerPosY: playerPosY,
-			playerMove: 0,
+			playerMove: {
+        rotate: 0,
+        direction: 'rotateY'
+      },
       playerControls: {
         LEFT: 37,
         RIGHT: 39,
@@ -50,18 +54,27 @@ class App extends Component {
     let playerPosY = this.state.playerPosY;
 		let playerMove = this.state.playerMove;
 		let tileTypes = this.state.tileTypes;
+
     switch (event.keyCode) {
       case playerControls['LEFT']:
         (playerPosX > 0 && tileTypes[playerPosY][playerPosX - 1].canPass) ? playerPosX -= 1 : playerPosX += 0;
+        playerMove.rotate > -360 ?  playerMove.rotate -= 180 : playerMove.rotate = 0;
+        playerMove.direction = 'rotateY';
         break;
       case playerControls['UP']:
         playerPosY > 0 && tileTypes[playerPosY - 1][playerPosX].canPass ? playerPosY -= 1 : playerPosY += 0;
+        playerMove.rotate < 360 ?  playerMove.rotate += 180 : playerMove.rotate = 0;
+        playerMove.direction = 'rotateX';
         break;
       case playerControls['RIGHT']:
         playerPosX < this.state.mapWidth - 1 && tileTypes[playerPosY][playerPosX + 1].canPass ? playerPosX += 1 : playerPosX += 0;
+        playerMove.rotate < 360 ?  playerMove.rotate += 180 : playerMove.rotate = 0;
+        playerMove.direction = 'rotateY';
         break;
       case playerControls['DOWN']:
         playerPosY < this.state.mapHeight - 1 && tileTypes[playerPosY + 1][playerPosX].canPass ? playerPosY += 1 : playerPosY += 0;
+        playerMove.rotate > -360 ?  playerMove.rotate -= 180 : playerMove.rotate = 0;
+        playerMove.direction = 'rotateX';
         break;
       default:
         break;
@@ -70,91 +83,59 @@ class App extends Component {
     this.setState({
       playerPosX: playerPosX,
       playerPosY: playerPosY,
-			playerMove: playerMove + 360,
+			playerMove: playerMove,
     });
   }
 
-  generateRooms() {
-      let rooms = this.state.rooms;
-      for (let i = 0; i < this.state.roomCount; i++) {
-          let room = {};
-
-          room.x = getRandomIntInclusive(1, this.state.mapWidth - this.state.maxRoomSize - 1);
-          room.y = getRandomIntInclusive(1, this.state.mapHeight - this.state.maxRoomSize - 1);
-          room.w = getRandomIntInclusive(this.state.minRoomSize, this.state.maxRoomSize);
-          room.h = getRandomIntInclusive(this.state.minRoomSize, this.state.maxRoomSize);
-
-          rooms.push(room);
-
-      }
+  generateRooms(rooms) {
       this.setState({
         rooms: rooms
       });
   }
 
-  carveRooms() {
-			let playerPosX = 0;
-			let playerPosY = 0;
-      let rooms = this.state.rooms;
-      let tileTs = this.state.tileTypes;
-			tileTs = [];
-			for (let q = 0; q < this.state.tileTypes.length; q++) {
-				tileTs.push([]);
-				for (let w = 0; w < this.state.tileTypes[q].length; w++) {
-					tileTs[q].push({type: 'tile tile-WALL', canPass: false});
-				}
-			}
+  carveRooms(tileTs, playerPosX, playerPosY) {
+    this.setState({
+      tileTypes: tileTs,
+      playerPosX: playerPosX,
+      playerPosY: playerPosY,
+    });
+  }
 
-      for (let g = 0; g < rooms.length; g++) {
-        // carve floors
-        for (let j = rooms[g].y; j < rooms[g].y + rooms[g].h; j++) {
-					console.log(tileTs[j]);
-          for (let k = rooms[g].x; k < rooms[g].x + rooms[g].w; k++) {
-						console.log(tileTs[j][k]);
-						console.log(j, k);
-            if (j < this.state.mapHeight && j > 0) {
-              if (k < this.state.mapWidth && k > 0) {
-								tileTs[j][k] = {type: 'tile tile-GROUND', canPass: true};
-
-								// Set player position within the last ground tile of the room
-								playerPosX = k;
-								playerPosY = j;
-
-              }
-            }
-          }
-        }
-      }
-      this.setState({
-        tileTypes: tileTs,
-				playerPosX: playerPosX,
-				playerPosY: playerPosY,
-      });
+  carveHalls(tileTs) {
+    this.setState({
+      tileTypes: tileTs,
+    });
   }
 
   componentDidMount() {
     document.addEventListener('keyup', this.handlePlayerMove.bind(this));
-    this.generateRooms();
-    this.carveRooms();
   }
 
   render() {
     return (
       <div className="App">
         <div className="game-container">
-          <Map mapWidth = {this.state.mapWidth} tileTypes = {this.state.tileTypes} tileMap = {this.state.tileMap} cellSize = {this.state.cellSize} cellGutter = {this.state.cellGutter}/>
-          <Player playerMove= {'rotateY( ' + this.state.playerMove.toString() + 'deg )'} playerPosX = {this.state.playerPosX} playerPosY = {this.state.playerPosY} cellSize = {this.state.cellSize} cellGutter = {this.state.cellGutter}/>
+          <Map
+              playerPosX = {this.state.playerPosX}
+              playerPosY = {this.state.playerPosY}
+              rooms = {this.state.rooms}
+              roomCount = {this.state.roomCount}
+              maxRoomSize = {this.state.maxRoomSize}
+              minRoomSize = {this.state.minRoomSize}
+              carveRooms = {this.carveRooms.bind(this)}
+              carveHalls = {this.carveHalls.bind(this)}
+              generateRooms = {this.generateRooms.bind(this)}
+              mapHeight = {this.state.mapHeight}
+              mapWidth = {this.state.mapWidth}
+              tileTypes = {this.state.tileTypes}
+              tileMap = {this.state.tileMap}
+              cellSize = {this.state.cellSize}
+              cellGutter = {this.state.cellGutter}/>
+          <Player playerMove= {this.state.playerMove.direction + '( ' + this.state.playerMove.rotate.toString() + 'deg )'} playerPosX = {this.state.playerPosX} playerPosY = {this.state.playerPosY} cellSize = {this.state.cellSize} cellGutter = {this.state.cellGutter}/>
         </div>
       </div>
     );
   }
 }
-
-// Helper Functions
-function getRandomIntInclusive(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
-};
 
 export default App;
