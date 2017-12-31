@@ -48,10 +48,15 @@
 
 .player {
   position: absolute;
+  border-radius: 6px;
+  transition: .3s;
+}
+
+.player:hover {
   border: solid;
   border-radius: 6px;
-  border-width: 0px;
-  border-color: #106f77;
+  border-width: 5px;
+  border-color: #aa4843;
   transition: .3s;
 }
 

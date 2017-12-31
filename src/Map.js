@@ -96,7 +96,35 @@ class Map extends Component {
         }
 
       }
-      this.props.carveHalls(tileTs)
+      this.props.carveHalls(tileTs);
+      this.placeEnemies(tileTs);
+  }
+
+  placeEnemies(tileTypes) {
+    let enemies = this.props.enemyList.concat();
+    // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
+    let tileTs = [];
+    for (let q = 0; q < tileTypes.length; q++) {
+      tileTs.push([]);
+      for (let w = 0; w < tileTypes[q].length; w++) {
+        tileTs[q].push({...tileTypes[q][w]});
+      }
+    }
+    for (let i = 0; i < enemies.length; i++) {
+      let placeX = getRandomIntInclusive(0, this.props.mapWidth - 1)
+      let placeY = getRandomIntInclusive(0, this.props.mapHeight - 1)
+
+      let tile = tileTs[placeY][placeX];
+      if (tile.canPass) {
+        enemies[i] = {...enemies[i]}
+        tileTs[placeY][placeX].canPass = false;
+        enemies[i].posX = placeX;
+        enemies[i].posY = placeY;
+      } else {
+        i--;
+      }
+    }
+    this.props.placeEnemies(enemies, tileTs);
   }
   componentDidMount() {
     this.generateRooms();

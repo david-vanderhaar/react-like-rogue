@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 
-function PlayerSprite(props) {
-  return (
-    <span className="player red white-text" style={props.style}>
-      P
-    </span>
-  );
-}
+// function PlayerSprite(props) {
+//   return (
+//     <span className="player red white-text" style={props.style}>
+//       P
+//     </span>
+//   );
+// }
 
 class Player extends Component {
   render() {
@@ -19,7 +19,9 @@ class Player extends Component {
     };
     return (
       <div className="Player">
-        <PlayerSprite style={style}/>
+        <span className="player red white-text" style={style}>
+          P
+        </span>
       </div>
     );
   }
