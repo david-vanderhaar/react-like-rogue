@@ -19,7 +19,7 @@ class Player extends Component {
     };
     return (
       <div className="Player">
-        <span className="player red white-text" style={style}>
+        <span className="player black white-text" style={style}>
           P
         </span>
       </div>

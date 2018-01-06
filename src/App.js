@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { getRandomIntInclusive} from './Helper'
 import Map from './Map';
+import DijkstraMap from './DijkstraMap';
 import Player from './Player';
 import Enemy from './Enemy';
 import './App.css';
@@ -34,8 +35,9 @@ class App extends Component {
       rooms: rooms,
       maxRoomSize: maxRoomSize,
       minRoomSize: minRoomSize,
-      tileMap: Array(mapHeight).fill(Array(mapWidth).fill('g')),
+      tileMap: Array(mapHeight).fill(Array(mapWidth).fill('')),
       tileTypes: Array(mapHeight).fill(Array(mapWidth).fill({type: 'tile tile-WALL', canPass: false})),
+      dijkstraMap: Array(mapHeight).fill(Array(mapWidth).fill(100)),
       playerPosX: playerPosX,
       playerPosY: playerPosY,
       enemyList: Array(enemies).fill({posX: 0, posY: 0}),
@@ -53,7 +55,7 @@ class App extends Component {
       },
     }
   }
-  handlePlayerMove(event) {
+  handlePlayerMove(event) { // MAIN TURN LOOP
     let state = {...this.state};
     let playerControls = state.playerControls;
     let playerPosX = state.playerPosX;
@@ -89,7 +91,7 @@ class App extends Component {
     }
 
     tileTypes[playerPosY][playerPosX].canPass = false;
-
+    this.dijkstraMap.generateDijkstraMap(tileTypes, [{posX: playerPosX, posY: playerPosY}]);
 
     this.setState({
       playerPosX,
@@ -99,7 +101,7 @@ class App extends Component {
     });
 
     this.moveEnemies();
-  }
+  } // end handlePlayerMove (MAIN TURN LOOP)
 
   placeEnemies(enemyList, tileTypes) {
     this.setState({
@@ -124,62 +126,17 @@ class App extends Component {
       enemyList[i] = {...enemyList[i]}; //copy the Object
       let posX = enemyList[i].posX;
       let posY = enemyList[i].posY;
+      let neighbors = this.dijkstraMap.getNeigbors(enemyList[i], this.state.dijkstraMap);
 
-      let moveDirection;
-      switch (getRandomIntInclusive(0, 3)) {
-        case 0:
-          moveDirection = 'LEFT';
-          break;
-        case 1:
-          moveDirection = 'UP';
-          break;
-        case 2:
-          moveDirection = 'RIGHT';
-          break;
-        case 3:
-          moveDirection = 'DOWN';
-          break;
-        default:
-          moveDirection = 'LEFT';
-          break;
+      if (neighbors.length > 0) {
+        if (tileTs[neighbors[0].posY][neighbors[0].posX].canPass === true) { // check that the tile is passable
+          tileTs[posY][posX].canPass = true; //reset current tile to passable
+          enemyList[i].posX = neighbors[0].posX;
+          enemyList[i].posY = neighbors[0].posY;
+          tileTs[neighbors[0].posY][neighbors[0].posX].canPass = false; //set new tile to impassable
+        }
       }
-
-      switch (moveDirection) {
-        case 'LEFT':
-          if (posX > 0 && tileTs[posY][posX - 1].canPass) {
-            tileTs[posY][posX].canPass = true; //reset tile to passable
-            posX -= 1;
-            tileTs[posY][posX].canPass = false; //set new tile to impassable
-          }
-          break;
-        case 'UP':
-          if (posY > 0 && tileTs[posY - 1][posX].canPass) {
-            tileTs[posY][posX].canPass = true; //reset tile to passable
-            posY -= 1;
-            tileTs[posY][posX].canPass = false; //set new tile to impassable
-          }
-          break;
-        case 'RIGHT':
-          if (posX < this.state.mapWidth - 1 && tileTs[posY][posX + 1].canPass) {
-            tileTs[posY][posX].canPass = true; //reset tile to passable
-            posX += 1;
-            tileTs[posY][posX].canPass = false; //set new tile to impassable
-          }
-          break;
-        case 'DOWN':
-          if (posY < this.state.mapHeight - 1 && tileTs[posY + 1][posX].canPass) {
-            tileTs[posY][posX].canPass = true; //reset tile to passable
-            posY += 1;
-            tileTs[posY][posX].canPass = false; //set new tile to impassable
-          }
-          break;
-        default:
-          break;
-      }
-      enemyList[i].posX = posX;
-      enemyList[i].posY = posY;
     }
-    console.log(enemyList[0])
     this.setState({
       enemyList,
       tileTypes: tileTs,
@@ -187,9 +144,9 @@ class App extends Component {
   }
 
   generateRooms(rooms) {
-      this.setState({
-        rooms: rooms
-      });
+    this.setState({
+      rooms: rooms
+    });
   }
 
   carveRooms(tileTs, playerPosX, playerPosY) {
@@ -203,6 +160,12 @@ class App extends Component {
   carveHalls(tileTs) {
     this.setState({
       tileTypes: tileTs,
+    });
+  }
+
+  handleGenerateDijkstraMap(dijkstraMap) {
+    this.setState({
+      dijkstraMap,
     });
   }
 
@@ -251,6 +214,15 @@ class App extends Component {
             cellGutter = {this.state.cellGutter}
           />
           { enemies }
+          <DijkstraMap
+            ref={(dijkstraMap) => { this.dijkstraMap = dijkstraMap; }}
+            dijkstraMap = {this.state.dijkstraMap}
+            tileTypes = {this.state.tileTypes}
+            goalPositions = {[{posX: this.state.playerPosX, posY: this.state.playerPosY}]}
+            handleGenerateDijkstraMap = {this.handleGenerateDijkstraMap.bind(this)}
+            cellSize = {this.state.cellSize}
+            cellGutter = {this.state.cellGutter}
+          />
         </div>
       </div>
     );

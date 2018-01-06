@@ -126,6 +126,7 @@ class Map extends Component {
     }
     this.props.placeEnemies(enemies, tileTs);
   }
+
   componentDidMount() {
     this.generateRooms();
   }

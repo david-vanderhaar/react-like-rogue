@@ -50,6 +50,7 @@
   position: absolute;
   border-radius: 6px;
   transition: .3s;
+  z-index: 2;
 }
 
 .player:hover {
