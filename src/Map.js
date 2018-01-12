@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { getRandomIntInclusive, findClosestRoom, doesCollide } from './Helper'
+import { getRandomIntInclusive, findClosestRoom, doesCollide, cloneTiles } from './Helper'
+import { Tile } from './Classes';
 
-function Tile(props) {
+function TileDisplay(props) {
   return (
-    <span className={props.type} style={props.style}>
+    <span className={props.className} style={props.style}>
       {props.value}
     </span>
   );
@@ -11,8 +12,10 @@ function Tile(props) {
 
 class Map extends Component {
   generateRooms() {
+      let killCount = 0 // to prevent infinite loops
       let rooms = [];
       for (let i = 0; i < this.props.roomCount; i++) {
+          killCount++
           let room = {};
 
           room.x = getRandomIntInclusive(1, this.props.mapWidth - this.props.maxRoomSize - 1);
@@ -20,11 +23,13 @@ class Map extends Component {
           room.w = getRandomIntInclusive(this.props.minRoomSize, this.props.maxRoomSize);
           room.h = getRandomIntInclusive(this.props.minRoomSize, this.props.maxRoomSize);
 
-          if (doesCollide(rooms, room, i)) {
-            i--;
-            continue;
+          if (killCount <= 100) {
+            if (doesCollide(rooms, room, i)) {
+              i--;
+              continue;
+            }
+            rooms.push(room);
           }
-          rooms.push(room);
 
       }
       this.props.generateRooms(rooms)
@@ -37,13 +42,7 @@ class Map extends Component {
       // let rooms = this.props.rooms;
       // let tileTs = this.props.tileTypes;
       // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
-      let tileTs = [];
-      for (let q = 0; q < this.props.tileTypes.length; q++) {
-        tileTs.push([]);
-        for (let w = 0; w < this.props.tileTypes[q].length; w++) {
-          tileTs[q].push({type: 'tile tile-WALL', canPass: false});
-        }
-      }
+      let tileTs = cloneTiles(this.props.tileTypes)
 
       for (let g = 0; g < rooms.length; g++) {
         // carve floors
@@ -51,7 +50,9 @@ class Map extends Component {
           for (let k = rooms[g].x; k < rooms[g].x + rooms[g].w; k++) {
             if (j < this.props.mapHeight && j > 0) {
               if (k < this.props.mapWidth && k > 0) {
-                tileTs[j][k] = {type: 'tile tile-GROUND', canPass: true};
+
+                tileTs[j][k] = new Tile('GROUND', true, false);
+                // tileTs[j][k] = {type: 'tile tile-GROUND', canPass: true};
 
                 // Set player position within the last ground tile of the room
                 playerPosX = k;
@@ -92,7 +93,8 @@ class Map extends Component {
             else pointB.y++;
           }
 
-          tileTs[pointB.y][pointB.x] = {type: 'tile tile-GROUND', canPass: true};
+          tileTs[pointB.y][pointB.x] = new Tile('GROUND', true, false);
+          // tileTs[pointB.y][pointB.x] = {type: 'tile tile-GROUND', canPass: true};
         }
 
       }
@@ -103,13 +105,8 @@ class Map extends Component {
   placeEnemies(tileTypes) {
     let enemies = this.props.enemyList.concat();
     // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
-    let tileTs = [];
-    for (let q = 0; q < tileTypes.length; q++) {
-      tileTs.push([]);
-      for (let w = 0; w < tileTypes[q].length; w++) {
-        tileTs[q].push({...tileTypes[q][w]});
-      }
-    }
+    let tileTs = cloneTiles(tileTypes)
+
     for (let i = 0; i < enemies.length; i++) {
       let placeX = getRandomIntInclusive(0, this.props.mapWidth - 1)
       let placeY = getRandomIntInclusive(0, this.props.mapHeight - 1)
@@ -151,7 +148,7 @@ class Map extends Component {
             height: this.props.cellSize
           }
           return (
-            <Tile key={tileCount} type={this.props.tileTypes[i][j]['type']} value={col} isEndRow={isEndRow} style={style}/>
+            <TileDisplay key={tileCount} className={this.props.tileTypes[i][j].cssClass} value={col} isEndRow={isEndRow} style={style}/>
           )
         })
       );

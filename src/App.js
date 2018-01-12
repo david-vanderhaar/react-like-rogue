@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { getRandomIntInclusive} from './Helper'
+import { getRandomIntInclusive, cloneTiles } from './Helper';
+import { Tile } from './Classes';
 import Map from './Map';
 import DijkstraMap from './DijkstraMap';
 import Player from './Player';
@@ -36,11 +37,12 @@ class App extends Component {
       maxRoomSize: maxRoomSize,
       minRoomSize: minRoomSize,
       tileMap: Array(mapHeight).fill(Array(mapWidth).fill('')),
-      tileTypes: Array(mapHeight).fill(Array(mapWidth).fill({type: 'tile tile-WALL', canPass: false})),
+      // tileTypes: Array(mapHeight).fill(Array(mapWidth).fill({type: 'tile tile-WALL', canPass: false, containsAttackable: false})),
+      tileTypes: Array(mapHeight).fill(Array(mapWidth).fill(new Tile('WALL', false, false))),
       dijkstraMap: Array(mapHeight).fill(Array(mapWidth).fill(100)),
       playerPosX: playerPosX,
       playerPosY: playerPosY,
-      enemyList: Array(enemies).fill({posX: 0, posY: 0}),
+      enemyList: Array(enemies).fill({posX: 0, posY: 0, life: 1, attack: 1, defense: 1}),
       enemyPosX: 0,
       enemyPosY: 0,
 			playerMove: {
@@ -52,6 +54,11 @@ class App extends Component {
         RIGHT: 39,
         UP: 38,
         DOWN: 40
+      },
+      playerStats: {
+        life: 10,
+        attack: 1,
+        defense: 1,
       },
     }
   }
@@ -114,13 +121,7 @@ class App extends Component {
     let enemyList = this.state.enemyList.concat();
 
     // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
-    let tileTs = [];
-    for (let q = 0; q < this.state.tileTypes.length; q++) {
-      tileTs.push([]);
-      for (let w = 0; w < this.state.tileTypes[q].length; w++) {
-        tileTs[q].push({...this.state.tileTypes[q][w]});
-      }
-    }
+    let tileTs = cloneTiles(this.state.tileTypes);
 
     for (let i = 0; i < enemyList.length; i++) {
       enemyList[i] = {...enemyList[i]}; //copy the Object

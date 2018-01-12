@@ -44,7 +44,7 @@ class DijkstraMap extends Component {
     for (let i = 0; i < dijkstraMap.length; i++) {
       dijkstraMap[i] = dijkstraMap[i].concat();
       for (let j = 0; j < dijkstraMap[i].length; j++) {
-        if (tileTypes[i][j].type === 'tile tile-WALL') {
+        if (tileTypes[i][j].type === 'WALL') {
           dijkstraMap[i][j] = 'ignore'
         } else {
           dijkstraMap[i][j] = 100;
@@ -102,20 +102,14 @@ class DijkstraMap extends Component {
             left: j * (this.props.cellSize + this.props.cellGutter),
             width: this.props.cellSize,
             height: this.props.cellSize,
-            position: 'absolute',
-            border: 'solid',
-            borderRadius: '6px',
-            borderWidth: '0px',
-            borderColor: '#106f77',
-            transition: '.5s',
             backgroundColor: color,
-            zIndex: 1,
           }
           return (
             <div
               key={tileCount}
               value={col}
               style={style}
+              className="tile tile-Dijkstra"
             >
               {cost}
             </div>

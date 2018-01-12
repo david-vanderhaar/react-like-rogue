@@ -38,3 +38,16 @@ export function doesCollide(rooms, room, ignore) {
 
   return false;
 }
+
+export function cloneTiles(tiles) {
+  let clonedTiles = [];
+  for (let q = 0; q < tiles.length; q++) {
+    clonedTiles.push([]);
+    for (let w = 0; w < tiles[q].length; w++) {
+      clonedTiles[q].push(Object.assign( Object.create( Object.getPrototypeOf(tiles[q][w])), tiles[q][w]));
+      // clonedTiles[q].push({...tiles[q][w]});
+
+    }
+  }
+  return clonedTiles;
+}

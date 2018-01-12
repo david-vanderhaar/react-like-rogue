@@ -46,6 +46,11 @@
   background-color: #106f77;
 }
 
+.tile-Dijkstra {
+  z-index: 1;
+  transition: .5s;
+}
+
 .player {
   position: absolute;
   border-radius: 6px;
