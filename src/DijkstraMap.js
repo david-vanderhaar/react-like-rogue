@@ -92,34 +92,41 @@ class DijkstraMap extends Component {
   render() {
     let tileCount = 0;
     const tiles = this.props.dijkstraMap.map((row, i) => {
-      return (
-        row.map((col, j) => {
-          tileCount += 1;
-          let cost = this.props.dijkstraMap[i][j];
-          let color = cost !== 'ignore' ? ('hsla(' + (360 * (cost/90)) + ',' + 50 + '%,' + 50 + '%, 1)') : 'hsla(360, 100%, 100%, 0)'
-          let style = {
-            top: i * (this.props.cellSize + this.props.cellGutter),
-            left: j * (this.props.cellSize + this.props.cellGutter),
-            width: this.props.cellSize,
-            height: this.props.cellSize,
-            backgroundColor: color,
-          }
-          return (
-            <div
+      if (this.props.showDijkstraMap) {
+        return (
+          row.map((col, j) => {
+            tileCount += 1;
+            let cost = this.props.dijkstraMap[i][j];
+            let color = cost !== 'ignore' ? ('hsla(' + (360 * (cost/90)) + ',' + 50 + '%,' + 50 + '%, 1)') : 'hsla(360, 100%, 100%, 0)'
+            let style = {
+              top: i * (this.props.cellSize + this.props.cellGutter),
+              left: j * (this.props.cellSize + this.props.cellGutter),
+              width: this.props.cellSize,
+              height: this.props.cellSize,
+              backgroundColor: color,
+            }
+            return (
+              <div
               key={tileCount}
               value={col}
               style={style}
               className="tile tile-Dijkstra"
-            >
+              >
               {cost}
-            </div>
-          )
-        })
-      );
+              </div>
+            )
+          })
+        );
+      } else {
+        return null;
+      }
     });
     return (
       <div className="DijkstraMap">
         {tiles}
+        <button className="btn ctrl-btn" onClick={this.props.handleToggleDijkstraMap}>
+          Toggle Dijkstra
+        </button>
       </div>
     );
   }

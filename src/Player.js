@@ -11,11 +11,11 @@ import React, { Component } from 'react';
 class Player extends Component {
   render() {
     const style = {
-      top: this.props.playerPosY * (this.props.cellSize + this.props.cellGutter),
-      left: this.props.playerPosX * (this.props.cellSize + this.props.cellGutter),
+      top: this.props.player.posY * (this.props.cellSize + this.props.cellGutter),
+      left: this.props.player.posX * (this.props.cellSize + this.props.cellGutter),
       width: this.props.cellSize,
       height: this.props.cellSize,
-      transform: this.props.playerMove,
+      // transform: this.props.playerMove,
     };
     return (
       <div className="Player">

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { getRandomIntInclusive, cloneTiles } from './Helper';
-import { Tile } from './Classes';
+import { cloneTiles } from './Helper';
+import { CreateTile, CreateActor } from './Classes';
 import Map from './Map';
 import DijkstraMap from './DijkstraMap';
 import Player from './Player';
@@ -24,12 +24,12 @@ class App extends Component {
     const minRoomSize = 4;
     const enemies = 10;
 
-    // Player Vars
-    const playerPosX = 8;
-    const playerPosY = 2;
+    const player = CreateActor();
+
     this.state = {
       mapWidth: mapWidth,
       mapHeight: mapHeight,
+      showDijkstraMap: true,
       cellSize: cellSize,
       cellGutter: cellGutter,
       roomCount: roomCount,
@@ -38,13 +38,13 @@ class App extends Component {
       minRoomSize: minRoomSize,
       tileMap: Array(mapHeight).fill(Array(mapWidth).fill('')),
       // tileTypes: Array(mapHeight).fill(Array(mapWidth).fill({type: 'tile tile-WALL', canPass: false, containsAttackable: false})),
-      tileTypes: Array(mapHeight).fill(Array(mapWidth).fill(new Tile('WALL', false, false))),
+      // tileTypes: Array(mapHeight).fill(Array(mapWidth).fill(new Tile('WALL', false, false))),
+      tileTypes: Array(mapHeight).fill(Array(mapWidth).fill(CreateTile({type: 'WALL', canPass: false, containsDestructible: false}))),
       dijkstraMap: Array(mapHeight).fill(Array(mapWidth).fill(100)),
-      playerPosX: playerPosX,
-      playerPosY: playerPosY,
       enemyList: Array(enemies).fill({posX: 0, posY: 0, life: 1, attack: 1, defense: 1}),
       enemyPosX: 0,
       enemyPosY: 0,
+      player: player,
 			playerMove: {
         rotate: 0,
         direction: 'rotateY'
@@ -55,41 +55,36 @@ class App extends Component {
         UP: 38,
         DOWN: 40
       },
-      playerStats: {
-        life: 10,
-        attack: 1,
-        defense: 1,
-      },
     }
   }
   handlePlayerMove(event) { // MAIN TURN LOOP
     let state = {...this.state};
     let playerControls = state.playerControls;
-    let playerPosX = state.playerPosX;
-    let playerPosY = state.playerPosY;
-		let playerMove = {...state.playerMove};
+    let playerMove = {...state.playerMove};
+    let player = {...state.player};
+
 		let tileTypes = state.tileTypes; //tile objs still refering to state tiles
 
-    tileTypes[playerPosY][playerPosX].canPass = true;
+    tileTypes[player.posY][player.posX].canPass = true;
 
     switch (event.keyCode) {
       case playerControls['LEFT']:
-        (playerPosX > 0 && tileTypes[playerPosY][playerPosX - 1].canPass) ? playerPosX -= 1 : playerPosX += 0;
+        (player.posX > 0 && tileTypes[player.posY][player.posX - 1].canPass) ? player.posX -= 1 : player.posX += 0;
         playerMove.rotate > -360 ?  playerMove.rotate -= 180 : playerMove.rotate = 0;
         playerMove.direction = 'rotateY';
         break;
       case playerControls['UP']:
-        playerPosY > 0 && tileTypes[playerPosY - 1][playerPosX].canPass ? playerPosY -= 1 : playerPosY += 0;
+        player.posY > 0 && tileTypes[player.posY - 1][player.posX].canPass ? player.posY -= 1 : player.posY += 0;
         playerMove.rotate < 360 ?  playerMove.rotate += 180 : playerMove.rotate = 0;
         playerMove.direction = 'rotateX';
         break;
       case playerControls['RIGHT']:
-        playerPosX < state.mapWidth - 1 && tileTypes[playerPosY][playerPosX + 1].canPass ? playerPosX += 1 : playerPosX += 0;
+        player.posX < state.mapWidth - 1 && tileTypes[player.posY][player.posX + 1].canPass ? player.posX += 1 : player.posX += 0;
         playerMove.rotate < 360 ?  playerMove.rotate += 180 : playerMove.rotate = 0;
         playerMove.direction = 'rotateY';
         break;
       case playerControls['DOWN']:
-        playerPosY < state.mapHeight - 1 && tileTypes[playerPosY + 1][playerPosX].canPass ? playerPosY += 1 : playerPosY += 0;
+        player.posY < state.mapHeight - 1 && tileTypes[player.posY + 1][player.posX].canPass ? player.posY += 1 : player.posY += 0;
         playerMove.rotate > -360 ?  playerMove.rotate -= 180 : playerMove.rotate = 0;
         playerMove.direction = 'rotateX';
         break;
@@ -97,12 +92,11 @@ class App extends Component {
         break;
     }
 
-    tileTypes[playerPosY][playerPosX].canPass = false;
-    this.dijkstraMap.generateDijkstraMap(tileTypes, [{posX: playerPosX, posY: playerPosY}]);
+    tileTypes[player.posY][player.posX].canPass = false;
+    this.dijkstraMap.generateDijkstraMap(tileTypes, [{posX: player.posX, posY: player.posY}]);
 
     this.setState({
-      playerPosX,
-      playerPosY,
+      player,
 			playerMove,
       tileTypes,
     });
@@ -151,10 +145,12 @@ class App extends Component {
   }
 
   carveRooms(tileTs, playerPosX, playerPosY) {
+    let player = {...this.state.player}
+    player.posX = playerPosX;
+    player.posY = playerPosY;
     this.setState({
       tileTypes: tileTs,
-      playerPosX: playerPosX,
-      playerPosY: playerPosY,
+      player,
     });
   }
 
@@ -167,6 +163,13 @@ class App extends Component {
   handleGenerateDijkstraMap(dijkstraMap) {
     this.setState({
       dijkstraMap,
+    });
+  }
+
+  handleToggleDijkstraMap(showDijkstraMap) {
+    showDijkstraMap = !this.state.showDijkstraMap;
+    this.setState({
+      showDijkstraMap,
     });
   }
 
@@ -208,19 +211,20 @@ class App extends Component {
             placeEnemies = {this.placeEnemies.bind(this)}
           />
           <Player
+            player = {this.state.player}
             playerMove = {this.state.playerMove.direction + '( ' + this.state.playerMove.rotate.toString() + 'deg )'}
-            playerPosX = {this.state.playerPosX}
-            playerPosY = {this.state.playerPosY}
             cellSize = {this.state.cellSize}
             cellGutter = {this.state.cellGutter}
           />
           { enemies }
           <DijkstraMap
             ref={(dijkstraMap) => { this.dijkstraMap = dijkstraMap; }}
+            showDijkstraMap = {this.state.showDijkstraMap}
             dijkstraMap = {this.state.dijkstraMap}
             tileTypes = {this.state.tileTypes}
-            goalPositions = {[{posX: this.state.playerPosX, posY: this.state.playerPosY}]}
+            goalPositions = {[{posX: this.state.player.posX, posY: this.state.player.posY}]}
             handleGenerateDijkstraMap = {this.handleGenerateDijkstraMap.bind(this)}
+            handleToggleDijkstraMap = {this.handleToggleDijkstraMap.bind(this)}
             cellSize = {this.state.cellSize}
             cellGutter = {this.state.cellGutter}
           />

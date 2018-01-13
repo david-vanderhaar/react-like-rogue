@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { getRandomIntInclusive, findClosestRoom, doesCollide, cloneTiles } from './Helper'
-import { Tile } from './Classes';
+import { getRandomIntInclusive, doesCollide, cloneTiles } from './Helper'
+import { CreateTile } from './Classes';
 
 function TileDisplay(props) {
   return (
@@ -39,8 +39,6 @@ class Map extends Component {
   carveRooms(rooms) {
       let playerPosX = 0;
       let playerPosY = 0;
-      // let rooms = this.props.rooms;
-      // let tileTs = this.props.tileTypes;
       // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
       let tileTs = cloneTiles(this.props.tileTypes)
 
@@ -51,8 +49,7 @@ class Map extends Component {
             if (j < this.props.mapHeight && j > 0) {
               if (k < this.props.mapWidth && k > 0) {
 
-                tileTs[j][k] = new Tile('GROUND', true, false);
-                // tileTs[j][k] = {type: 'tile tile-GROUND', canPass: true};
+                tileTs[j][k] = CreateTile({type: 'GROUND', canPass: true, containsDestructible: false});
 
                 // Set player position within the last ground tile of the room
                 playerPosX = k;
@@ -93,8 +90,8 @@ class Map extends Component {
             else pointB.y++;
           }
 
-          tileTs[pointB.y][pointB.x] = new Tile('GROUND', true, false);
-          // tileTs[pointB.y][pointB.x] = {type: 'tile tile-GROUND', canPass: true};
+          tileTs[pointB.y][pointB.x] = CreateTile({type: 'GROUND', canPass: true, containsDestructible: false});
+
         }
 
       }
@@ -148,7 +145,7 @@ class Map extends Component {
             height: this.props.cellSize
           }
           return (
-            <TileDisplay key={tileCount} className={this.props.tileTypes[i][j].cssClass} value={col} isEndRow={isEndRow} style={style}/>
+            <TileDisplay key={tileCount} className={this.props.tileTypes[i][j].cssClass()} value={col} isEndRow={isEndRow} style={style}/>
           )
         })
       );
