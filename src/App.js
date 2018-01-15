@@ -129,6 +129,7 @@ class App extends Component {
 
   moveEnemies() {
     let enemyList = this.state.enemyList.concat();
+    // enemyList = enemyList.filter((enemy) => enemy.life > 0);
 
     // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
     let tileTs = cloneTiles(this.state.tileTypes);
@@ -153,6 +154,18 @@ class App extends Component {
         }
       }
     }
+
+    enemyList = enemyList.filter((enemy) => {
+      if (enemy.life > 0) {
+        return true;
+      } else {
+        tileTs[enemy.posY][enemy.posX].canPass = true; //reset current tile to passable
+        tileTs[enemy.posY][enemy.posX].containsDestructible = false; //reset current tile
+        tileTs[enemy.posY][enemy.posX].destructible = {}; //reset current tile
+        return false;
+      }
+    });
+
     this.setState({
       enemyList,
       tileTypes: tileTs,
