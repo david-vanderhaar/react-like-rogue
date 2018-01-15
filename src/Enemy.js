@@ -19,7 +19,7 @@ class Enemy extends Component {
     return (
       <div className="Enemy">
         <span className="player purple darken-4 white-text" style={style}>
-          E
+          {this.props.life}
         </span>
       </div>
     );

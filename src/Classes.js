@@ -18,11 +18,13 @@ export const CreateTile = ({
     // Set default values if none passed in
     type = 'WALL',
     canPass = false,
-    containsDestructible = false
+    containsDestructible = false,
+    destructible = {}
   } = {}) => ({
   type,
   canPass,
   containsDestructible,
+  destructible,
   // Method
   cssClass() {
     return 'tile tile-' + this.type;

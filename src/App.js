@@ -24,7 +24,7 @@ class App extends Component {
     const minRoomSize = 4;
     const enemies = 10;
 
-    const player = CreateActor();
+    const player = CreateActor({attack: 2});
 
     this.state = {
       mapWidth: mapWidth,
@@ -37,18 +37,12 @@ class App extends Component {
       maxRoomSize: maxRoomSize,
       minRoomSize: minRoomSize,
       tileMap: Array(mapHeight).fill(Array(mapWidth).fill('')),
-      // tileTypes: Array(mapHeight).fill(Array(mapWidth).fill({type: 'tile tile-WALL', canPass: false, containsAttackable: false})),
-      // tileTypes: Array(mapHeight).fill(Array(mapWidth).fill(new Tile('WALL', false, false))),
       tileTypes: Array(mapHeight).fill(Array(mapWidth).fill(CreateTile({type: 'WALL', canPass: false, containsDestructible: false}))),
       dijkstraMap: Array(mapHeight).fill(Array(mapWidth).fill(100)),
-      enemyList: Array(enemies).fill({posX: 0, posY: 0, life: 1, attack: 1, defense: 1}),
+      enemyList: Array(enemies).fill(CreateActor()),
       enemyPosX: 0,
       enemyPosY: 0,
       player: player,
-			playerMove: {
-        rotate: 0,
-        direction: 'rotateY'
-      },
       playerControls: {
         LEFT: 37,
         RIGHT: 39,
@@ -60,33 +54,56 @@ class App extends Component {
   handlePlayerMove(event) { // MAIN TURN LOOP
     let state = {...this.state};
     let playerControls = state.playerControls;
-    let playerMove = {...state.playerMove};
     let player = {...state.player};
-
 		let tileTypes = state.tileTypes; //tile objs still refering to state tiles
+    let tileToCheck;
 
     tileTypes[player.posY][player.posX].canPass = true;
 
     switch (event.keyCode) {
       case playerControls['LEFT']:
-        (player.posX > 0 && tileTypes[player.posY][player.posX - 1].canPass) ? player.posX -= 1 : player.posX += 0;
-        playerMove.rotate > -360 ?  playerMove.rotate -= 180 : playerMove.rotate = 0;
-        playerMove.direction = 'rotateY';
+        tileToCheck = tileTypes[player.posY][player.posX - 1];
+        if (player.posX > 0) {
+          if (tileToCheck.canPass) {
+            player.posX -= 1;
+          }
+          if (tileToCheck.containsDestructible) {
+            tileToCheck.destructible.life -= (player.attack - tileToCheck.destructible.defense)
+          }
+        }
         break;
       case playerControls['UP']:
-        player.posY > 0 && tileTypes[player.posY - 1][player.posX].canPass ? player.posY -= 1 : player.posY += 0;
-        playerMove.rotate < 360 ?  playerMove.rotate += 180 : playerMove.rotate = 0;
-        playerMove.direction = 'rotateX';
+        tileToCheck = tileTypes[player.posY - 1][player.posX];
+        if (player.posY > 0) {
+          if (tileToCheck.canPass) {
+            player.posY -= 1;
+          }
+          if (tileToCheck.containsDestructible) {
+            tileToCheck.destructible.life -= (player.attack - tileToCheck.destructible.defense)
+          }
+        }
         break;
       case playerControls['RIGHT']:
-        player.posX < state.mapWidth - 1 && tileTypes[player.posY][player.posX + 1].canPass ? player.posX += 1 : player.posX += 0;
-        playerMove.rotate < 360 ?  playerMove.rotate += 180 : playerMove.rotate = 0;
-        playerMove.direction = 'rotateY';
+        tileToCheck = tileTypes[player.posY][player.posX + 1];
+        if (player.posX < state.mapWidth - 1) {
+          if (tileToCheck.canPass) {
+            player.posX += 1;
+          }
+          if (tileToCheck.containsDestructible) {
+            tileToCheck.destructible.life -= (player.attack - tileToCheck.destructible.defense)
+          }
+        }
         break;
       case playerControls['DOWN']:
-        player.posY < state.mapHeight - 1 && tileTypes[player.posY + 1][player.posX].canPass ? player.posY += 1 : player.posY += 0;
-        playerMove.rotate > -360 ?  playerMove.rotate -= 180 : playerMove.rotate = 0;
-        playerMove.direction = 'rotateX';
+        tileToCheck = tileTypes[player.posY + 1][player.posX];
+        if (player.posY < state.mapHeight - 1) {
+          if (tileToCheck.canPass) {
+            player.posY += 1;
+          }
+          if (tileToCheck.containsDestructible) {
+            tileToCheck.destructible.life -= (player.attack - tileToCheck.destructible.defense)
+          }
+        }
         break;
       default:
         break;
@@ -97,7 +114,6 @@ class App extends Component {
 
     this.setState({
       player,
-			playerMove,
       tileTypes,
     });
 
@@ -121,14 +137,19 @@ class App extends Component {
       enemyList[i] = {...enemyList[i]}; //copy the Object
       let posX = enemyList[i].posX;
       let posY = enemyList[i].posY;
+      tileTs[posY][posX].destructible = enemyList[i]; //reset current tile
       let neighbors = this.dijkstraMap.getNeigbors(enemyList[i], this.state.dijkstraMap);
 
       if (neighbors.length > 0) {
         if (tileTs[neighbors[0].posY][neighbors[0].posX].canPass === true) { // check that the tile is passable
           tileTs[posY][posX].canPass = true; //reset current tile to passable
+          tileTs[posY][posX].containsDestructible = false; //reset current tile
+          tileTs[posY][posX].destructible = {}; //reset current tile
           enemyList[i].posX = neighbors[0].posX;
           enemyList[i].posY = neighbors[0].posY;
           tileTs[neighbors[0].posY][neighbors[0].posX].canPass = false; //set new tile to impassable
+          tileTs[neighbors[0].posY][neighbors[0].posX].containsDestructible = true;
+          tileTs[neighbors[0].posY][neighbors[0].posX].destructible = enemyList[i];
         }
       }
     }
@@ -181,6 +202,7 @@ class App extends Component {
       return (
         <Enemy
           key = {enemyCount}
+          life = {enemy.life}
           enemyPosX = {enemy.posX}
           enemyPosY = {enemy.posY}
           cellSize = {this.state.cellSize}
@@ -192,8 +214,6 @@ class App extends Component {
       <div className="App" tabIndex="0" onKeyUp={this.handlePlayerMove.bind(this)}>
         <div className="game-container">
           <Map
-            state = {Object.assign({}, this.state)}
-
             rooms = {this.state.rooms}
             roomCount = {this.state.roomCount}
             maxRoomSize = {this.state.maxRoomSize}
@@ -212,7 +232,6 @@ class App extends Component {
           />
           <Player
             player = {this.state.player}
-            playerMove = {this.state.playerMove.direction + '( ' + this.state.playerMove.rotate.toString() + 'deg )'}
             cellSize = {this.state.cellSize}
             cellGutter = {this.state.cellGutter}
           />

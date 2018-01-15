@@ -112,6 +112,8 @@ class Map extends Component {
       if (tile.canPass) {
         enemies[i] = {...enemies[i]}
         tileTs[placeY][placeX].canPass = false;
+        tileTs[placeY][placeX].containsDestructible = true;
+        tileTs[placeY][placeX].destructible = enemies[i];
         enemies[i].posX = placeX;
         enemies[i].posY = placeY;
       } else {
