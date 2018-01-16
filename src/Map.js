@@ -2,12 +2,28 @@ import React, { Component } from 'react';
 import { getRandomIntInclusive, doesCollide, cloneTiles } from './Helper'
 import { CreateTile } from './Classes';
 
-function TileDisplay(props) {
-  return (
-    <span className={props.className} style={props.style}>
-      {props.value}
-    </span>
-  );
+// function TileDisplay(props) {
+//   return (
+//     <span className={props.className} style={props.style}>
+//       {props.value}
+//     </span>
+//   );
+// }
+
+class TileDisplay extends Component {
+  shouldComponentUpdate(nextProps) {
+    // REPLACE with a deep compare of props objects
+    return (JSON.stringify(nextProps) !== JSON.stringify(this.props))
+    }
+
+    render() {
+      console.log('rendering tile')
+      return (
+        <span className={this.props.className} style={this.props.style}>
+          {this.props.value}
+        </span>
+      );
+    }
 }
 
 class Map extends Component {
