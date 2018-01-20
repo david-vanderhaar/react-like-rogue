@@ -43,5 +43,20 @@ export const CreateActor = ({
     posY,
     life,
     attack,
-    defense
+    defense,
+    // Method
+    takeHit(attack) {
+      let newDefenseValue = this.defense;
+      let newLifeValue = this.life;
+      for (let i = 0; i < attack; i++) {
+        if (newDefenseValue > 0) {
+          newDefenseValue -= 1;
+        }
+        else if (newDefenseValue <= 0) {
+          newLifeValue -= 1;
+        }
+      }
+      this.life = newLifeValue;
+      this.defense = newDefenseValue;
+    }
 });

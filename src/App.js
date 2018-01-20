@@ -24,12 +24,12 @@ class App extends Component {
     const minRoomSize = 4;
     const enemies = 10;
 
-    const player = CreateActor({attack: 2});
+    const player = CreateActor({life: 5, attack: 3});
 
     this.state = {
       mapWidth: mapWidth,
       mapHeight: mapHeight,
-      showDijkstraMap: true,
+      showDijkstraMap: false,
       cellSize: cellSize,
       cellGutter: cellGutter,
       roomCount: roomCount,
@@ -39,7 +39,7 @@ class App extends Component {
       tileMap: Array(mapHeight).fill(Array(mapWidth).fill('')),
       tileTypes: Array(mapHeight).fill(Array(mapWidth).fill(CreateTile({type: 'WALL', canPass: false, containsDestructible: false}))),
       dijkstraMap: Array(mapHeight).fill(Array(mapWidth).fill(100)),
-      enemyList: Array(enemies).fill(CreateActor()),
+      enemyList: Array(enemies).fill(CreateActor({defense: 10})),
       enemyPosX: 0,
       enemyPosY: 0,
       player: player,
@@ -68,7 +68,7 @@ class App extends Component {
             player.posX -= 1;
           }
           if (tileToCheck.containsDestructible) {
-            tileToCheck.destructible.life -= (player.attack - tileToCheck.destructible.defense)
+            tileToCheck.destructible.takeHit(player.attack);
           }
         }
         break;
@@ -79,7 +79,7 @@ class App extends Component {
             player.posY -= 1;
           }
           if (tileToCheck.containsDestructible) {
-            tileToCheck.destructible.life -= (player.attack - tileToCheck.destructible.defense)
+            tileToCheck.destructible.takeHit(player.attack);
           }
         }
         break;
@@ -90,7 +90,7 @@ class App extends Component {
             player.posX += 1;
           }
           if (tileToCheck.containsDestructible) {
-            tileToCheck.destructible.life -= (player.attack - tileToCheck.destructible.defense)
+            tileToCheck.destructible.takeHit(player.attack);
           }
         }
         break;
@@ -101,7 +101,7 @@ class App extends Component {
             player.posY += 1;
           }
           if (tileToCheck.containsDestructible) {
-            tileToCheck.destructible.life -= (player.attack - tileToCheck.destructible.defense)
+            tileToCheck.destructible.takeHit(player.attack);
           }
         }
         break;
@@ -117,7 +117,7 @@ class App extends Component {
       tileTypes,
     });
 
-    this.moveEnemies();
+    this.moveEnemies(player);
   } // end handlePlayerMove (MAIN TURN LOOP)
 
   placeEnemies(enemyList, tileTypes) {
@@ -127,9 +127,8 @@ class App extends Component {
     });
   }
 
-  moveEnemies() {
+  moveEnemies(player) {
     let enemyList = this.state.enemyList.concat();
-    // enemyList = enemyList.filter((enemy) => enemy.life > 0);
 
     // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
     let tileTs = cloneTiles(this.state.tileTypes);
@@ -142,15 +141,27 @@ class App extends Component {
       let neighbors = this.dijkstraMap.getNeigbors(enemyList[i], this.state.dijkstraMap);
 
       if (neighbors.length > 0) {
-        if (tileTs[neighbors[0].posY][neighbors[0].posX].canPass === true) { // check that the tile is passable
+        let tileToCheck = tileTs[neighbors[0].posY][neighbors[0].posX];
+
+        // This snippet would allow enemies to damage each other
+        // if (tileToCheck.containsDestructible) {
+        //     tileToCheck.destructible.takeHit(enemyList[i].attack);
+        // }
+
+        // this snippet targets only the player
+        if (neighbors[0].posX === player.posX && neighbors[0].posY === player.posY) {
+          player.takeHit(enemyList[i].attack);
+        }
+
+        if (tileToCheck.canPass === true) { // check that the tile is passable
           tileTs[posY][posX].canPass = true; //reset current tile to passable
           tileTs[posY][posX].containsDestructible = false; //reset current tile
           tileTs[posY][posX].destructible = {}; //reset current tile
           enemyList[i].posX = neighbors[0].posX;
           enemyList[i].posY = neighbors[0].posY;
-          tileTs[neighbors[0].posY][neighbors[0].posX].canPass = false; //set new tile to impassable
-          tileTs[neighbors[0].posY][neighbors[0].posX].containsDestructible = true;
-          tileTs[neighbors[0].posY][neighbors[0].posX].destructible = enemyList[i];
+          tileToCheck.canPass = false; //set new tile to impassable
+          tileToCheck.containsDestructible = true;
+          tileToCheck.destructible = enemyList[i];
         }
       }
     }
@@ -167,6 +178,7 @@ class App extends Component {
     });
 
     this.setState({
+      player,
       enemyList,
       tileTypes: tileTs,
     });
@@ -215,7 +227,7 @@ class App extends Component {
       return (
         <Enemy
           key = {enemyCount}
-          life = {enemy.life}
+          enemy = {enemy}
           enemyPosX = {enemy.posX}
           enemyPosY = {enemy.posY}
           cellSize = {this.state.cellSize}

@@ -20,6 +20,8 @@ class Player extends Component {
       <div className="Player">
         <span className="player black white-text" style={style}>
           P
+          <br/>
+          {this.props.player.life}/{this.props.player.defense}
         </span>
       </div>
     );

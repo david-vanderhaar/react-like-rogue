@@ -19,7 +19,9 @@ class Enemy extends Component {
     return (
       <div className="Enemy">
         <span className="player purple darken-4 white-text" style={style}>
-          {this.props.life}
+          E
+          <br/>
+          {this.props.enemy.life}/{this.props.enemy.defense}
         </span>
       </div>
     );

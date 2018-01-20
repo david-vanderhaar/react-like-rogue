@@ -14,7 +14,7 @@ class TileDisplay extends Component {
   shouldComponentUpdate(nextProps) {
     // REPLACE with a deep compare of props objects
     return (JSON.stringify(nextProps) !== JSON.stringify(this.props))
-    }
+  }
 
     render() {
       console.log('rendering tile')
