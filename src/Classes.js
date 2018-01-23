@@ -19,16 +19,39 @@ export const CreateTile = ({
     type = 'WALL',
     canPass = false,
     containsDestructible = false,
-    destructible = {}
+    destructible = {},
+    containsPickUp = false,
+    pickUp = {},
   } = {}) => ({
   type,
   canPass,
   containsDestructible,
   destructible,
+  containsPickUp,
+  pickUp,
   // Method
   cssClass() {
     return 'tile tile-' + this.type;
   }
+});
+
+export const CreatePickUp = ({
+    posX = 0,
+    posY = 0,
+    boostValue = 1,
+    statName = 'life',
+    taken = false,
+  } = {}) => ({
+    posX,
+    posY,
+    statName,
+    boostValue,
+    taken,
+
+    //Method
+    takePickUp() {
+      this.taken = true;
+    }
 });
 
 export const CreateActor = ({
@@ -36,14 +59,20 @@ export const CreateActor = ({
     posX = 0,
     posY = 0,
     life = 1,
+    lifeMax = life,
     attack = 1,
-    defense = 1
+    attackMax = attack,
+    defense = 1,
+    defenseMax = defense
   } = {}) => ({
     posX,
     posY,
     life,
+    lifeMax,
     attack,
+    attackMax,
     defense,
+    defenseMax,
     // Method
     takeHit(attack) {
       let newDefenseValue = this.defense;

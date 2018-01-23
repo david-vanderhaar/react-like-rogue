@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { cloneTiles } from './Helper';
-import { CreateTile, CreateActor } from './Classes';
+import StatBar from './UI/StatBar';
+import { CreateTile, CreateActor, CreatePickUp } from './Classes';
 import Map from './Map';
 import DijkstraMap from './DijkstraMap';
 import Player from './Player';
 import Enemy from './Enemy';
+import PickUp from './PickUp';
 import './App.css';
 
 class App extends Component {
@@ -22,7 +24,8 @@ class App extends Component {
     const rooms = []; // holds all room info
     const maxRoomSize = 8;
     const minRoomSize = 4;
-    const enemies = 10;
+    const enemies = 0;
+    const pickUps = 10;
 
     const player = CreateActor({life: 5, attack: 3});
 
@@ -40,6 +43,8 @@ class App extends Component {
       tileTypes: Array(mapHeight).fill(Array(mapWidth).fill(CreateTile({type: 'WALL', canPass: false, containsDestructible: false}))),
       dijkstraMap: Array(mapHeight).fill(Array(mapWidth).fill(100)),
       enemyList: Array(enemies).fill(CreateActor({defense: 10})),
+      pickUpList: Array(pickUps).fill(CreatePickUp()),
+      defeatedEnemyList: [],
       enemyPosX: 0,
       enemyPosY: 0,
       player: player,
@@ -67,9 +72,6 @@ class App extends Component {
           if (tileToCheck.canPass) {
             player.posX -= 1;
           }
-          if (tileToCheck.containsDestructible) {
-            tileToCheck.destructible.takeHit(player.attack);
-          }
         }
         break;
       case playerControls['UP']:
@@ -77,9 +79,6 @@ class App extends Component {
         if (player.posY > 0) {
           if (tileToCheck.canPass) {
             player.posY -= 1;
-          }
-          if (tileToCheck.containsDestructible) {
-            tileToCheck.destructible.takeHit(player.attack);
           }
         }
         break;
@@ -89,9 +88,6 @@ class App extends Component {
           if (tileToCheck.canPass) {
             player.posX += 1;
           }
-          if (tileToCheck.containsDestructible) {
-            tileToCheck.destructible.takeHit(player.attack);
-          }
         }
         break;
       case playerControls['DOWN']:
@@ -100,13 +96,19 @@ class App extends Component {
           if (tileToCheck.canPass) {
             player.posY += 1;
           }
-          if (tileToCheck.containsDestructible) {
-            tileToCheck.destructible.takeHit(player.attack);
-          }
         }
         break;
       default:
+        tileToCheck = tileTypes[player.posY][player.posX];
         break;
+    }
+
+    if (tileToCheck.containsDestructible) {
+      tileToCheck.destructible.takeHit(player.attack);
+    }
+    if (tileToCheck.containsPickUp) {
+      player[tileToCheck.pickUp.statName] += tileToCheck.pickUp.boostValue;
+      tileToCheck.pickUp.taken = true;
     }
 
     tileTypes[player.posY][player.posX].canPass = false;
@@ -117,6 +119,7 @@ class App extends Component {
       tileTypes,
     });
 
+    this.updatePickUps(tileTypes);
     this.moveEnemies(player);
   } // end handlePlayerMove (MAIN TURN LOOP)
 
@@ -124,6 +127,38 @@ class App extends Component {
     this.setState({
       enemyList,
       tileTypes,
+    });
+  }
+
+  placePickUps(pickUpList, tileTypes) {
+    this.setState({
+      pickUpList,
+      tileTypes,
+    });
+  }
+
+  updatePickUps(tileTs) {
+    let pickUpList = this.state.pickUpList.concat();
+    // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
+    // let tileTs = cloneTiles(this.state.tileTypes);
+
+    for (let i = 0; i < pickUpList.length; i++) {
+      console.log(pickUpList[i].taken)
+      console.log(tileTs[pickUpList[i].posY][pickUpList[i].posX].pickUp)
+      pickUpList[i] = {...pickUpList[i]}; //copy the Object
+    }
+    pickUpList = pickUpList.filter((pickUp) => {
+      if (pickUp.taken === false) {
+        return true;
+      } else {
+        tileTs[pickUp.posY][pickUp.posX].pickUp = {}; //reset current tile
+        return false;
+      }
+    });
+
+    this.setState({
+      pickUpList,
+      tileTypes: tileTs,
     });
   }
 
@@ -235,8 +270,47 @@ class App extends Component {
         />
       );
     });
+
+    // Generate pickUps
+    let pickUpCount = 0;
+    const pickUps = this.state.pickUpList.map((pickUp) => {
+      pickUpCount++
+      return (
+        <PickUp
+          key = {pickUpCount}
+          pickUp = {pickUp}
+          cellSize = {this.state.cellSize}
+          cellGutter = {this.state.cellGutter}
+        />
+      );
+    });
+
     return (
       <div className="App" tabIndex="0" onKeyUp={this.handlePlayerMove.bind(this)}>
+        <StatBar
+          name="life"
+          color="red"
+          icon="fa fa-heart stat-icon"
+          stat={this.state.player.life}
+          statMax={10}
+          position={{top: 10, left: 2, width: 6, height: 25, gutter: 1, iconSize: 6}}
+        />
+        <StatBar
+          name="defense"
+          color="blue"
+          icon="fa fa-shield stat-icon"
+          stat={this.state.player.defense}
+          statMax={10}
+          position={{top: 40, left: 2, width: 6, height: 25, gutter: 1, iconSize: 6}}
+        />
+        <StatBar
+          name="attack"
+          color="green"
+          icon="fa fa-legal stat-icon"
+          stat={this.state.player.attack}
+          statMax={10}
+          position={{top: 70, left: 2, width: 6, height: 25, gutter: 1, iconSize: 6}}
+        />
         <div className="game-container">
           <Map
             rooms = {this.state.rooms}
@@ -254,6 +328,8 @@ class App extends Component {
             cellGutter = {this.state.cellGutter}
             enemyList = {this.state.enemyList}
             placeEnemies = {this.placeEnemies.bind(this)}
+            pickUpList = {this.state.pickUpList}
+            placePickUps = {this.placePickUps.bind(this)}
           />
           <Player
             player = {this.state.player}
@@ -261,6 +337,7 @@ class App extends Component {
             cellGutter = {this.state.cellGutter}
           />
           { enemies }
+          { pickUps }
           <DijkstraMap
             ref={(dijkstraMap) => { this.dijkstraMap = dijkstraMap; }}
             showDijkstraMap = {this.state.showDijkstraMap}
@@ -273,6 +350,7 @@ class App extends Component {
             cellGutter = {this.state.cellGutter}
           />
         </div>
+
       </div>
     );
   }

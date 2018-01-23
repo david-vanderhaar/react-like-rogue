@@ -113,6 +113,7 @@ class Map extends Component {
       }
       this.props.carveHalls(tileTs);
       this.placeEnemies(tileTs);
+      this.placePickUps(tileTs);
   }
 
   placeEnemies(tileTypes) {
@@ -137,6 +138,29 @@ class Map extends Component {
       }
     }
     this.props.placeEnemies(enemies, tileTs);
+  }
+
+  placePickUps(tileTypes) {
+    let pickUps = this.props.pickUpList.concat();
+    // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
+    let tileTs = cloneTiles(tileTypes)
+
+    for (let i = 0; i < pickUps.length; i++) {
+      let placeX = getRandomIntInclusive(0, this.props.mapWidth - 1)
+      let placeY = getRandomIntInclusive(0, this.props.mapHeight - 1)
+
+      let tile = tileTs[placeY][placeX];
+      if (tile.canPass) {
+        pickUps[i] = {...pickUps[i]}
+        tileTs[placeY][placeX].containsPickUp = true;
+        tileTs[placeY][placeX].pickUp = pickUps[i];
+        pickUps[i].posX = placeX;
+        pickUps[i].posY = placeY;
+      } else {
+        i--;
+      }
+    }
+    this.props.placePickUps(pickUps, tileTs);
   }
 
   componentDidMount() {

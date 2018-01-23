@@ -1,3 +1,7 @@
+html {
+  background-color: hsl(210,12%,30%);
+}
+
 .App {
   text-align: center;
 }
@@ -26,6 +30,39 @@
   height: 80vh;
   background-color: slategrey;
   overflow: scroll;
+  box-shadow: 8px 10px 50px hsl(0, 0%, 5%);
+}
+
+.SideBar {
+  position: absolute;
+  top: 10vh;
+  left: 2vw;
+  width: 6vw;
+  height: 80vh;
+  border-radius: 10px;
+  background-color: slategrey;
+}
+
+.StatBar {
+  position: absolute;
+  border-radius: 10px;
+  background-color: lightgrey;
+  box-shadow: 8px 10px 50px hsl(0, 0%, 5%);
+
+}
+
+.stat-block {
+  position: relative;
+  border-radius: 5px;
+  box-shadow: inset 0 0 8px hsl(0, 0%, 5%)
+}
+
+.stat-icon {
+  color: hsl(210,12%,30%);
+}
+
+.stat-icon-background {
+  background-color: hsl(210,12%,30%);
 }
 
 .ctrl-btn {
