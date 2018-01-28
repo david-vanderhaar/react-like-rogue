@@ -33,10 +33,10 @@ html {
   box-shadow: 8px 10px 50px hsl(0, 0%, 5%);
 }
 
-.SideBar {
+.Inventory {
   position: absolute;
   top: 10vh;
-  left: 2vw;
+  left: 92vw;
   width: 6vw;
   height: 80vh;
   border-radius: 10px;
@@ -97,7 +97,7 @@ html {
 .player {
   position: absolute;
   border-radius: 6px;
-  transition: .3s;
+  transition: .2s;
   z-index: 2;
 }
 

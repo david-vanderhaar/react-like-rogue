@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import uuid from 'uuid4'; //generates unique ids
 import { cloneTiles } from './Helper';
 import StatBar from './UI/StatBar';
+import Inventory from './UI/Inventory';
 import { CreateTile, CreateActor, CreatePickUp } from './Classes';
 import Map from './Map';
 import DijkstraMap from './DijkstraMap';
@@ -24,10 +26,24 @@ class App extends Component {
     const rooms = []; // holds all room info
     const maxRoomSize = 8;
     const minRoomSize = 4;
-    const enemies = 0;
+    const enemies = 10;
     const pickUps = 10;
 
-    const player = CreateActor({life: 5, attack: 3});
+    const player = CreateActor({id: 'player', life: 5, attack: 3});
+
+    let enemyList = [];
+    for (let i = 0; i < enemies; i++) {
+      let id = i;
+      // let id = uuid();
+      enemyList.push(CreateActor({id: id, attack: 2, life: 2}));
+    }
+
+    let pickUpList = [];
+    for (let i = 0; i < pickUps; i++) {
+      let id = i;
+      // let id = uuid();
+      pickUpList.push(CreatePickUp({id: id}));
+    }
 
     this.state = {
       mapWidth: mapWidth,
@@ -42,8 +58,10 @@ class App extends Component {
       tileMap: Array(mapHeight).fill(Array(mapWidth).fill('')),
       tileTypes: Array(mapHeight).fill(Array(mapWidth).fill(CreateTile({type: 'WALL', canPass: false, containsDestructible: false}))),
       dijkstraMap: Array(mapHeight).fill(Array(mapWidth).fill(100)),
-      enemyList: Array(enemies).fill(CreateActor({defense: 10})),
-      pickUpList: Array(pickUps).fill(CreatePickUp()),
+      enemyList: enemyList,
+      // enemyList: Array(enemies).fill(CreateActor()),
+      pickUpList: pickUpList,
+      // pickUpList: Array(pickUps).fill(CreatePickUp()),
       defeatedEnemyList: [],
       enemyPosX: 0,
       enemyPosY: 0,
@@ -103,12 +121,25 @@ class App extends Component {
         break;
     }
 
+    let enemyList = this.state.enemyList.concat();
     if (tileToCheck.containsDestructible) {
-      tileToCheck.destructible.takeHit(player.attack);
+      for (let i = 0; i < enemyList.length; i++) {
+        enemyList[i] = {...enemyList[i]}; //copy the Object
+        if (enemyList[i].id === tileToCheck.destructibleId) {
+          enemyList[i].takeHit(player.attack);
+        }
+      }
     }
+
+    let pickUpList = this.state.pickUpList.concat();
     if (tileToCheck.containsPickUp) {
-      player[tileToCheck.pickUp.statName] += tileToCheck.pickUp.boostValue;
-      tileToCheck.pickUp.taken = true;
+      for (let i = 0; i < pickUpList.length; i++) {
+        pickUpList[i] = {...pickUpList[i]}; //copy the Object
+        if (pickUpList[i].id === tileToCheck.pickUpId) {
+          pickUpList[i].taken = true;
+          player.inventory.push({...pickUpList[i]})
+        }
+      }
     }
 
     tileTypes[player.posY][player.posX].canPass = false;
@@ -119,8 +150,8 @@ class App extends Component {
       tileTypes,
     });
 
-    this.updatePickUps(tileTypes);
-    this.moveEnemies(player);
+    this.updatePickUps(tileTypes, pickUpList);
+    this.moveEnemies(player, enemyList);
   } // end handlePlayerMove (MAIN TURN LOOP)
 
   placeEnemies(enemyList, tileTypes) {
@@ -137,21 +168,16 @@ class App extends Component {
     });
   }
 
-  updatePickUps(tileTs) {
-    let pickUpList = this.state.pickUpList.concat();
+  updatePickUps(tileTs, pickUpList) {
     // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
     // let tileTs = cloneTiles(this.state.tileTypes);
 
-    for (let i = 0; i < pickUpList.length; i++) {
-      console.log(pickUpList[i].taken)
-      console.log(tileTs[pickUpList[i].posY][pickUpList[i].posX].pickUp)
-      pickUpList[i] = {...pickUpList[i]}; //copy the Object
-    }
     pickUpList = pickUpList.filter((pickUp) => {
       if (pickUp.taken === false) {
         return true;
       } else {
-        tileTs[pickUp.posY][pickUp.posX].pickUp = {}; //reset current tile
+        tileTs[pickUp.posY][pickUp.posX].containsPickUp = false;
+        tileTs[pickUp.posY][pickUp.posX].pickUpId = null; //reset current tile
         return false;
       }
     });
@@ -162,17 +188,15 @@ class App extends Component {
     });
   }
 
-  moveEnemies(player) {
-    let enemyList = this.state.enemyList.concat();
-
+  moveEnemies(player, enemyList) {
     // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
     let tileTs = cloneTiles(this.state.tileTypes);
 
     for (let i = 0; i < enemyList.length; i++) {
-      enemyList[i] = {...enemyList[i]}; //copy the Object
+      // enemyList[i] = {...enemyList[i]}; //copy the Object
       let posX = enemyList[i].posX;
       let posY = enemyList[i].posY;
-      tileTs[posY][posX].destructible = enemyList[i]; //reset current tile
+      tileTs[posY][posX].destructibleId = enemyList[i].id; //reset current tile
       let neighbors = this.dijkstraMap.getNeigbors(enemyList[i], this.state.dijkstraMap);
 
       if (neighbors.length > 0) {
@@ -191,12 +215,12 @@ class App extends Component {
         if (tileToCheck.canPass === true) { // check that the tile is passable
           tileTs[posY][posX].canPass = true; //reset current tile to passable
           tileTs[posY][posX].containsDestructible = false; //reset current tile
-          tileTs[posY][posX].destructible = {}; //reset current tile
+          tileTs[posY][posX].destructibleId = null; //reset current tile
           enemyList[i].posX = neighbors[0].posX;
           enemyList[i].posY = neighbors[0].posY;
           tileToCheck.canPass = false; //set new tile to impassable
           tileToCheck.containsDestructible = true;
-          tileToCheck.destructible = enemyList[i];
+          tileToCheck.destructibleId = enemyList[i].id;
         }
       }
     }
@@ -207,7 +231,7 @@ class App extends Component {
       } else {
         tileTs[enemy.posY][enemy.posX].canPass = true; //reset current tile to passable
         tileTs[enemy.posY][enemy.posX].containsDestructible = false; //reset current tile
-        tileTs[enemy.posY][enemy.posX].destructible = {}; //reset current tile
+        tileTs[enemy.posY][enemy.posX].destructibleId = null; //reset current tile
         return false;
       }
     });
@@ -251,6 +275,12 @@ class App extends Component {
     showDijkstraMap = !this.state.showDijkstraMap;
     this.setState({
       showDijkstraMap,
+    });
+  }
+
+  handlePlayerUpdate(player) {
+    this.setState({
+      player,
     });
   }
 
@@ -310,6 +340,12 @@ class App extends Component {
           stat={this.state.player.attack}
           statMax={10}
           position={{top: 70, left: 2, width: 6, height: 25, gutter: 1, iconSize: 6}}
+        />
+
+        <Inventory
+          player = {this.state.player}
+          inventory = {this.state.player.inventory}
+          handlePlayerUpdate = {this.handlePlayerUpdate.bind(this)}
         />
         <div className="game-container">
           <Map

@@ -130,7 +130,7 @@ class Map extends Component {
         enemies[i] = {...enemies[i]}
         tileTs[placeY][placeX].canPass = false;
         tileTs[placeY][placeX].containsDestructible = true;
-        tileTs[placeY][placeX].destructible = enemies[i];
+        tileTs[placeY][placeX].destructibleId = enemies[i].id;
         enemies[i].posX = placeX;
         enemies[i].posY = placeY;
       } else {
@@ -153,7 +153,7 @@ class Map extends Component {
       if (tile.canPass) {
         pickUps[i] = {...pickUps[i]}
         tileTs[placeY][placeX].containsPickUp = true;
-        tileTs[placeY][placeX].pickUp = pickUps[i];
+        tileTs[placeY][placeX].pickUpId = pickUps[i].id;
         pickUps[i].posX = placeX;
         pickUps[i].posY = placeY;
       } else {

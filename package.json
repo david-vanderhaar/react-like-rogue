@@ -17,6 +17,10 @@
     "deploy": "gh-pages -d build"
   },
   "devDependencies": {
-    "gh-pages": "^1.1.0"
+    "gh-pages": "^1.1.0",
+    "jquery": "^3.3.1",
+    "materialize-css": "^0.100.2",
+    "react-materialize": "^1.1.2",
+    "uuid4": "^1.0.0"
   }
 }
