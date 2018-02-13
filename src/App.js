@@ -3,12 +3,13 @@ import uuid from 'uuid4'; //generates unique ids
 import { cloneTiles } from './Helper';
 import StatBar from './UI/StatBar';
 import Inventory from './UI/Inventory';
-import { CreateTile, CreateActor, CreatePickUp } from './Classes';
+import { CreateTile, CreateActor, CreatePickUp, CreateEquipmentItem } from './Classes';
 import Map from './Map';
 import DijkstraMap from './DijkstraMap';
 import Player from './Player';
 import Enemy from './Enemy';
 import PickUp from './PickUp';
+import EquipmentItem from './EquipmentItem';
 import './App.css';
 
 class App extends Component {
@@ -26,8 +27,9 @@ class App extends Component {
     const rooms = []; // holds all room info
     const maxRoomSize = 8;
     const minRoomSize = 4;
-    const enemies = 10;
+    const enemies = 1;
     const pickUps = 10;
+    const equipmentItems = 5;
 
     const player = CreateActor({id: 'player', life: 5, attack: 3});
 
@@ -40,9 +42,16 @@ class App extends Component {
 
     let pickUpList = [];
     for (let i = 0; i < pickUps; i++) {
-      let id = i;
+      let id = i.toString() + '-pickUp';
       // let id = uuid();
       pickUpList.push(CreatePickUp({id: id}));
+    }
+
+    let equipmentItemList = [];
+    for (let i = 0; i < equipmentItems; i++) {
+      let id = i.toString() + '-equipmentItem';
+      // let id = uuid();
+      equipmentItemList.push(CreateEquipmentItem({id: id}));
     }
 
     this.state = {
@@ -59,9 +68,8 @@ class App extends Component {
       tileTypes: Array(mapHeight).fill(Array(mapWidth).fill(CreateTile({type: 'WALL', canPass: false, containsDestructible: false}))),
       dijkstraMap: Array(mapHeight).fill(Array(mapWidth).fill(100)),
       enemyList: enemyList,
-      // enemyList: Array(enemies).fill(CreateActor()),
       pickUpList: pickUpList,
-      // pickUpList: Array(pickUps).fill(CreatePickUp()),
+      equipmentItemList: equipmentItemList,
       defeatedEnemyList: [],
       enemyPosX: 0,
       enemyPosY: 0,
@@ -121,6 +129,7 @@ class App extends Component {
         break;
     }
 
+    // Check for Enemies
     let enemyList = this.state.enemyList.concat();
     if (tileToCheck.containsDestructible) {
       for (let i = 0; i < enemyList.length; i++) {
@@ -131,6 +140,7 @@ class App extends Component {
       }
     }
 
+    // Check for pick ups
     let pickUpList = this.state.pickUpList.concat();
     if (tileToCheck.containsPickUp) {
       for (let i = 0; i < pickUpList.length; i++) {
@@ -138,6 +148,18 @@ class App extends Component {
         if (pickUpList[i].id === tileToCheck.pickUpId) {
           pickUpList[i].taken = true;
           player.inventory.push({...pickUpList[i]})
+        }
+      }
+    }
+
+    // Check for equipment items
+    let equipmentItemList = this.state.equipmentItemList.concat();
+    if (tileToCheck.containsPickUp) {
+      for (let i = 0; i < equipmentItemList.length; i++) {
+        equipmentItemList[i] = {...equipmentItemList[i]}; //copy the Object
+        if (equipmentItemList[i].id === tileToCheck.pickUpId) {
+          equipmentItemList[i].taken = true;
+          player.equipment.push({...equipmentItemList[i]})
         }
       }
     }
@@ -150,8 +172,9 @@ class App extends Component {
       tileTypes,
     });
 
+    this.moveEnemies(tileTypes, player, enemyList);
     this.updatePickUps(tileTypes, pickUpList);
-    this.moveEnemies(player, enemyList);
+    this.updateEquipmentItems(tileTypes, equipmentItemList);
   } // end handlePlayerMove (MAIN TURN LOOP)
 
   placeEnemies(enemyList, tileTypes) {
@@ -168,9 +191,34 @@ class App extends Component {
     });
   }
 
+  placeEquipmentItems(equipmentItemList, tileTypes) {
+    this.setState({
+      equipmentItemList,
+      tileTypes,
+    });
+  }
+
+  updateEquipmentItems(tileTs, equipmentItemList) {
+    // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
+
+    equipmentItemList = equipmentItemList.filter((equipmentItem) => {
+      if (equipmentItem.taken === false) {
+        return true;
+      } else {
+        tileTs[equipmentItem.posY][equipmentItem.posX].containsPickUp = false;
+        tileTs[equipmentItem.posY][equipmentItem.posX].pickUpId = null; //reset current tile
+        return false;
+      }
+    });
+
+    this.setState({
+      equipmentItemList,
+      tileTypes: tileTs,
+    });
+  }
+
   updatePickUps(tileTs, pickUpList) {
     // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
-    // let tileTs = cloneTiles(this.state.tileTypes);
 
     pickUpList = pickUpList.filter((pickUp) => {
       if (pickUp.taken === false) {
@@ -188,9 +236,9 @@ class App extends Component {
     });
   }
 
-  moveEnemies(player, enemyList) {
+  moveEnemies(tileTs, player, enemyList) {
     // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
-    let tileTs = cloneTiles(this.state.tileTypes);
+    // let tileTs = cloneTiles(this.state.tileTypes);
 
     for (let i = 0; i < enemyList.length; i++) {
       // enemyList[i] = {...enemyList[i]}; //copy the Object
@@ -315,6 +363,20 @@ class App extends Component {
       );
     });
 
+    // Generate equipmentItems
+    let equipmentItemCount = 0;
+    const equipmentItems = this.state.equipmentItemList.map((equipmentItem) => {
+      equipmentItemCount++
+      return (
+        <EquipmentItem
+          key = {equipmentItemCount}
+          equipmentItem = {equipmentItem}
+          cellSize = {this.state.cellSize}
+          cellGutter = {this.state.cellGutter}
+        />
+      );
+    });
+
     return (
       <div className="App" tabIndex="0" onKeyUp={this.handlePlayerMove.bind(this)}>
         <StatBar
@@ -366,6 +428,8 @@ class App extends Component {
             placeEnemies = {this.placeEnemies.bind(this)}
             pickUpList = {this.state.pickUpList}
             placePickUps = {this.placePickUps.bind(this)}
+            equipmentItemList = {this.state.equipmentItemList}
+            placeEquipmentItems = {this.placeEquipmentItems.bind(this)}
           />
           <Player
             player = {this.state.player}
@@ -374,6 +438,7 @@ class App extends Component {
           />
           { enemies }
           { pickUps }
+          { equipmentItems }
           <DijkstraMap
             ref={(dijkstraMap) => { this.dijkstraMap = dijkstraMap; }}
             showDijkstraMap = {this.state.showDijkstraMap}

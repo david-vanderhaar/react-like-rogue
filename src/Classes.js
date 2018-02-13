@@ -67,6 +67,37 @@ export const CreatePickUp = ({
     }
 });
 
+export const CreateEquipmentItem = ({
+  id = null,
+  posX = 0,
+  posY = 0,
+  taken = false,
+  type = 'armor',
+  name = 'Straw Plate',
+  defense = 1,
+  attack = 1,
+} = {}) => ({
+  id,
+  posX,
+  posY,
+  taken,
+  type,
+  name,
+  defense,
+  attack,
+
+  equip(type, actor) {
+    //swaps actor armor and/or weapon stats with these stats
+    //if actor is holding this type of equipment, then
+    //drop(actor)
+    //equip(actor)
+  },
+
+  drop(actor) {
+
+  },
+});
+
 export const CreateActor = ({
     // Set default values if none passed in
     id = null,
@@ -79,6 +110,7 @@ export const CreateActor = ({
     defense = 1,
     defenseMax = defense,
     inventory = [],
+    equipment = [],
   } = {}) => ({
     id,
     posX,
@@ -90,6 +122,7 @@ export const CreateActor = ({
     defense,
     defenseMax,
     inventory,
+    equipment,
     // Method
     takeHitV1(attack) {
       let newDefenseValue = this.defense;

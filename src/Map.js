@@ -112,8 +112,9 @@ class Map extends Component {
 
       }
       this.props.carveHalls(tileTs);
-      this.placeEnemies(tileTs);
-      this.placePickUps(tileTs);
+      tileTs = this.placeEnemies(tileTs);
+      tileTs = this.placePickUps(tileTs);
+      tileTs = this.placeEquipmentItems(tileTs);
   }
 
   placeEnemies(tileTypes) {
@@ -138,6 +139,8 @@ class Map extends Component {
       }
     }
     this.props.placeEnemies(enemies, tileTs);
+
+    return tileTs;
   }
 
   placePickUps(tileTypes) {
@@ -161,6 +164,33 @@ class Map extends Component {
       }
     }
     this.props.placePickUps(pickUps, tileTs);
+
+    return tileTs;
+  }
+
+  placeEquipmentItems(tileTypes) {
+    let equipmentItems = this.props.equipmentItemList.concat();
+    // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
+    let tileTs = cloneTiles(tileTypes)
+
+    for (let i = 0; i < equipmentItems.length; i++) {
+      let placeX = getRandomIntInclusive(0, this.props.mapWidth - 1)
+      let placeY = getRandomIntInclusive(0, this.props.mapHeight - 1)
+
+      let tile = tileTs[placeY][placeX];
+      if (tile.canPass) {
+        equipmentItems[i] = {...equipmentItems[i]}
+        tileTs[placeY][placeX].containsPickUp = true;
+        tileTs[placeY][placeX].pickUpId = equipmentItems[i].id;
+        equipmentItems[i].posX = placeX;
+        equipmentItems[i].posY = placeY;
+      } else {
+        i--;
+      }
+    }
+    this.props.placeEquipmentItems(equipmentItems, tileTs);
+
+    return tileTs;
   }
 
   componentDidMount() {
