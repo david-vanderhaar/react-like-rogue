@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import uuid from 'uuid4'; //generates unique ids
-import { cloneTiles } from './Helper';
+import { focusOnGameWindow } from './Helper';
 import StatBar from './UI/StatBar';
 import Inventory from './UI/Inventory';
 import { CreateTile, CreateActor, CreatePickUp, CreateEquipmentItem } from './Classes';
@@ -10,6 +9,7 @@ import Player from './Player';
 import Enemy from './Enemy';
 import PickUp from './PickUp';
 import EquipmentItem from './EquipmentItem';
+import EquipmentCompare from './UI/EquipmentCompare';
 import './App.css';
 
 class App extends Component {
@@ -29,7 +29,7 @@ class App extends Component {
     const minRoomSize = 4;
     const enemies = 1;
     const pickUps = 10;
-    const equipmentItems = 5;
+    const equipmentItems = 15;
 
     const player = CreateActor({id: 'player', life: 5, attack: 3});
 
@@ -68,9 +68,11 @@ class App extends Component {
       tileTypes: Array(mapHeight).fill(Array(mapWidth).fill(CreateTile({type: 'WALL', canPass: false, containsDestructible: false}))),
       dijkstraMap: Array(mapHeight).fill(Array(mapWidth).fill(100)),
       enemyList: enemyList,
+      defeatedEnemyList: [],
       pickUpList: pickUpList,
       equipmentItemList: equipmentItemList,
-      defeatedEnemyList: [],
+      showEquipmentCompare: false,
+      equipmentCompareItemId: null,
       enemyPosX: 0,
       enemyPosY: 0,
       player: player,
@@ -135,7 +137,7 @@ class App extends Component {
       for (let i = 0; i < enemyList.length; i++) {
         enemyList[i] = {...enemyList[i]}; //copy the Object
         if (enemyList[i].id === tileToCheck.destructibleId) {
-          enemyList[i].takeHit(player.attack);
+          enemyList[i].takeHit(player.calculateStat('attack'));
         }
       }
     }
@@ -153,13 +155,18 @@ class App extends Component {
     }
 
     // Check for equipment items
+    let showEquipmentCompare = false;
     let equipmentItemList = this.state.equipmentItemList.concat();
+    let equipmentCompareItemId = this.state.equipmentCompareItemId;
     if (tileToCheck.containsPickUp) {
       for (let i = 0; i < equipmentItemList.length; i++) {
         equipmentItemList[i] = {...equipmentItemList[i]}; //copy the Object
         if (equipmentItemList[i].id === tileToCheck.pickUpId) {
-          equipmentItemList[i].taken = true;
-          player.equipment.push({...equipmentItemList[i]})
+
+          //trigger modal prompt that shows stat compare, and asks if player will equip or leave
+          showEquipmentCompare = true;
+          equipmentCompareItemId = equipmentItemList[i].id;
+
         }
       }
     }
@@ -170,6 +177,8 @@ class App extends Component {
     this.setState({
       player,
       tileTypes,
+      showEquipmentCompare,
+      equipmentCompareItemId,
     });
 
     this.moveEnemies(tileTypes, player, enemyList);
@@ -198,15 +207,19 @@ class App extends Component {
     });
   }
 
+  updateEquipmentCompareId(equipmentCompareItemId) {
+    this.setState({
+      equipmentCompareItemId
+    });
+  }
+
   updateEquipmentItems(tileTs, equipmentItemList) {
     // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
 
     equipmentItemList = equipmentItemList.filter((equipmentItem) => {
-      if (equipmentItem.taken === false) {
+      if (!equipmentItem.taken) {
         return true;
       } else {
-        tileTs[equipmentItem.posY][equipmentItem.posX].containsPickUp = false;
-        tileTs[equipmentItem.posY][equipmentItem.posX].pickUpId = null; //reset current tile
         return false;
       }
     });
@@ -332,6 +345,20 @@ class App extends Component {
     });
   }
 
+  handleTileUpdate(tileTs) {
+    this.setState({
+      tileTypes: tileTs,
+    });
+  }
+
+  handleToggleEquipmentCompare(value) {
+    this.setState({
+      showEquipmentCompare: value,
+    })
+
+    focusOnGameWindow();
+  }
+
   render() {
     // Generate enemies
     let enemyCount = 0;
@@ -378,7 +405,7 @@ class App extends Component {
     });
 
     return (
-      <div className="App" tabIndex="0" onKeyUp={this.handlePlayerMove.bind(this)}>
+      <div id="game-window" className="App" tabIndex="0" onKeyUp={this.handlePlayerMove.bind(this)}>
         <StatBar
           name="life"
           color="red"
@@ -391,7 +418,7 @@ class App extends Component {
           name="defense"
           color="blue"
           icon="fa fa-shield stat-icon"
-          stat={this.state.player.defense}
+          stat={this.state.player.calculateStat('defense')}
           statMax={10}
           position={{top: 40, left: 2, width: 6, height: 25, gutter: 1, iconSize: 6}}
         />
@@ -399,7 +426,7 @@ class App extends Component {
           name="attack"
           color="green"
           icon="fa fa-legal stat-icon"
-          stat={this.state.player.attack}
+          stat={this.state.player.calculateStat('attack')}
           statMax={10}
           position={{top: 70, left: 2, width: 6, height: 25, gutter: 1, iconSize: 6}}
         />
@@ -409,6 +436,23 @@ class App extends Component {
           inventory = {this.state.player.inventory}
           handlePlayerUpdate = {this.handlePlayerUpdate.bind(this)}
         />
+
+        {
+          this.state.showEquipmentCompare && (
+            <EquipmentCompare
+            toggleEquipmentCompare = {this.handleToggleEquipmentCompare.bind(this)}
+            tileTypes = {this.state.tileTypes}
+            player = {this.state.player}
+            handlePlayerUpdate = {this.handlePlayerUpdate.bind(this)}
+            handleUpdateEquipmentItems = {this.updateEquipmentItems.bind(this)}
+            handleUpdateEquipmentCompareItemId = {this.updateEquipmentCompareId.bind(this)}
+            handlePlaceEquipmentItems = {this.placeEquipmentItems.bind(this)}
+            equipmentItemList = {this.state.equipmentItemList}
+            equipmentCompareItemId = {this.state.equipmentCompareItemId}
+          />
+        )
+        }
+
         <div className="game-container">
           <Map
             rooms = {this.state.rooms}

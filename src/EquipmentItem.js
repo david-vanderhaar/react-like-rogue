@@ -10,7 +10,7 @@ class EquipmentItem extends Component {
     };
     return (
       <div className="EquipmentItem">
-        <span className="player brown lighten-1 white-text" style={style}>
+        <span className="item grey white-text" style={style}>
           {this.props.equipmentItem.type}
         </span>
       </div>

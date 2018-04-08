@@ -48,7 +48,27 @@ html {
   border-radius: 10px;
   background-color: lightgrey;
   box-shadow: 8px 10px 50px hsl(0, 0%, 5%);
+}
 
+.EquipmentCompare {
+  position: fixed;
+  left: 35%;
+  top: 30%;
+  z-index: 10;
+  width: 30%;
+  color: lightgrey;
+}
+
+.EquipmentCompare .card {
+  background-color: grey;
+}
+
+.EquipmentCompare .item-compare-card {
+  /* position: relative;
+  left: 40%; */
+  width: 60px;
+  height: 60px;
+  border-radius: 5px;
 }
 
 .stat-block {
@@ -92,6 +112,12 @@ html {
 .tile-Dijkstra {
   z-index: 1;
   transition: .5s;
+}
+
+.item {
+  position: absolute;
+  border-radius: 6px;
+  z-index: 2;
 }
 
 .player {

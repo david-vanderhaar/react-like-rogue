@@ -10,7 +10,7 @@ class PickUp extends Component {
     };
     return (
       <div className="PickUp">
-        <span className="player amber darken-4 white-text" style={style}>
+        <span className="item amber darken-4 white-text" style={style}>
           Pi
           <br/>
           {this.props.pickUp.boostValue}

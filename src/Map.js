@@ -2,14 +2,6 @@ import React, { Component } from 'react';
 import { getRandomIntInclusive, doesCollide, cloneTiles } from './Helper'
 import { CreateTile } from './Classes';
 
-// function TileDisplay(props) {
-//   return (
-//     <span className={props.className} style={props.style}>
-//       {props.value}
-//     </span>
-//   );
-// }
-
 class TileDisplay extends Component {
   shouldComponentUpdate(nextProps) {
     // REPLACE with a deep compare of props objects

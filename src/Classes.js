@@ -86,16 +86,17 @@ export const CreateEquipmentItem = ({
   defense,
   attack,
 
-  equip(type, actor) {
+  canEquip(actor) {
     //swaps actor armor and/or weapon stats with these stats
-    //if actor is holding this type of equipment, then
-    //drop(actor)
-    //equip(actor)
+    //if actor is not holding this type of equipment,
+    for (let item in actor.equipment) {
+      if (this.type === actor.equipment[item].type) {
+        return false;
+      }
+    }
+    return true;
   },
 
-  drop(actor) {
-
-  },
 });
 
 export const CreateActor = ({
@@ -124,6 +125,11 @@ export const CreateActor = ({
     inventory,
     equipment,
     // Method
+    calculateStat(stat) {
+      let statFromEquipment = this.equipment.reduce((prev, curr) => prev + curr[stat], 0);
+      return this[stat] + statFromEquipment;
+    },
+
     takeHitV1(attack) {
       let newDefenseValue = this.defense;
       let newLifeValue = this.life;
@@ -140,8 +146,7 @@ export const CreateActor = ({
     },
 
     takeHit(attack) {
-      let calculatedAttack = attack - this.defense;
-      calculatedAttack > 0 ? calculatedAttack = calculatedAttack : calculatedAttack = 0;
+      let calculatedAttack = (attack - this.calculateStat('defense')) > 0 ? (attack - this.calculateStat('defense')) : 0;
       this.life -= calculatedAttack;
       if (this.id === 'player') {
         Materialize.toast('Attacked for ' + calculatedAttack + ' damage!', 4000)

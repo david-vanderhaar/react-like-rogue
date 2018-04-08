@@ -51,3 +51,7 @@ export function cloneTiles(tiles) {
   }
   return clonedTiles;
 }
+
+export function focusOnGameWindow() {
+  document.getElementById("game-window").focus();
+}
