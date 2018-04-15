@@ -29,8 +29,20 @@ html {
   width: 80vw;
   height: 80vh;
   background-color: slategrey;
-  overflow: scroll;
+  overflow: hidden;
   box-shadow: 8px 10px 50px hsl(0, 0%, 5%);
+}
+
+.SessionStats {
+  position: fixed;
+  top: 0px;
+  width: 100vw;
+}
+
+.SessionStats span {
+  color: lightgrey;
+  font-size: 30px;
+  font-weight: bold;
 }
 
 .Inventory {
@@ -64,11 +76,31 @@ html {
 }
 
 .EquipmentCompare .item-compare-card {
-  /* position: relative;
-  left: 40%; */
   width: 60px;
   height: 60px;
   border-radius: 5px;
+}
+
+.EndDungeonSummary {
+  position: fixed;
+  left: 35%;
+  top: 30%;
+  z-index: 10;
+  color: lightgrey;
+}
+
+.EndDungeonSummary .card {
+  background-color: grey;
+}
+
+.EndDungeonSummary .title {
+  color: lightgrey;
+}
+
+.EndDungeonSummary .quote {
+  font-size: 20px;
+  font-weight: 400;
+  color: lightgrey;
 }
 
 .stat-block {
@@ -87,8 +119,8 @@ html {
 
 .ctrl-btn {
   position: fixed;
-  top: 10px;
-  left: 5px;
+  top: 6vh;
+  left: 10vw;
 }
 
 .tile {

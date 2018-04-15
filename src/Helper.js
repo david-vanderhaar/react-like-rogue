@@ -1,3 +1,6 @@
+import { CreateTile, CreateActor, CreatePickUp, CreateEquipmentItem } from './Classes';
+import uuid from 'uuid';
+
 // Helper Functions
 export function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
@@ -54,4 +57,43 @@ export function cloneTiles(tiles) {
 
 export function focusOnGameWindow() {
   document.getElementById("game-window").focus();
+}
+
+export function prepareDungeonLevel(dungeonLevel, currentState) {
+  const enemies = 1 + (dungeonLevel * 2);
+  const pickUps = 10;
+  const equipmentItems = 5;
+
+  let enemyList = [];
+  for (let i = 0; i < enemies; i++) {
+    let id = uuid();
+    enemyList.push(CreateActor({id: id, attack: 2, life: 2}));
+  }
+
+  let pickUpList = [];
+  for (let i = 0; i < pickUps; i++) {
+    let id = uuid();
+    pickUpList.push(CreatePickUp({id: id}));
+  }
+
+  let equipmentItemList = [];
+  for (let i = 0; i < equipmentItems; i++) {
+    let id = uuid();
+    equipmentItemList.push(CreateEquipmentItem({id: id}));
+  }
+
+  let newState = {
+    dungeonLevel: dungeonLevel,
+    showEndDungeonSummary: false,
+    canMove: true,
+    tileMap: Array(currentState.mapHeight).fill(Array(currentState.mapWidth).fill('')),
+    tileTypes: Array(currentState.mapHeight).fill(Array(currentState.mapWidth).fill(CreateTile({type: 'WALL', canPass: false, containsDestructible: false}))),
+    dijkstraMap: Array(currentState.mapHeight).fill(Array(currentState.mapWidth).fill(100)),
+    enemyList: enemyList,
+    pickUpList: pickUpList,
+    equipmentItemList: equipmentItemList,
+  }
+  
+  focusOnGameWindow();
+  return newState;
 }

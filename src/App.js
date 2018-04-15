@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import { focusOnGameWindow } from './Helper';
+import { focusOnGameWindow, prepareDungeonLevel } from './Helper';
+import uuid from 'uuid';
 import StatBar from './UI/StatBar';
 import Inventory from './UI/Inventory';
+import EndDungeonSummary from './UI/EndDungeonSummary';
+import SessionStats from './UI/SessionStats';
 import { CreateTile, CreateActor, CreatePickUp, CreateEquipmentItem } from './Classes';
 import Map from './Map';
 import DijkstraMap from './DijkstraMap';
@@ -35,26 +38,27 @@ class App extends Component {
 
     let enemyList = [];
     for (let i = 0; i < enemies; i++) {
-      let id = i;
-      // let id = uuid();
+      // let id = i;
+      let id = uuid();
       enemyList.push(CreateActor({id: id, attack: 2, life: 2}));
     }
 
     let pickUpList = [];
     for (let i = 0; i < pickUps; i++) {
-      let id = i.toString() + '-pickUp';
-      // let id = uuid();
+      // let id = i.toString() + '-pickUp';
+      let id = uuid();
       pickUpList.push(CreatePickUp({id: id}));
     }
 
     let equipmentItemList = [];
     for (let i = 0; i < equipmentItems; i++) {
-      let id = i.toString() + '-equipmentItem';
-      // let id = uuid();
+      // let id = i.toString() + '-equipmentItem';
+      let id = uuid();
       equipmentItemList.push(CreateEquipmentItem({id: id}));
     }
 
     this.state = {
+      dungeonLevel: 1,
       mapWidth: mapWidth,
       mapHeight: mapHeight,
       showDijkstraMap: false,
@@ -71,10 +75,12 @@ class App extends Component {
       defeatedEnemyList: [],
       pickUpList: pickUpList,
       equipmentItemList: equipmentItemList,
-      showEquipmentCompare: false,
       equipmentCompareItemId: null,
+      showEquipmentCompare: false,
+      showEndDungeonSummary: false,
       enemyPosX: 0,
       enemyPosY: 0,
+      canMove: true,
       player: player,
       playerControls: {
         LEFT: 37,
@@ -84,17 +90,19 @@ class App extends Component {
       },
     }
   }
+
   handlePlayerMove(event) { // MAIN TURN LOOP
-    let state = {...this.state};
-    let playerControls = state.playerControls;
-    let player = {...state.player};
-		let tileTypes = state.tileTypes; //tile objs still refering to state tiles
-    let tileToCheck;
+    if (this.state.canMove) {
+      let state = {...this.state};
+      let playerControls = state.playerControls;
+      let player = {...state.player};
+      let tileTypes = state.tileTypes; //tile objs still refering to state tiles
+      let tileToCheck;
 
-    tileTypes[player.posY][player.posX].canPass = true;
+      tileTypes[player.posY][player.posX].canPass = true;
 
-    switch (event.keyCode) {
-      case playerControls['LEFT']:
+      switch (event.keyCode) {
+        case playerControls['LEFT']:
         tileToCheck = tileTypes[player.posY][player.posX - 1];
         if (player.posX > 0) {
           if (tileToCheck.canPass) {
@@ -102,7 +110,7 @@ class App extends Component {
           }
         }
         break;
-      case playerControls['UP']:
+        case playerControls['UP']:
         tileToCheck = tileTypes[player.posY - 1][player.posX];
         if (player.posY > 0) {
           if (tileToCheck.canPass) {
@@ -110,7 +118,7 @@ class App extends Component {
           }
         }
         break;
-      case playerControls['RIGHT']:
+        case playerControls['RIGHT']:
         tileToCheck = tileTypes[player.posY][player.posX + 1];
         if (player.posX < state.mapWidth - 1) {
           if (tileToCheck.canPass) {
@@ -118,7 +126,7 @@ class App extends Component {
           }
         }
         break;
-      case playerControls['DOWN']:
+        case playerControls['DOWN']:
         tileToCheck = tileTypes[player.posY + 1][player.posX];
         if (player.posY < state.mapHeight - 1) {
           if (tileToCheck.canPass) {
@@ -126,64 +134,67 @@ class App extends Component {
           }
         }
         break;
-      default:
+        default:
         tileToCheck = tileTypes[player.posY][player.posX];
         break;
-    }
+      }
 
-    // Check for Enemies
-    let enemyList = this.state.enemyList.concat();
-    if (tileToCheck.containsDestructible) {
-      for (let i = 0; i < enemyList.length; i++) {
-        enemyList[i] = {...enemyList[i]}; //copy the Object
-        if (enemyList[i].id === tileToCheck.destructibleId) {
-          enemyList[i].takeHit(player.calculateStat('attack'));
+      // Check for Enemies
+      let enemyList = this.state.enemyList.concat();
+      if (tileToCheck.containsDestructible) {
+        for (let i = 0; i < enemyList.length; i++) {
+          enemyList[i] = {...enemyList[i]}; //copy the Object
+          if (enemyList[i].id === tileToCheck.destructibleId) {
+            enemyList[i].takeHit(player.calculateStat('attack'));
+          }
         }
       }
-    }
 
-    // Check for pick ups
-    let pickUpList = this.state.pickUpList.concat();
-    if (tileToCheck.containsPickUp) {
-      for (let i = 0; i < pickUpList.length; i++) {
-        pickUpList[i] = {...pickUpList[i]}; //copy the Object
-        if (pickUpList[i].id === tileToCheck.pickUpId) {
-          pickUpList[i].taken = true;
-          player.inventory.push({...pickUpList[i]})
+      // Check for pick ups
+      let pickUpList = this.state.pickUpList.concat();
+      if (tileToCheck.containsPickUp) {
+        for (let i = 0; i < pickUpList.length; i++) {
+          pickUpList[i] = {...pickUpList[i]}; //copy the Object
+          if (pickUpList[i].id === tileToCheck.pickUpId) {
+            pickUpList[i].taken = true;
+            player.inventory.push({...pickUpList[i]})
+          }
         }
       }
-    }
 
-    // Check for equipment items
-    let showEquipmentCompare = false;
-    let equipmentItemList = this.state.equipmentItemList.concat();
-    let equipmentCompareItemId = this.state.equipmentCompareItemId;
-    if (tileToCheck.containsPickUp) {
-      for (let i = 0; i < equipmentItemList.length; i++) {
-        equipmentItemList[i] = {...equipmentItemList[i]}; //copy the Object
-        if (equipmentItemList[i].id === tileToCheck.pickUpId) {
+      // Check for equipment items
+      let showEquipmentCompare = false;
+      let equipmentItemList = this.state.equipmentItemList.concat();
+      let equipmentCompareItemId = this.state.equipmentCompareItemId;
+      if (tileToCheck.containsPickUp) {
+        for (let i = 0; i < equipmentItemList.length; i++) {
+          equipmentItemList[i] = {...equipmentItemList[i]}; //copy the Object
+          if (equipmentItemList[i].id === tileToCheck.pickUpId) {
 
-          //trigger modal prompt that shows stat compare, and asks if player will equip or leave
-          showEquipmentCompare = true;
-          equipmentCompareItemId = equipmentItemList[i].id;
+            //trigger modal prompt that shows stat compare, and asks if player will equip or leave
+            showEquipmentCompare = true;
+            equipmentCompareItemId = equipmentItemList[i].id;
 
+          }
         }
       }
+
+      tileTypes[player.posY][player.posX].canPass = false;
+      this.dijkstraMap.generateDijkstraMap(tileTypes, [{posX: player.posX, posY: player.posY}]);
+
+      this.setState({
+        player,
+        tileTypes,
+        showEquipmentCompare,
+        equipmentCompareItemId,
+      });
+
+      this.moveEnemies(tileTypes, player, enemyList);
+      this.updatePickUps(tileTypes, pickUpList);
+      this.updateEquipmentItems(tileTypes, equipmentItemList);
+
+      document.getElementById("player").scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
     }
-
-    tileTypes[player.posY][player.posX].canPass = false;
-    this.dijkstraMap.generateDijkstraMap(tileTypes, [{posX: player.posX, posY: player.posY}]);
-
-    this.setState({
-      player,
-      tileTypes,
-      showEquipmentCompare,
-      equipmentCompareItemId,
-    });
-
-    this.moveEnemies(tileTypes, player, enemyList);
-    this.updatePickUps(tileTypes, pickUpList);
-    this.updateEquipmentItems(tileTypes, equipmentItemList);
   } // end handlePlayerMove (MAIN TURN LOOP)
 
   placeEnemies(enemyList, tileTypes) {
@@ -250,6 +261,9 @@ class App extends Component {
   }
 
   moveEnemies(tileTs, player, enemyList) {
+    let showEndDungeonSummary = false;
+    let canMove = true;
+    let defeatedEnemyList = this.state.defeatedEnemyList.concat();
     // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
     // let tileTs = cloneTiles(this.state.tileTypes);
 
@@ -293,13 +307,23 @@ class App extends Component {
         tileTs[enemy.posY][enemy.posX].canPass = true; //reset current tile to passable
         tileTs[enemy.posY][enemy.posX].containsDestructible = false; //reset current tile
         tileTs[enemy.posY][enemy.posX].destructibleId = null; //reset current tile
+
+        defeatedEnemyList.push({...enemy});
         return false;
       }
     });
 
+    if (enemyList.length === 0) { // check if we should move to the next dungeon
+      showEndDungeonSummary = true;
+      canMove = false;
+    }
+
     this.setState({
+      showEndDungeonSummary,
+      canMove,
       player,
       enemyList,
+      defeatedEnemyList,
       tileTypes: tileTs,
     });
   }
@@ -359,6 +383,15 @@ class App extends Component {
     focusOnGameWindow();
   }
 
+  goToDungeonLevel(level, currentState) {
+    this.setState(prepareDungeonLevel(level, currentState));
+  }
+
+  componentDidMount() {
+    focusOnGameWindow();
+    document.getElementById("player").scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+  }
+
   render() {
     // Generate enemies
     let enemyCount = 0;
@@ -404,8 +437,16 @@ class App extends Component {
       );
     });
 
+    let endDungeonSummary = this.state.showEndDungeonSummary && (
+      <EndDungeonSummary
+        goToDungeonLevel={this.goToDungeonLevel.bind(this, this.state.dungeonLevel + 1, this.state)}
+      />
+    )
+
     return (
       <div id="game-window" className="App" tabIndex="0" onKeyUp={this.handlePlayerMove.bind(this)}>
+        { endDungeonSummary }
+        <SessionStats currentState={{...this.state}} />
         <StatBar
           name="life"
           color="red"
@@ -455,6 +496,7 @@ class App extends Component {
 
         <div className="game-container">
           <Map
+            key = {this.state.dungeonLevel}
             rooms = {this.state.rooms}
             roomCount = {this.state.roomCount}
             maxRoomSize = {this.state.maxRoomSize}
@@ -494,8 +536,8 @@ class App extends Component {
             cellSize = {this.state.cellSize}
             cellGutter = {this.state.cellGutter}
           />
-        </div>
 
+        </div>
       </div>
     );
   }
