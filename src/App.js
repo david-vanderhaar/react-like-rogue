@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { focusOnGameWindow, prepareDungeonLevel } from './Helper';
+import { focusOnGameWindow, prepareDungeonLevel, prepareResetGame } from './Helper';
 import uuid from 'uuid';
 import StatBar from './UI/StatBar';
 import Inventory from './UI/Inventory';
 import EndDungeonSummary from './UI/EndDungeonSummary';
+import EndGame from './UI/EndGame';
 import SessionStats from './UI/SessionStats';
 import { CreateTile, CreateActor, CreatePickUp, CreateEquipmentItem } from './Classes';
 import Map from './Map';
@@ -24,6 +25,8 @@ class App extends Component {
     const mapHeight = 26;
     const cellSize = 50; // pixel width/height of each cell
     const cellGutter = 4; // pixels between each cell
+
+    let mapKey = uuid();
 
     //Dungeon Vars
     const roomCount = 12;
@@ -59,6 +62,7 @@ class App extends Component {
 
     this.state = {
       dungeonLevel: 1,
+      mapKey: mapKey,
       mapWidth: mapWidth,
       mapHeight: mapHeight,
       showDijkstraMap: false,
@@ -78,6 +82,7 @@ class App extends Component {
       equipmentCompareItemId: null,
       showEquipmentCompare: false,
       showEndDungeonSummary: false,
+      showEndGame: false,
       enemyPosX: 0,
       enemyPosY: 0,
       canMove: true,
@@ -92,6 +97,7 @@ class App extends Component {
   }
 
   handlePlayerMove(event) { // MAIN TURN LOOP
+
     if (this.state.canMove) {
       let state = {...this.state};
       let playerControls = state.playerControls;
@@ -261,6 +267,7 @@ class App extends Component {
   }
 
   moveEnemies(tileTs, player, enemyList) {
+    let showEndGame = false;
     let showEndDungeonSummary = false;
     let canMove = true;
     let defeatedEnemyList = this.state.defeatedEnemyList.concat();
@@ -318,7 +325,13 @@ class App extends Component {
       canMove = false;
     }
 
+    if (player.life <=0 ) {
+      showEndGame = true;
+      canMove = false;
+    }
+
     this.setState({
+      showEndGame,
       showEndDungeonSummary,
       canMove,
       player,
@@ -387,6 +400,10 @@ class App extends Component {
     this.setState(prepareDungeonLevel(level, currentState));
   }
 
+  resetGame(currentState) {
+    this.setState(prepareResetGame(currentState));
+  }
+
   componentDidMount() {
     focusOnGameWindow();
     document.getElementById("player").scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
@@ -443,8 +460,15 @@ class App extends Component {
       />
     )
 
+    let endGame = this.state.showEndGame && (
+      <EndGame
+        resetGame={this.resetGame.bind(this, this.state)}
+      />
+    )
+
     return (
       <div id="game-window" className="App" tabIndex="0" onKeyUp={this.handlePlayerMove.bind(this)}>
+        { endGame }
         { endDungeonSummary }
         <SessionStats currentState={{...this.state}} />
         <StatBar
@@ -496,7 +520,7 @@ class App extends Component {
 
         <div className="game-container">
           <Map
-            key = {this.state.dungeonLevel}
+            key = {this.state.mapKey}
             rooms = {this.state.rooms}
             roomCount = {this.state.roomCount}
             maxRoomSize = {this.state.maxRoomSize}

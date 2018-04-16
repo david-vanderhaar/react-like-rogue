@@ -1,5 +1,7 @@
 import { CreateTile, CreateActor, CreatePickUp, CreateEquipmentItem } from './Classes';
 import uuid from 'uuid';
+var names = require('fantasy-names');
+
 
 // Helper Functions
 export function getRandomIntInclusive(min, max) {
@@ -84,6 +86,7 @@ export function prepareDungeonLevel(dungeonLevel, currentState) {
 
   let newState = {
     dungeonLevel: dungeonLevel,
+    mapKey: uuid(),
     showEndDungeonSummary: false,
     canMove: true,
     tileMap: Array(currentState.mapHeight).fill(Array(currentState.mapWidth).fill('')),
@@ -93,7 +96,50 @@ export function prepareDungeonLevel(dungeonLevel, currentState) {
     pickUpList: pickUpList,
     equipmentItemList: equipmentItemList,
   }
-  
+
+  focusOnGameWindow();
+  return newState;
+}
+
+export function prepareResetGame(currentState) {
+  const enemies = 1;
+  const pickUps = 10;
+  const equipmentItems = 5;
+
+  let enemyList = [];
+  for (let i = 0; i < enemies; i++) {
+    let id = uuid();
+    enemyList.push(CreateActor({id: id, attack: 2, life: 2}));
+  }
+
+  let pickUpList = [];
+  for (let i = 0; i < pickUps; i++) {
+    let id = uuid();
+    pickUpList.push(CreatePickUp({id: id}));
+  }
+
+  let equipmentItemList = [];
+  for (let i = 0; i < equipmentItems; i++) {
+    let id = uuid();
+    equipmentItemList.push(CreateEquipmentItem({id: id}));
+  }
+
+  let newState = {
+    player: CreateActor({id: 'player', life: 5, attack: 3}),
+    dungeonLevel: 1,
+    mapKey: uuid(),
+    defeatedEnemyList: [],
+    showEndDungeonSummary: false,
+    showEndGame: false,
+    canMove: true,
+    tileMap: Array(currentState.mapHeight).fill(Array(currentState.mapWidth).fill('')),
+    tileTypes: Array(currentState.mapHeight).fill(Array(currentState.mapWidth).fill(CreateTile({type: 'WALL', canPass: false, containsDestructible: false}))),
+    dijkstraMap: Array(currentState.mapHeight).fill(Array(currentState.mapWidth).fill(100)),
+    enemyList: enemyList,
+    pickUpList: pickUpList,
+    equipmentItemList: equipmentItemList,
+  }
+
   focusOnGameWindow();
   return newState;
 }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Card } from 'react-materialize';
+import { dungeonDescriptionGenerator } from '../Generators/Dungeons/generator';
 
 class EndDungeonSummary extends Component {
   render() {
@@ -10,14 +11,14 @@ class EndDungeonSummary extends Component {
     cardActions.push(<button className="btn" onClick={() => {this.props.goToDungeonLevel()}}>Tweet</button>);
 
     return (
-      <div className="EndDungeonSummary">
+      <div className="EndDungeonSummary card-prompt">
         <Card
           title=''
           actions={cardActions}
         >
           <div className="row">
-            <h1 className="title">Good Job!</h1>
-            <span className="quote">Let's get to the next dungeon.</span> 
+            <h1 className="title">On to the next Dungeon!</h1>
+            <span className="quote flow-text">{dungeonDescriptionGenerator()}</span>
           </div>
         </Card>
       </div>

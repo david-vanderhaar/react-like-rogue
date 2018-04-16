@@ -8,7 +8,7 @@ class DijkstraMap extends Component {
     let minY = 0;
     let maxY = dijkstraMap.length;
     // right
-    if (target.posX + 1 <= maxX) {
+    if (target.posX + 1 < maxX) {
       if (dijkstraMap[target.posY][target.posX + 1] !== 'ignore') {
         neighbors.push({posX: target.posX + 1, posY: target.posY, cost: dijkstraMap[target.posY][target.posX + 1]});
       }
@@ -26,7 +26,7 @@ class DijkstraMap extends Component {
       }
     }
     //down
-    if (target.posY + 1 <= maxY) {
+    if (target.posY + 1 < maxY) {
       if (dijkstraMap[target.posY + 1][target.posX] !== 'ignore') {
         neighbors.push({posX: target.posX, posY: target.posY + 1, cost: dijkstraMap[target.posY + 1][target.posX]});
       }
