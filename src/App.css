@@ -125,6 +125,13 @@ html {
   left: 10vw;
 }
 
+.btn-help-menu {
+  position: fixed;
+  top: 6vh;
+  left: 80vw;
+  width: 10vw;
+}
+
 .tile {
   position: absolute;
   border: solid;

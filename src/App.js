@@ -3,6 +3,7 @@ import { focusOnGameWindow, prepareDungeonLevel, prepareResetGame } from './Help
 import uuid from 'uuid';
 import StatBar from './UI/StatBar';
 import Inventory from './UI/Inventory';
+import HelpMenu from './UI/HelpMenu';
 import EndDungeonSummary from './UI/EndDungeonSummary';
 import EndGame from './UI/EndGame';
 import SessionStats from './UI/SessionStats';
@@ -83,6 +84,7 @@ class App extends Component {
       showEquipmentCompare: false,
       showEndDungeonSummary: false,
       showEndGame: false,
+      showHelpMenu: false,
       enemyPosX: 0,
       enemyPosY: 0,
       canMove: true,
@@ -404,6 +406,12 @@ class App extends Component {
     this.setState(prepareResetGame(currentState));
   }
 
+  toggleHelpMenu() {
+    this.setState({
+      showHelpMenu: !this.state.showHelpMenu
+    });
+  }
+
   componentDidMount() {
     focusOnGameWindow();
     document.getElementById("player").scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
@@ -454,6 +462,10 @@ class App extends Component {
       );
     });
 
+    let helpMenu = this.state.showHelpMenu && (
+      <HelpMenu/>
+    )
+
     let endDungeonSummary = this.state.showEndDungeonSummary && (
       <EndDungeonSummary
         goToDungeonLevel={this.goToDungeonLevel.bind(this, this.state.dungeonLevel + 1, this.state)}
@@ -463,11 +475,20 @@ class App extends Component {
     let endGame = this.state.showEndGame && (
       <EndGame
         resetGame={this.resetGame.bind(this, this.state)}
+        dungeonLevel={this.state.dungeonLevel}
+        defeatedEnemyList={this.state.defeatedEnemyList}
       />
     )
 
     return (
       <div id="game-window" className="App" tabIndex="0" onKeyUp={this.handlePlayerMove.bind(this)}>
+        <button
+          className="btn btn-help-menu"
+          onClick={() => {this.toggleHelpMenu()}}
+        >
+          Help
+        </button>
+        { helpMenu }
         { endGame }
         { endDungeonSummary }
         <SessionStats currentState={{...this.state}} />

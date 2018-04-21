@@ -18,6 +18,14 @@ class EndGame extends Component {
             <h1 className="title">You have fallen!</h1>
             <span className="quote flow-text"></span>
           </div>
+          <div className="row">
+          <div className="col s6 flow-text">
+              You will forever sleep in dungeon level {this.props.dungeonLevel}
+            </div>
+            <div className="col s6 flow-text">
+              You defeated {this.props.defeatedEnemyList.length} monsters.
+            </div>
+          </div>
         </Card>
       </div>
     );
