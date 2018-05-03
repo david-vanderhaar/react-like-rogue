@@ -91,6 +91,18 @@ html {
   color: lightgrey;
 }
 
+.HelpMenu {
+  width: 100%;
+}
+
+.HelpMenu .collapsible-header {
+  background-color: hsl(210,12%,30%);
+}
+
+.HelpMenu .collapsible-body {
+  background-color: grey;
+}
+
 .card-prompt .card {
   background-color: grey;
 }

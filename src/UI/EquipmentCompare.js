@@ -85,12 +85,12 @@ class EquipmentCompare extends Component {
     let cardActions = [];
 
     if (currentItem === null) {
-      cardActions.push(<button className="btn" onClick={() => {this.onEquipHandler(this.props.tileTypes, this.props.equipmentItemList, this.props.player)}}>Equip</button>)
+      cardActions.push(<button key="1" className="btn" onClick={() => {this.onEquipHandler(this.props.tileTypes, this.props.equipmentItemList, this.props.player)}}>Equip</button>)
     } else {
-      cardActions.push(<button className="btn" onClick={() => {this.onSwapHandler(this.props.tileTypes, this.props.equipmentItemList, this.props.player, currentItem)}}>Swap</button>)
+      cardActions.push(<button key="2" className="btn" onClick={() => {this.onSwapHandler(this.props.tileTypes, this.props.equipmentItemList, this.props.player, currentItem)}}>Swap</button>)
     }
 
-    cardActions.push(<button className="btn" onClick={() => {this.props.toggleEquipmentCompare(false)}}>Ignore</button>);
+    cardActions.push(<button key="3" className="btn" onClick={() => {this.props.toggleEquipmentCompare(false)}}>Ignore</button>);
 
     return (
       <div className="EquipmentCompare">

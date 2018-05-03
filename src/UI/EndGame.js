@@ -4,9 +4,21 @@ import { Card } from 'react-materialize';
 class EndGame extends Component {
   render() {
 
+    let tweetText = "https://twitter.com/intent/tweet?text="
+    tweetText += "I made it to dungeon level " + this.props.dungeonLevel + ". How far can you go?".split(' ').join('%20')
+
     let cardActions = [];
-    cardActions.push(<button className="btn" onClick={() => {this.props.resetGame()}}>Restart</button>);
-    cardActions.push(<button className="btn" onClick={() => {this.props.resetGame()}}>Tweet</button>);
+    cardActions.push(<button key="1" className="btn" onClick={() => {this.props.resetGame()}}>Restart</button>);
+    cardActions.push(
+      <a
+        key="2"
+        className="btn twitter-share-button"
+        href={tweetText}
+        target="_blank"
+      >
+        <span className="fa fa-twitter"></span> Tweet
+      </a>
+    );
 
     return (
       <div className="EndGame card-prompt">

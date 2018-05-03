@@ -5,10 +5,22 @@ import { dungeonDescriptionGenerator } from '../Generators/Dungeons/generator';
 class EndDungeonSummary extends Component {
   render() {
 
+    let tweetText = "https://twitter.com/intent/tweet?text="
+    tweetText += "Currently on dungeon level " + this.props.dungeonLevel + ". How far can you go?".split(' ').join('%20')
+
     let cardActions = [];
-    cardActions.push(<button className="btn" onClick={() => {this.props.goToDungeonLevel()}}>Next Dungeon</button>);
-    cardActions.push(<button className="btn" onClick={() => {this.props.goToDungeonLevel()}}>Save</button>);
-    cardActions.push(<button className="btn" onClick={() => {this.props.goToDungeonLevel()}}>Tweet</button>);
+    cardActions.push(<button key="1" className="btn" onClick={() => {this.props.goToDungeonLevel()}}>Next Dungeon</button>);
+    cardActions.push(<button key="2" className="btn" onClick={() => {this.props.goToDungeonLevel()}}>Save</button>);
+    cardActions.push(
+      <a
+        key="3"
+        className="btn twitter-share-button"
+        href={tweetText}
+        target="_blank"
+      >
+        <span className="fa fa-twitter"></span> Tweet
+      </a>
+    );
 
     return (
       <div className="EndDungeonSummary card-prompt">

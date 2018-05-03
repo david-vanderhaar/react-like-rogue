@@ -1,7 +1,5 @@
 import { CreateTile, CreateActor, CreatePickUp, CreateEquipmentItem } from './Classes';
 import uuid from 'uuid';
-var names = require('fantasy-names');
-
 
 // Helper Functions
 export function getRandomIntInclusive(min, max) {

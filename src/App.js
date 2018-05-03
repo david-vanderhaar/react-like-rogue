@@ -84,7 +84,7 @@ class App extends Component {
       showEquipmentCompare: false,
       showEndDungeonSummary: false,
       showEndGame: false,
-      showHelpMenu: false,
+      showHelpMenu: true,
       enemyPosX: 0,
       enemyPosY: 0,
       canMove: true,
@@ -407,6 +407,9 @@ class App extends Component {
   }
 
   toggleHelpMenu() {
+    if (!this.state.showHelpMenu === false) {
+      focusOnGameWindow();
+    }
     this.setState({
       showHelpMenu: !this.state.showHelpMenu
     });
@@ -462,13 +465,10 @@ class App extends Component {
       );
     });
 
-    let helpMenu = this.state.showHelpMenu && (
-      <HelpMenu/>
-    )
-
     let endDungeonSummary = this.state.showEndDungeonSummary && (
       <EndDungeonSummary
         goToDungeonLevel={this.goToDungeonLevel.bind(this, this.state.dungeonLevel + 1, this.state)}
+        dungeonLevel={this.state.dungeonLevel}
       />
     )
 
@@ -482,13 +482,10 @@ class App extends Component {
 
     return (
       <div id="game-window" className="App" tabIndex="0" onKeyUp={this.handlePlayerMove.bind(this)}>
-        <button
-          className="btn btn-help-menu"
-          onClick={() => {this.toggleHelpMenu()}}
-        >
-          Help
-        </button>
-        { helpMenu }
+        <HelpMenu
+          toggleHelpMenu={this.toggleHelpMenu.bind(this)}
+          showHelpMenu={this.state.showHelpMenu}
+        />
         { endGame }
         { endDungeonSummary }
         <SessionStats currentState={{...this.state}} />
