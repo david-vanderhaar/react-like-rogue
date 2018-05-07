@@ -96,6 +96,7 @@ export function prepareDungeonLevel(dungeonLevel, currentState) {
   }
 
   focusOnGameWindow();
+  clearDice();
   return newState;
 }
 
@@ -139,5 +140,28 @@ export function prepareResetGame(currentState) {
   }
 
   focusOnGameWindow();
+  clearDice();
   return newState;
+}
+
+export function throwDice(text, color, stat) {
+  let die = document.createElement('span');
+  let max_move = 20;
+  die.setAttribute('class', 'thrown-dice ' + color + ' ' + stat);
+  document.getElementById('game-window').appendChild(die);
+  // die.innerHTML = text;
+
+  setTimeout(() => {
+    die.style.left = getRandomIntInclusive(50 - max_move, 50 + max_move).toString() + 'vw';
+    die.style.top = getRandomIntInclusive(50 - max_move, 50 + max_move).toString() + 'vh';
+  }, 100)
+  setTimeout(() => {
+    die.remove();
+  }, 4000)
+}
+
+export function clearDice() {
+  [].forEach.call(document.querySelectorAll('.thrown-dice'),function(e){
+    e.parentNode.removeChild(e);
+  });
 }

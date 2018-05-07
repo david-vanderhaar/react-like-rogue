@@ -1,4 +1,5 @@
 import Materialize from 'materialize-css';
+import { getRandomIntInclusive, throwDice } from './Helper';
 
 export class Tile {
   constructor(type, canPass, containsDestructible) {
@@ -130,6 +131,25 @@ export const CreateActor = ({
       return this[stat] + statFromEquipment;
     },
 
+    rollStatDice(stat) {
+      let color = stat == 'attack' ? 'green' : 'blue';
+      let is_player = true;
+      if (this.id !== 'player') {
+        color += ' darken-4'
+        is_player = false;
+      }
+      let statFromEquipment = this.equipment.reduce((prev, curr) => prev + curr[stat], 0);
+      let dice_count = this[stat] + statFromEquipment;
+
+      let dice = [];
+      for (let i = 0; i < dice_count; i++){
+        let die = CreateDie().roll(color, stat, is_player);
+        dice.push(die)
+      }
+      let result = dice.reduce((acc, curr) => acc + curr, 0);
+      return result;
+    },
+
     takeHitV1(attack) {
       let newDefenseValue = this.defense;
       let newLifeValue = this.life;
@@ -146,10 +166,48 @@ export const CreateActor = ({
     },
 
     takeHit(attack) {
-      let calculatedAttack = (attack - this.calculateStat('defense')) > 0 ? (attack - this.calculateStat('defense')) : 0;
+      let defense = this.rollStatDice('defense');
+      let calculatedAttack = (attack - defense) > 0 ? (attack - defense) : 0;
       this.life -= calculatedAttack;
       if (this.id === 'player') {
-        Materialize.toast('Attacked for ' + calculatedAttack + ' damage!', 4000)
+        Materialize.toast('You were attacked and took ' + calculatedAttack + ' damage!', 4000)
+      } else {
+        Materialize.toast('You attacked this creature a dealt ' + calculatedAttack + ' damage!', 4000)
       }
     },
+});
+
+export const CreateDie = ({
+    // Set default values if none passed in
+    sides = 6,
+    hits = 3,
+    criticals = 1,
+  } = {}) => ({
+  sides,
+  hits,
+  criticals,
+
+  // Method
+  roll(color, stat, is_player) {
+    let result = getRandomIntInclusive(1, this.sides);
+
+    if (result <= this.criticals) {
+      let stat_class = 'dice-critical';
+      if (is_player) { stat_class += '-player'}
+      throwDice('Critical', color, stat_class);
+      return 2;
+    } else if (result <= this.criticals + this.hits) {
+      let stat_class = 'dice-hit';
+      if (stat === 'defense') { stat_class += '-defense'}
+      if (is_player) { stat_class += '-player'}
+      throwDice('Hit', color, stat_class);
+      return 1;
+    } else {
+      let stat_class = 'dice-miss';
+      if (is_player) { stat_class += '-player'}
+      throwDice('Miss', color, stat_class);
+      return 0;
+    }
+  }
+
 });

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { focusOnGameWindow, prepareDungeonLevel, prepareResetGame } from './Helper';
+import { focusOnGameWindow, prepareDungeonLevel, prepareResetGame, throwDice, clearDice } from './Helper';
 import uuid from 'uuid';
 import StatBar from './UI/StatBar';
 import Inventory from './UI/Inventory';
@@ -84,7 +84,7 @@ class App extends Component {
       showEquipmentCompare: false,
       showEndDungeonSummary: false,
       showEndGame: false,
-      showHelpMenu: true,
+      showHelpMenu: false,
       enemyPosX: 0,
       enemyPosY: 0,
       canMove: true,
@@ -153,7 +153,8 @@ class App extends Component {
         for (let i = 0; i < enemyList.length; i++) {
           enemyList[i] = {...enemyList[i]}; //copy the Object
           if (enemyList[i].id === tileToCheck.destructibleId) {
-            enemyList[i].takeHit(player.calculateStat('attack'));
+            clearDice();
+            enemyList[i].takeHit(player.rollStatDice('attack'));
           }
         }
       }
@@ -293,7 +294,7 @@ class App extends Component {
 
         // this snippet targets only the player
         if (neighbors[0].posX === player.posX && neighbors[0].posY === player.posY) {
-          player.takeHit(enemyList[i].attack);
+          player.takeHit(enemyList[i].rollStatDice('attack'));
         }
 
         if (tileToCheck.canPass === true) { // check that the tile is passable
