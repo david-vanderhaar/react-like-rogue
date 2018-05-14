@@ -1,4 +1,6 @@
 import { CreateTile, CreateActor, CreatePickUp, CreateEquipmentItem } from './Classes';
+import { getSvg } from './SVGGenerator';
+import * as Enemy from './Enemy';
 import uuid from 'uuid';
 
 // Helper Functions
@@ -64,11 +66,7 @@ export function prepareDungeonLevel(dungeonLevel, currentState) {
   const pickUps = 10;
   const equipmentItems = 5;
 
-  let enemyList = [];
-  for (let i = 0; i < enemies; i++) {
-    let id = uuid();
-    enemyList.push(CreateActor({id: id, attack: 2, life: 2}));
-  }
+  let enemyList = Enemy.generateEnemies(enemies);
 
   let pickUpList = [];
   for (let i = 0; i < pickUps; i++) {
@@ -144,12 +142,12 @@ export function prepareResetGame(currentState) {
   return newState;
 }
 
-export function throwDice(text, color, stat) {
+export function throwDice(text, color, svg_name) {
   let die = document.createElement('span');
   let max_move = 20;
-  die.setAttribute('class', 'thrown-dice ' + color + ' ' + stat);
+  die.setAttribute('class', 'thrown-dice ' + color);
   document.getElementById('game-window').appendChild(die);
-  // die.innerHTML = text;
+  die.innerHTML = getSvg(svg_name, 'none');
 
   setTimeout(() => {
     die.style.left = getRandomIntInclusive(50 - max_move, 50 + max_move).toString() + 'vw';

@@ -103,6 +103,7 @@ export const CreateEquipmentItem = ({
 export const CreateActor = ({
     // Set default values if none passed in
     id = null,
+    name = 'none',
     posX = 0,
     posY = 0,
     life = 1,
@@ -115,6 +116,7 @@ export const CreateActor = ({
     equipment = [],
   } = {}) => ({
     id,
+    name,
     posX,
     posY,
     life,
@@ -132,18 +134,18 @@ export const CreateActor = ({
     },
 
     rollStatDice(stat) {
-      let color = stat == 'attack' ? 'green' : 'blue';
-      let is_player = true;
+      // let color = stat == 'attack' ? 'green' : 'blue';
+      let color = 'black';
       if (this.id !== 'player') {
-        color += ' darken-4'
-        is_player = false;
+        // color += ' darken-4'
+        color = 'purple darken-4'
       }
       let statFromEquipment = this.equipment.reduce((prev, curr) => prev + curr[stat], 0);
       let dice_count = this[stat] + statFromEquipment;
 
       let dice = [];
       for (let i = 0; i < dice_count; i++){
-        let die = CreateDie().roll(color, stat, is_player);
+        let die = CreateDie().roll(color, stat);
         dice.push(die)
       }
       let result = dice.reduce((acc, curr) => acc + curr, 0);
@@ -172,7 +174,7 @@ export const CreateActor = ({
       if (this.id === 'player') {
         Materialize.toast('You were attacked and took ' + calculatedAttack + ' damage!', 4000)
       } else {
-        Materialize.toast('You attacked this creature a dealt ' + calculatedAttack + ' damage!', 4000)
+        Materialize.toast('You attacked this creature and dealt ' + calculatedAttack + ' damage!', 4000)
       }
     },
 });
@@ -188,24 +190,21 @@ export const CreateDie = ({
   criticals,
 
   // Method
-  roll(color, stat, is_player) {
+  roll(color, stat) {
     let result = getRandomIntInclusive(1, this.sides);
 
     if (result <= this.criticals) {
-      let stat_class = 'dice-critical';
-      if (is_player) { stat_class += '-player'}
-      throwDice('Critical', color, stat_class);
+      let svg_name = 'electric';
+      throwDice('Critical', color, svg_name);
       return 2;
     } else if (result <= this.criticals + this.hits) {
-      let stat_class = 'dice-hit';
-      if (stat === 'defense') { stat_class += '-defense'}
-      if (is_player) { stat_class += '-player'}
-      throwDice('Hit', color, stat_class);
+      let svg_name = 'revolt';
+      if (stat === 'defense') { svg_name = 'round_shield'}
+      throwDice('Hit', color, svg_name);
       return 1;
     } else {
-      let stat_class = 'dice-miss';
-      if (is_player) { stat_class += '-player'}
-      throwDice('Miss', color, stat_class);
+      let svg_name = 'cross_mark';
+      throwDice('Miss', color, svg_name);
       return 0;
     }
   }

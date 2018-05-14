@@ -1,7 +1,7 @@
 # To Do
 
 1. ~~Add Help/Tutorial Component~~
-2. Re-factor Combat Mechanic
+2. ~~Re-factor Combat Mechanic~~
 3. Add Monsters and Equipment
 4. Add and implement SVG images for items and actors
 5. Tweak scrollToPlayer animation

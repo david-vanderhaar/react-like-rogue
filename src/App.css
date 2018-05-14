@@ -187,7 +187,6 @@ html {
     100% {
       transform:  rotate(879deg);
     }
-
 }
 
 .thrown-dice {
@@ -199,37 +198,7 @@ html {
   border-radius: 6px;
   transition: .2s;
   z-index: 3;
-  /* filter: brightness(0.5) sepia(1) hue-rotate(-120deg) saturate(5); */
-  /* fill: red; */
-  /* animation-name: throw;
-  animation-duration: 2s; */
   animation: App-logo-spin 1 1s ease-out;
-}
-
-.dice-hit {
-  background-image: url('./svgs/enemy/revolt.svg');
-}
-.dice-hit-defense {
-  background-image: url('./svgs/enemy/round-shield.svg');
-}
-.dice-critical {
-  background-image: url('./svgs/enemy/electric.svg');
-}
-.dice-miss {
-  background-image: url('./svgs/enemy/cross-mark.svg');
-}
-
-.dice-hit-player {
-  background-image: url('./svgs/player/revolt.svg');
-}
-.dice-hit-defense-player {
-  background-image: url('./svgs/player/round-shield.svg');
-}
-.dice-critical-player {
-  background-image: url('./svgs/player/electric.svg');
-}
-.dice-miss-player {
-  background-image: url('./svgs/player/cross-mark.svg');
 }
 
 .player {

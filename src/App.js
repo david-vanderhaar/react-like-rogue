@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { focusOnGameWindow, prepareDungeonLevel, prepareResetGame, throwDice, clearDice } from './Helper';
+import { focusOnGameWindow, prepareDungeonLevel, prepareResetGame, clearDice } from './Helper';
 import uuid from 'uuid';
 import StatBar from './UI/StatBar';
 import Inventory from './UI/Inventory';
