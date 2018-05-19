@@ -11,3 +11,4 @@
 9. Add music and SFX
 10. Add Save Option
 11. ~~Add Tweet Option~~
+12. Add Battle Simulator for Dice Probabilities

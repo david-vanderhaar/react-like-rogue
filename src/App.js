@@ -12,6 +12,7 @@ import Map from './Map';
 import DijkstraMap from './DijkstraMap';
 import Player from './Player';
 import Enemy from './Enemy';
+import { generateEnemies } from './Enemy';
 import PickUp from './PickUp';
 import EquipmentItem from './EquipmentItem';
 import EquipmentCompare from './UI/EquipmentCompare';
@@ -40,12 +41,7 @@ class App extends Component {
 
     const player = CreateActor({id: 'player', life: 5, attack: 3});
 
-    let enemyList = [];
-    for (let i = 0; i < enemies; i++) {
-      // let id = i;
-      let id = uuid();
-      enemyList.push(CreateActor({id: id, attack: 2, life: 2}));
-    }
+    let enemyList = generateEnemies(enemies, 0);
 
     let pickUpList = [];
     for (let i = 0; i < pickUps; i++) {

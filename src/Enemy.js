@@ -1,9 +1,16 @@
 import React, { Component } from 'react';
 import { getRandomIntInclusive } from './Helper';
 import { CreateActor } from './Classes';
+import { getSvg } from './SVGGenerator';
+import { getMonster } from './DB/monsters.js';
 import uuid from 'uuid';
 
 class Enemy extends Component {
+
+  componentDidMount() {
+    document.getElementById(this.props.enemy.id).innerHTML = getSvg(this.props.enemy.svgReference, 'none', this.props.cellSize);
+  }
+
   render() {
     const style = {
       top: this.props.enemyPosY * (this.props.cellSize + this.props.cellGutter),
@@ -11,9 +18,10 @@ class Enemy extends Component {
       width: this.props.cellSize,
       height: this.props.cellSize,
     };
+
     return (
       <div className="Enemy">
-        <span className="player purple darken-4 white-text" style={style}>
+        <span id={this.props.enemy.id} className="player purple darken-4 white-text" style={style}>
           E
           <br/>
           {this.props.enemy.life}/{this.props.enemy.defense}/{this.props.enemy.attack}
@@ -24,8 +32,9 @@ class Enemy extends Component {
 }
 
 export default Enemy;
+// END COMPONENT
 
-export function generateEnemies(enemyAmount) {
+export function generateEnemies(enemyAmount, dungeonLevel) {
   let levelTypes = [
     'balanced',
     'attack',
@@ -54,28 +63,16 @@ export function generateEnemies(enemyAmount) {
     defense: 0,
   }
 
-  let createEnemyType = {
-    balanced: function(id) {
-      return CreateActor({id: id, life: 3})
-    },
-    attack: function(id) {
-      return CreateActor({id: id, attack: 3})
-    },
-    defense: function(id) {
-      return CreateActor({id: id, defense: 3})
-    }
-  }
-
   let enemyList = [];
   for (let type in enemyAmounts) {
     if (enemyAmount > 0) {
       enemyAmounts[type] = Math.ceil(enemyAmount * enemyTypes[type])
       enemyAmount -= enemyAmounts[type];
       for (let i = 0; i < enemyAmounts[type]; i++) {
-        let id = uuid();
-        enemyList.push(createEnemyType[type](id));
+        enemyList.push(getMonster(dungeonLevel, type));
       }
     }
   }
+
   return enemyList
 }

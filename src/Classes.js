@@ -104,6 +104,7 @@ export const CreateActor = ({
     // Set default values if none passed in
     id = null,
     name = 'none',
+    svgReference = 'round_shield',
     posX = 0,
     posY = 0,
     life = 1,
@@ -117,6 +118,7 @@ export const CreateActor = ({
   } = {}) => ({
     id,
     name,
+    svgReference,
     posX,
     posY,
     life,

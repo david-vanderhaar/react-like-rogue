@@ -1,3 +1,6 @@
+import uuid from 'uuid';
+import { CreateActor } from '../Classes';
+
 export function getMonster(dungeonLevel, type) {
   let id = uuid();
   let actorStats = {id: id};
@@ -6,10 +9,8 @@ export function getMonster(dungeonLevel, type) {
   let availableMonsters = monsters[type].filter(monster => monster.minimumDungeonLevel <= dungeonLevel);
   // grab random monster: balanced[Math.floor(Math.random()*balanced.length)];
   let selectedMonster = availableMonsters[Math.floor(Math.random()*monsters[type].length)]['stats']
-
   // merge monster stats with actor stats object
-
-  return CreateActor(actorStats)
+  return CreateActor({...actorStats, ...selectedMonster})
 }
 
 let monsters = {
@@ -20,7 +21,8 @@ let monsters = {
         name: 'Goblin',
         life: 1,
         defense: 1,
-        attack: 1
+        attack: 1,
+        svgReference: 'goblin',
       },
       minimumDungeonLevel: 0
     }
@@ -32,7 +34,8 @@ let monsters = {
         name: 'Fat Goblin',
         life: 1,
         defense: 2,
-        attack: 1
+        attack: 1,
+        svgReference: 'fat_goblin',
       },
       minimumDungeonLevel: 0
     }
@@ -44,7 +47,8 @@ let monsters = {
         name: 'Fierce Goblin',
         life: 1,
         defense: 1,
-        attack: 2
+        attack: 2,
+        svgReference: 'fierce_goblin',
       },
       minimumDungeonLevel: 0
     }
