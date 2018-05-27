@@ -7,7 +7,7 @@ import uuid from 'uuid';
 
 class Enemy extends Component {
 
-  componentDidMount() {
+  componentDidUpdate() {
     document.getElementById(this.props.enemy.id).innerHTML = getSvg(this.props.enemy.svgReference, 'none', this.props.cellSize);
   }
 
@@ -34,20 +34,12 @@ class Enemy extends Component {
 export default Enemy;
 // END COMPONENT
 
-export function generateEnemies(enemyAmount, dungeonLevel) {
-  let levelTypes = [
-    'balanced',
-    'attack',
-    'defense'
-  ];
-
+export function generateEnemies(enemyAmount, dungeonLevel, currentLevelType) {
   let enemyTypes = {
     balanced: 0,
     attack: 0,
     defense: 0
   }
-
-  let currentLevelType = levelTypes[getRandomIntInclusive(0, 2)];
 
   for (let type in enemyTypes) {
     if (type === currentLevelType) {

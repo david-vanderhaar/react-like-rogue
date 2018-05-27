@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { focusOnGameWindow, prepareDungeonLevel, prepareResetGame, clearDice } from './Helper';
+import { getRandomIntInclusive, focusOnGameWindow, prepareDungeonLevel, prepareResetGame, clearDice } from './Helper';
 import uuid from 'uuid';
 import StatBar from './UI/StatBar';
 import Inventory from './UI/Inventory';
@@ -14,7 +14,9 @@ import Player from './Player';
 import Enemy from './Enemy';
 import { generateEnemies } from './Enemy';
 import PickUp from './PickUp';
+import { generatePickUps } from './PickUp';
 import EquipmentItem from './EquipmentItem';
+import { generateEquipment } from './EquipmentItem';
 import EquipmentCompare from './UI/EquipmentCompare';
 import './App.css';
 
@@ -37,28 +39,27 @@ class App extends Component {
     const minRoomSize = 4;
     const enemies = 1;
     const pickUps = 10;
-    const equipmentItems = 15;
+    const equipmentItems = 5;
 
     const player = CreateActor({id: 'player', life: 5, attack: 3});
 
-    let enemyList = generateEnemies(enemies, 0);
+    const levelTypes = [
+      'balanced',
+      'attack',
+      'defense'
+    ];
 
-    let pickUpList = [];
-    for (let i = 0; i < pickUps; i++) {
-      // let id = i.toString() + '-pickUp';
-      let id = uuid();
-      pickUpList.push(CreatePickUp({id: id}));
-    }
+    let currentLevelType = levelTypes[getRandomIntInclusive(0, 2)];
 
-    let equipmentItemList = [];
-    for (let i = 0; i < equipmentItems; i++) {
-      // let id = i.toString() + '-equipmentItem';
-      let id = uuid();
-      equipmentItemList.push(CreateEquipmentItem({id: id}));
-    }
+    let enemyList = generateEnemies(enemies, 0, currentLevelType);
+
+    let pickUpList = generatePickUps(pickUps, 0, currentLevelType);
+
+    let equipmentItemList = generateEquipment(equipmentItems, 0, currentLevelType);
 
     this.state = {
       dungeonLevel: 1,
+      currentLevelType: currentLevelType,
       mapKey: mapKey,
       mapWidth: mapWidth,
       mapHeight: mapHeight,

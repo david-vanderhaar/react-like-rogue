@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
+import { getSvg } from './SVGGenerator';
+import { getPickUp } from './DB/pickups.js';
 
 class PickUp extends Component {
+
+  componentDidUpdate() {
+    document.getElementById(this.props.pickUp.id).innerHTML = getSvg(this.props.pickUp.svgReference, 'none', this.props.cellSize);
+  }
+
   render() {
     const style = {
       top: this.props.pickUp.posY * (this.props.cellSize + this.props.cellGutter),
@@ -10,7 +17,7 @@ class PickUp extends Component {
     };
     return (
       <div className="PickUp">
-        <span className="item amber darken-4 white-text" style={style}>
+        <span id={this.props.pickUp.id} className="item amber darken-4 white-text" style={style}>
           Pi
           <br/>
           {this.props.pickUp.boostValue}
@@ -21,3 +28,38 @@ class PickUp extends Component {
 }
 
 export default PickUp;
+
+export function generatePickUps(amount, dungeonLevel, currentLevelType) {
+  let pickUpTypes = {
+    balanced: 0,
+    attack: 0,
+    defense: 0
+  }
+
+  for (let type in pickUpTypes) {
+    if (type === currentLevelType) {
+      pickUpTypes[type] = 0.6;
+    } else {
+      pickUpTypes[type] = 0.2;
+    }
+  }
+
+  let typeAmounts = {
+    balanced: 0,
+    attack: 0,
+    defense: 0,
+  }
+
+  let pickUpList = [];
+  for (let type in typeAmounts) {
+    if (amount > 0) {
+      typeAmounts[type] = Math.ceil(amount * pickUpTypes[type])
+      amount -= typeAmounts[type];
+      for (let i = 0; i < typeAmounts[type]; i++) {
+        pickUpList.push(getPickUp(dungeonLevel, type));
+      }
+    }
+  }
+
+  return pickUpList
+}

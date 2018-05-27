@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { focusOnGameWindow, cloneTiles } from '../Helper';
+import { getSvg } from '../SVGGenerator';
 import { Card } from 'react-materialize';
 import Materialize from 'materialize-css';
+import Parser from 'html-react-parser';
 
 class EquipmentCompare extends Component {
   // compares stats of current equipment slot and this esuipment slot
@@ -34,6 +36,7 @@ class EquipmentCompare extends Component {
   }
 
   onSwapHandler(tileTs, equipmentItemList, player, currentItem) {
+    console.log('swap')
     tileTs = cloneTiles(tileTs);
     equipmentItemList = equipmentItemList.concat();
     player = {...player};
@@ -76,6 +79,7 @@ class EquipmentCompare extends Component {
 
   render() {
     let itemToEquip = this.props.equipmentItemList.filter(item => item.id === this.props.equipmentCompareItemId)[0];
+
     let currentItem = null
 
     if (itemToEquip && !itemToEquip.canEquip(this.props.player)) {
@@ -110,7 +114,7 @@ class EquipmentCompare extends Component {
               <div className="grey left center-align item-compare-card">
                 {
                   itemToEquip &&
-                    itemToEquip.id
+                    Parser(getSvg(itemToEquip.svgReference, 'none', '60px'))
                 }
               </div>
               <ul className="center">
@@ -128,7 +132,7 @@ class EquipmentCompare extends Component {
               <div className="grey right center-align item-compare-card">
                 {
                   currentItem &&
-                    currentItem.id
+                    Parser(getSvg(currentItem.svgReference, 'none', '60px'))
                 }
               </div>
               {

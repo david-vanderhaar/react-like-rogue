@@ -1,6 +1,8 @@
 import { CreateTile, CreateActor, CreatePickUp, CreateEquipmentItem } from './Classes';
 import { getSvg } from './SVGGenerator';
 import * as Enemy from './Enemy';
+import * as PickUp from './PickUp';
+import * as EquipmentItem from './EquipmentItem';
 import uuid from 'uuid';
 
 // Helper Functions
@@ -65,22 +67,22 @@ export function prepareDungeonLevel(dungeonLevel, currentState) {
   const enemies = 1 + (dungeonLevel * 2);
   const pickUps = 10;
   const equipmentItems = 5;
+  const levelTypes = [
+    'balanced',
+    'attack',
+    'defense'
+  ];
 
-  let enemyList = Enemy.generateEnemies(enemies, dungeonLevel);
+  let currentLevelType = levelTypes[getRandomIntInclusive(0, 2)];
 
-  let pickUpList = [];
-  for (let i = 0; i < pickUps; i++) {
-    let id = uuid();
-    pickUpList.push(CreatePickUp({id: id}));
-  }
+  let enemyList = Enemy.generateEnemies(enemies, dungeonLevel, currentLevelType);
 
-  let equipmentItemList = [];
-  for (let i = 0; i < equipmentItems; i++) {
-    let id = uuid();
-    equipmentItemList.push(CreateEquipmentItem({id: id}));
-  }
+  let pickUpList = PickUp.generatePickUps(pickUps, dungeonLevel, currentLevelType);
+
+  let equipmentItemList = EquipmentItem.generateEquipment(equipmentItems, dungeonLevel, currentLevelType);
 
   let newState = {
+    currentLevelType: currentLevelType,
     dungeonLevel: dungeonLevel,
     mapKey: uuid(),
     showEndDungeonSummary: false,
@@ -102,22 +104,22 @@ export function prepareResetGame(currentState) {
   const enemies = 1;
   const pickUps = 10;
   const equipmentItems = 5;
+  const levelTypes = [
+    'balanced',
+    'attack',
+    'defense'
+  ];
 
-  let enemyList = Enemy.generateEnemies(enemies, 0);
+  let currentLevelType = levelTypes[getRandomIntInclusive(0, 2)];
 
-  let pickUpList = [];
-  for (let i = 0; i < pickUps; i++) {
-    let id = uuid();
-    pickUpList.push(CreatePickUp({id: id}));
-  }
+  let enemyList = Enemy.generateEnemies(enemies, 0, currentLevelType);
 
-  let equipmentItemList = [];
-  for (let i = 0; i < equipmentItems; i++) {
-    let id = uuid();
-    equipmentItemList.push(CreateEquipmentItem({id: id}));
-  }
+  let pickUpList = PickUp.generatePickUps(pickUps, 0, currentLevelType);
+
+  let equipmentItemList = EquipmentItem.generateEquipment(equipmentItems, 0, currentLevelType);
 
   let newState = {
+    currentLevelType: currentLevelType,
     player: CreateActor({id: 'player', life: 5, attack: 3}),
     dungeonLevel: 1,
     mapKey: uuid(),

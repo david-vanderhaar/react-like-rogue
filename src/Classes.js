@@ -42,6 +42,7 @@ export const CreateTile = ({
 
 export const CreatePickUp = ({
     id = null,
+    svgReference = 'round_shield',
     posX = 0,
     posY = 0,
     boostValue = 1,
@@ -50,6 +51,7 @@ export const CreatePickUp = ({
     taken = false,
   } = {}) => ({
     id,
+    svgReference,
     posX,
     posY,
     statName,
@@ -70,6 +72,7 @@ export const CreatePickUp = ({
 
 export const CreateEquipmentItem = ({
   id = null,
+  svgReference = 'torso_chain_mail',
   posX = 0,
   posY = 0,
   taken = false,
@@ -79,6 +82,7 @@ export const CreateEquipmentItem = ({
   attack = 1,
 } = {}) => ({
   id,
+  svgReference,
   posX,
   posY,
   taken,
@@ -136,10 +140,8 @@ export const CreateActor = ({
     },
 
     rollStatDice(stat) {
-      // let color = stat == 'attack' ? 'green' : 'blue';
       let color = 'black';
       if (this.id !== 'player') {
-        // color += ' darken-4'
         color = 'purple darken-4'
       }
       let statFromEquipment = this.equipment.reduce((prev, curr) => prev + curr[stat], 0);

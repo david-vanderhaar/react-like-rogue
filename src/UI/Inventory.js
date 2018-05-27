@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { getSvg } from '../SVGGenerator';
 
 class InventoryItem extends Component {
 
@@ -23,10 +24,15 @@ class InventoryItem extends Component {
 
   }
 
+  componentDidMount() {
+    document.getElementById(this.props.item.id + '-item').innerHTML = getSvg(this.props.item.svgReference, 'none', 35);
+  }
+
   render() {
     return (
       <div className="InventoryItem">
         <div
+          id={this.props.item.id + '-item'}
           className="btn"
           onClick={this.useItem}
         >
