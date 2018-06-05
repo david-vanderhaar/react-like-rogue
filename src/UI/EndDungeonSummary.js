@@ -18,7 +18,7 @@ class EndDungeonSummary extends Component {
         href={tweetText}
         target="_blank"
       >
-        <span className="fa fa-twitter"></span> Tweet
+        <span className="fab fa-twitter"></span> Tweet
       </a>
     );
 

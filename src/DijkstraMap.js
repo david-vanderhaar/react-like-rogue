@@ -124,9 +124,6 @@ class DijkstraMap extends Component {
     return (
       <div className="DijkstraMap">
         {tiles}
-        <button className="btn ctrl-btn" onClick={this.props.handleToggleDijkstraMap}>
-          Toggle Dijkstra
-        </button>
       </div>
     );
   }

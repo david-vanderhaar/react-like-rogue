@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { getRandomIntInclusive, focusOnGameWindow, prepareDungeonLevel, prepareResetGame, clearDice } from './Helper';
 import uuid from 'uuid';
+import MenuButtons from './UI/MenuButtons';
 import StatBar from './UI/StatBar';
 import Inventory from './UI/Inventory';
 import HelpMenu from './UI/HelpMenu';
@@ -82,6 +83,7 @@ class App extends Component {
       showEndDungeonSummary: false,
       showEndGame: false,
       showHelpMenu: false,
+      showInventoryCard: false,
       enemyPosX: 0,
       enemyPosY: 0,
       canMove: true,
@@ -413,6 +415,15 @@ class App extends Component {
     });
   }
 
+  toggleInventoryCard() {
+    if (!this.state.showInventoryCard === false) {
+      focusOnGameWindow();
+    }
+    this.setState({
+      showInventoryCard: !this.state.showInventoryCard
+    });
+  }
+
   componentDidMount() {
     focusOnGameWindow();
     document.getElementById("player").scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
@@ -481,8 +492,8 @@ class App extends Component {
     return (
       <div id="game-window" className="App" tabIndex="0" onKeyUp={this.handlePlayerMove.bind(this)}>
         <HelpMenu
-          toggleHelpMenu={this.toggleHelpMenu.bind(this)}
           showHelpMenu={this.state.showHelpMenu}
+          toggleHelpMenu = {this.toggleHelpMenu.bind(this)}
         />
         { endGame }
         { endDungeonSummary }
@@ -498,7 +509,7 @@ class App extends Component {
         <StatBar
           name="defense"
           color="blue"
-          icon="fa fa-shield stat-icon"
+          icon="fa fa-shield-alt stat-icon"
           stat={this.state.player.calculateStat('defense')}
           statMax={10}
           position={{top: 40, left: 2, width: 6, height: 25, gutter: 1, iconSize: 6}}
@@ -506,7 +517,7 @@ class App extends Component {
         <StatBar
           name="attack"
           color="green"
-          icon="fa fa-legal stat-icon"
+          icon="fa fa-gavel stat-icon"
           stat={this.state.player.calculateStat('attack')}
           statMax={10}
           position={{top: 70, left: 2, width: 6, height: 25, gutter: 1, iconSize: 6}}
@@ -516,6 +527,8 @@ class App extends Component {
           player = {this.state.player}
           inventory = {this.state.player.inventory}
           handlePlayerUpdate = {this.handlePlayerUpdate.bind(this)}
+          showInventoryCard={this.state.showInventoryCard}
+          toggleInventoryCard = {this.toggleInventoryCard.bind(this)}
         />
 
         {
@@ -578,6 +591,11 @@ class App extends Component {
           />
 
         </div>
+        <MenuButtons
+          handleToggleDijkstraMap = {this.handleToggleDijkstraMap.bind(this)}
+          toggleHelpMenu = {this.toggleHelpMenu.bind(this)}
+          toggleInventoryCard = {this.toggleInventoryCard.bind(this)}
+        />
       </div>
     );
   }

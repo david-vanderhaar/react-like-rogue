@@ -97,7 +97,7 @@ class EquipmentCompare extends Component {
     cardActions.push(<button key="3" className="btn" onClick={() => {this.props.toggleEquipmentCompare(false)}}>Ignore</button>);
 
     return (
-      <div className="EquipmentCompare">
+      <div className="EquipmentCompare card-prompt">
         <Card
           title=''
           actions={cardActions}

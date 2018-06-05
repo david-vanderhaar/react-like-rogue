@@ -18,7 +18,7 @@ class HelpMenu extends Component {
         </div>
         <div className="row">
           <div className="col s12 flow-text">
-          <Collapsible accordion defaultActiveKey={0}>
+          <Collapsible accordion defaultActiveKey={false}>
             <CollapsibleItem header='Controls'>
               <div className="row">
                 <div className="col s12 center">
@@ -65,15 +65,7 @@ class HelpMenu extends Component {
 
     return (
       <div className="HelpMenu card-prompt">
-        <button
-          className="btn btn-help-menu"
-          onClick={() => {this.props.toggleHelpMenu()}}
-        >
-          Help
-        </button>
-
         { helpMenu }
-
       </div>
     );
   }

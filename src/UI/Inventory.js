@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import { Card } from 'react-materialize';
 import { getSvg } from '../SVGGenerator';
+import Parser from 'html-react-parser';
 
 class InventoryItem extends Component {
 
@@ -24,10 +26,6 @@ class InventoryItem extends Component {
 
   }
 
-  componentDidMount() {
-    document.getElementById(this.props.item.id + '-item').innerHTML = getSvg(this.props.item.svgReference, 'none', 35);
-  }
-
   render() {
     return (
       <div className="InventoryItem">
@@ -36,7 +34,7 @@ class InventoryItem extends Component {
           className="btn"
           onClick={this.useItem}
         >
-          {this.props.item.title}
+          {Parser(getSvg(this.props.item.svgReference, 'none', 35))}
         </div>
       </div>
     );
@@ -56,9 +54,32 @@ class Inventory extends Component {
         />
       );
     });
+
+    let cardActions = [];
+    cardActions.push(<button key="1" className="btn" onClick={() => {this.props.toggleInventoryCard()}}>Close</button>);
+
+    let inventoryMobileCard = this.props.showInventoryCard && (
+      <div className="Inventory-mobile card-prompt">
+        <Card
+          title=''
+          actions={cardActions}
+        >
+          <div className="row">
+            <h1 className="title">Inventory!</h1>
+            {inventory}
+          </div>
+        </Card>
+      </div>
+    );
+
     return (
-      <div className="Inventory">
-        {inventory}
+      <div>
+        <div className="Inventory">
+          {inventory}
+        </div>
+
+        {inventoryMobileCard}
+
       </div>
     );
   }

@@ -62,15 +62,6 @@ html {
   box-shadow: 8px 10px 50px hsl(0, 0%, 5%);
 }
 
-.EquipmentCompare {
-  position: fixed;
-  left: 35%;
-  top: 30%;
-  z-index: 10;
-  width: 30%;
-  color: lightgrey;
-}
-
 .EquipmentCompare .card {
   background-color: grey;
 }
@@ -81,18 +72,17 @@ html {
   border-radius: 5px;
 }
 
-.card-prompt {
+.card-prompt .card {
   position: fixed;
-  top: 10%;
-  left: 20%;
-  max-width: 60%;
-  max-height: 60%;
+  top: 10vh;
+  left: 20vw;
+  width: 60vw;
+  height: 60vh;
+  max-height: 60vh;
+  overflow-y: scroll;
   z-index: 10;
   color: lightgrey;
-}
-
-.HelpMenu {
-  width: 100%;
+  box-shadow: 5px 10px 10px #333;
 }
 
 .HelpMenu .collapsible-header {
@@ -224,4 +214,62 @@ html {
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+@media(max-width: 767px) {
+  .game-container {
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 80vh;
+  }
+  .card-prompt .card {
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+  }
+  .Inventory,
+  .StatBar,
+  .SessionStats,
+  .MenuButtons {
+    display: none;
+  }
+}
+
+.MenuButtons {
+  position: absolute;
+  top: 5vh;
+  left: 10vw;
+}
+
+.MenuButtons-mobile {
+  position: relative;
+  z-index: 2;
+  float: left;
+}
+
+.SessionStats-mobile {
+  position: absolute;
+  bottom: 0;
+  width: 100vw;
+  font-size: 180%;
+}
+
+.SessionStats-mobile .row {
+  margin: 0;
+}
+
+.SessionStats-mobile span {
+  color: lightgrey;
+  font-weight: bold;
+}
+
+@media(min-width: 767px) {
+  .MenuButtons-mobile,
+  .SessionStats-mobile,
+  .Inventory-mobile {
+    display: none;
+  }
 }
