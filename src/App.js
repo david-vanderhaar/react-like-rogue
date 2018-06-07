@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Swipe from 'react-easy-swipe';
 import { getRandomIntInclusive, focusOnGameWindow, prepareDungeonLevel, prepareResetGame, clearDice } from './Helper';
 import uuid from 'uuid';
 import MenuButtons from './UI/MenuButtons';
@@ -98,6 +99,13 @@ class App extends Component {
   }
 
   handlePlayerMove(event) { // MAIN TURN LOOP
+    console.log(event)
+    if (!event.hasOwnProperty('keyCode')) {
+      let code = event
+      event = {
+        keyCode: code
+      }
+    }
 
     if (this.state.canMove) {
       let state = {...this.state};
@@ -546,51 +554,57 @@ class App extends Component {
           />
         )
         }
+        <Swipe
+          onSwipeLeft={() => {this.handlePlayerMove(37)}}
+          onSwipeRight={() => {this.handlePlayerMove(39)}}
+          onSwipeUp={() => {this.handlePlayerMove(38)}}
+          onSwipeDown={() => {this.handlePlayerMove(40)}}
+        >
+          <div className="game-container">
+            <Map
+              key = {this.state.mapKey}
+              rooms = {this.state.rooms}
+              roomCount = {this.state.roomCount}
+              maxRoomSize = {this.state.maxRoomSize}
+              minRoomSize = {this.state.minRoomSize}
+              carveRooms = {this.carveRooms.bind(this)}
+              carveHalls = {this.carveHalls.bind(this)}
+              generateRooms = {this.generateRooms.bind(this)}
+              mapHeight = {this.state.mapHeight}
+              mapWidth = {this.state.mapWidth}
+              tileTypes = {this.state.tileTypes}
+              tileMap = {this.state.tileMap}
+              cellSize = {this.state.cellSize}
+              cellGutter = {this.state.cellGutter}
+              enemyList = {this.state.enemyList}
+              placeEnemies = {this.placeEnemies.bind(this)}
+              pickUpList = {this.state.pickUpList}
+              placePickUps = {this.placePickUps.bind(this)}
+              equipmentItemList = {this.state.equipmentItemList}
+              placeEquipmentItems = {this.placeEquipmentItems.bind(this)}
+            />
+            <Player
+              player = {this.state.player}
+              cellSize = {this.state.cellSize}
+              cellGutter = {this.state.cellGutter}
+            />
+            { enemies }
+            { pickUps }
+            { equipmentItems }
+            <DijkstraMap
+              ref={(dijkstraMap) => { this.dijkstraMap = dijkstraMap; }}
+              showDijkstraMap = {this.state.showDijkstraMap}
+              dijkstraMap = {this.state.dijkstraMap}
+              tileTypes = {this.state.tileTypes}
+              goalPositions = {[{posX: this.state.player.posX, posY: this.state.player.posY}]}
+              handleGenerateDijkstraMap = {this.handleGenerateDijkstraMap.bind(this)}
+              handleToggleDijkstraMap = {this.handleToggleDijkstraMap.bind(this)}
+              cellSize = {this.state.cellSize}
+              cellGutter = {this.state.cellGutter}
+            />
 
-        <div className="game-container">
-          <Map
-            key = {this.state.mapKey}
-            rooms = {this.state.rooms}
-            roomCount = {this.state.roomCount}
-            maxRoomSize = {this.state.maxRoomSize}
-            minRoomSize = {this.state.minRoomSize}
-            carveRooms = {this.carveRooms.bind(this)}
-            carveHalls = {this.carveHalls.bind(this)}
-            generateRooms = {this.generateRooms.bind(this)}
-            mapHeight = {this.state.mapHeight}
-            mapWidth = {this.state.mapWidth}
-            tileTypes = {this.state.tileTypes}
-            tileMap = {this.state.tileMap}
-            cellSize = {this.state.cellSize}
-            cellGutter = {this.state.cellGutter}
-            enemyList = {this.state.enemyList}
-            placeEnemies = {this.placeEnemies.bind(this)}
-            pickUpList = {this.state.pickUpList}
-            placePickUps = {this.placePickUps.bind(this)}
-            equipmentItemList = {this.state.equipmentItemList}
-            placeEquipmentItems = {this.placeEquipmentItems.bind(this)}
-          />
-          <Player
-            player = {this.state.player}
-            cellSize = {this.state.cellSize}
-            cellGutter = {this.state.cellGutter}
-          />
-          { enemies }
-          { pickUps }
-          { equipmentItems }
-          <DijkstraMap
-            ref={(dijkstraMap) => { this.dijkstraMap = dijkstraMap; }}
-            showDijkstraMap = {this.state.showDijkstraMap}
-            dijkstraMap = {this.state.dijkstraMap}
-            tileTypes = {this.state.tileTypes}
-            goalPositions = {[{posX: this.state.player.posX, posY: this.state.player.posY}]}
-            handleGenerateDijkstraMap = {this.handleGenerateDijkstraMap.bind(this)}
-            handleToggleDijkstraMap = {this.handleToggleDijkstraMap.bind(this)}
-            cellSize = {this.state.cellSize}
-            cellGutter = {this.state.cellGutter}
-          />
-
-        </div>
+          </div>
+        </Swipe>
         <MenuButtons
           handleToggleDijkstraMap = {this.handleToggleDijkstraMap.bind(this)}
           toggleHelpMenu = {this.toggleHelpMenu.bind(this)}
