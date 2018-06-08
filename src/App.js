@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Swipe from 'react-easy-swipe';
+import $ from 'jquery';
 import { getRandomIntInclusive, focusOnGameWindow, prepareDungeonLevel, prepareResetGame, clearDice } from './Helper';
 import uuid from 'uuid';
 import MenuButtons from './UI/MenuButtons';
@@ -21,6 +21,10 @@ import EquipmentItem from './EquipmentItem';
 import { generateEquipment } from './EquipmentItem';
 import EquipmentCompare from './UI/EquipmentCompare';
 import './App.css';
+import smoothscroll from 'smoothscroll-polyfill';
+
+// kick off the polyfill!
+smoothscroll.polyfill();
 
 class App extends Component {
 
@@ -99,7 +103,6 @@ class App extends Component {
   }
 
   handlePlayerMove(event) { // MAIN TURN LOOP
-    console.log(event)
     if (!event.hasOwnProperty('keyCode')) {
       let code = event
       event = {
@@ -209,7 +212,12 @@ class App extends Component {
       this.updatePickUps(tileTypes, pickUpList);
       this.updateEquipmentItems(tileTypes, equipmentItemList);
 
-      document.getElementById("player").scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+      // console.log(document.getElementById("player").position)
+      // document.getElementById("player").scrollIntoView(false);
+      // document.getElementById("player").scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+      document.querySelector(".game-container").scroll({ top: (player.posY * 50) - 100, left: player.posX * 50 - 100, behavior: 'smooth' });
+
+
     }
   } // end handlePlayerMove (MAIN TURN LOOP)
 
@@ -434,7 +442,12 @@ class App extends Component {
 
   componentDidMount() {
     focusOnGameWindow();
-    document.getElementById("player").scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+    // document.getElementById("player").scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+    setTimeout(() => {
+      // document.getElementById("player").scrollIntoView(false);
+      document.getElementById("player").scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+    }, 1000)
+
   }
 
   render() {
@@ -554,57 +567,52 @@ class App extends Component {
           />
         )
         }
-        <Swipe
-          onSwipeLeft={() => {this.handlePlayerMove(37)}}
-          onSwipeRight={() => {this.handlePlayerMove(39)}}
-          onSwipeUp={() => {this.handlePlayerMove(38)}}
-          onSwipeDown={() => {this.handlePlayerMove(40)}}
-        >
-          <div className="game-container">
-            <Map
-              key = {this.state.mapKey}
-              rooms = {this.state.rooms}
-              roomCount = {this.state.roomCount}
-              maxRoomSize = {this.state.maxRoomSize}
-              minRoomSize = {this.state.minRoomSize}
-              carveRooms = {this.carveRooms.bind(this)}
-              carveHalls = {this.carveHalls.bind(this)}
-              generateRooms = {this.generateRooms.bind(this)}
-              mapHeight = {this.state.mapHeight}
-              mapWidth = {this.state.mapWidth}
-              tileTypes = {this.state.tileTypes}
-              tileMap = {this.state.tileMap}
-              cellSize = {this.state.cellSize}
-              cellGutter = {this.state.cellGutter}
-              enemyList = {this.state.enemyList}
-              placeEnemies = {this.placeEnemies.bind(this)}
-              pickUpList = {this.state.pickUpList}
-              placePickUps = {this.placePickUps.bind(this)}
-              equipmentItemList = {this.state.equipmentItemList}
-              placeEquipmentItems = {this.placeEquipmentItems.bind(this)}
-            />
-            <Player
-              player = {this.state.player}
-              cellSize = {this.state.cellSize}
-              cellGutter = {this.state.cellGutter}
-            />
-            { enemies }
-            { pickUps }
-            { equipmentItems }
-            <DijkstraMap
-              ref={(dijkstraMap) => { this.dijkstraMap = dijkstraMap; }}
-              showDijkstraMap = {this.state.showDijkstraMap}
-              dijkstraMap = {this.state.dijkstraMap}
-              tileTypes = {this.state.tileTypes}
-              goalPositions = {[{posX: this.state.player.posX, posY: this.state.player.posY}]}
-              handleGenerateDijkstraMap = {this.handleGenerateDijkstraMap.bind(this)}
-              handleToggleDijkstraMap = {this.handleToggleDijkstraMap.bind(this)}
-              cellSize = {this.state.cellSize}
-              cellGutter = {this.state.cellGutter}
-            />
 
-          </div>
-        </Swipe>
+        <div className="game-container">
+          <Map
+            key = {this.state.mapKey}
+            rooms = {this.state.rooms}
+            roomCount = {this.state.roomCount}
+            maxRoomSize = {this.state.maxRoomSize}
+            minRoomSize = {this.state.minRoomSize}
+            carveRooms = {this.carveRooms.bind(this)}
+            carveHalls = {this.carveHalls.bind(this)}
+            generateRooms = {this.generateRooms.bind(this)}
+            mapHeight = {this.state.mapHeight}
+            mapWidth = {this.state.mapWidth}
+            tileTypes = {this.state.tileTypes}
+            tileMap = {this.state.tileMap}
+            cellSize = {this.state.cellSize}
+            cellGutter = {this.state.cellGutter}
+            enemyList = {this.state.enemyList}
+            placeEnemies = {this.placeEnemies.bind(this)}
+            pickUpList = {this.state.pickUpList}
+            placePickUps = {this.placePickUps.bind(this)}
+            equipmentItemList = {this.state.equipmentItemList}
+            placeEquipmentItems = {this.placeEquipmentItems.bind(this)}
+          />
+          <Player
+            player = {this.state.player}
+            cellSize = {this.state.cellSize}
+            cellGutter = {this.state.cellGutter}
+            handlePlayerMove = {this.handlePlayerMove.bind(this)}
+          />
+          { enemies }
+          { pickUps }
+          { equipmentItems }
+          <DijkstraMap
+            ref={(dijkstraMap) => { this.dijkstraMap = dijkstraMap; }}
+            showDijkstraMap = {this.state.showDijkstraMap}
+            dijkstraMap = {this.state.dijkstraMap}
+            tileTypes = {this.state.tileTypes}
+            goalPositions = {[{posX: this.state.player.posX, posY: this.state.player.posY}]}
+            handleGenerateDijkstraMap = {this.handleGenerateDijkstraMap.bind(this)}
+            handleToggleDijkstraMap = {this.handleToggleDijkstraMap.bind(this)}
+            cellSize = {this.state.cellSize}
+            cellGutter = {this.state.cellGutter}
+          />
+
+        </div>
         <MenuButtons
           handleToggleDijkstraMap = {this.handleToggleDijkstraMap.bind(this)}
           toggleHelpMenu = {this.toggleHelpMenu.bind(this)}

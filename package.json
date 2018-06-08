@@ -24,6 +24,7 @@
     "materialize-css": "^0.100.2",
     "react-easy-swipe": "0.0.16",
     "react-materialize": "^1.1.2",
+    "smoothscroll-polyfill": "^0.4.3",
     "uuid4": "^1.0.0"
   }
 }

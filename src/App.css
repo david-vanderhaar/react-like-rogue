@@ -22,6 +22,57 @@ html {
   font-size: 1.5em;
 }
 
+.MobileMoveControls {
+  position: absolute;
+}
+
+@-webkit-keyframes greenPulse {
+  from { color: #749a02; text-shadow: 0 0 9px #333; opacity: .3;}
+  50% { color: #91bd09; text-shadow: 0 0 18px #91bd09; opacity: .9;}
+  to { color: #749a02; text-shadow: 0 0 9px #333; opacity: .3;}
+}
+
+@-webkit-keyframes redPulse {
+  from { color: #bc330d; text-shadow: 0 0 9px #333; }
+  50% { color: #e33100; text-shadow: 0 0 18px #e33100; }
+  to { color: #bc330d; text-shadow: 0 0 9px #333; }
+}
+
+.MobileMoveControls span {
+  position: absolute;
+  z-index: 3;
+  font-size: 5em;
+  -webkit-animation-name: greenPulse;
+  -webkit-animation-duration: 5s;
+  -webkit-animation-iteration-count: infinite;
+}
+
+.MobileMoveControls span:hover {
+  -webkit-animation-name: redPulse;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-iteration-count: infinite;
+}
+
+#mobile-move-left {
+  top: -29px;
+  left: -40px;
+}
+
+#mobile-move-right {
+  top: -29px;
+  left: 64px;
+}
+
+#mobile-move-up {
+  bottom: -30px;
+  left: 2px;
+}
+
+#mobile-move-down {
+  bottom: -130px;
+  left: 2px;
+}
+
 .game-container {
   position: relative;
   top: 10vh;
@@ -83,6 +134,7 @@ html {
   z-index: 10;
   color: lightgrey;
   box-shadow: 5px 10px 10px #333;
+  margin: 0;
 }
 
 .HelpMenu .collapsible-header {
@@ -160,7 +212,6 @@ html {
 .item {
   position: absolute;
   border-radius: 6px;
-  z-index: 2;
 }
 
 
@@ -195,15 +246,14 @@ html {
   position: absolute;
   border-radius: 6px;
   transition: .2s;
-  z-index: 2;
 }
 
 .player:hover {
-  border: solid;
+  /* border: solid;
   border-radius: 6px;
   border-width: 5px;
   border-color: #aa4843;
-  transition: .3s;
+  transition: .3s; */
 }
 
 .tile:hover {
@@ -269,7 +319,8 @@ html {
 @media(min-width: 767px) {
   .MenuButtons-mobile,
   .SessionStats-mobile,
-  .Inventory-mobile {
+  .Inventory-mobile,
+  .MobileMoveControls {
     display: none;
   }
 }
