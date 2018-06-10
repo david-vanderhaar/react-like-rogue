@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
+import { findPlayer } from './Helper';
 import MobileMoveControls from './MobileMoveControls';
 
 class Player extends Component {
+  componentWillReceiveProps() {
+    findPlayer(this.props.player)
+  }
+
   render() {
     const style = {
       top: this.props.player.posY * (this.props.cellSize + this.props.cellGutter),
@@ -18,6 +23,7 @@ class Player extends Component {
             onRight={() => {this.props.handlePlayerMove(39)}}
             onUp={() => {this.props.handlePlayerMove(38)}}
             onDown={() => {this.props.handlePlayerMove(40)}}
+            onStay={() => {this.props.handlePlayerMove(32)}}
           />
           P
           <br/>

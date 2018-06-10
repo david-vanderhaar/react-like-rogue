@@ -1,9 +1,10 @@
+import uuid from 'uuid';
+import $ from 'jquery';
 import { CreateTile, CreateActor, CreatePickUp, CreateEquipmentItem } from './Classes';
 import { getSvg } from './SVGGenerator';
 import * as Enemy from './Enemy';
 import * as PickUp from './PickUp';
 import * as EquipmentItem from './EquipmentItem';
-import uuid from 'uuid';
 
 // Helper Functions
 export function getRandomIntInclusive(min, max) {
@@ -59,8 +60,15 @@ export function cloneTiles(tiles) {
   return clonedTiles;
 }
 
+export function findPlayer(player) {
+  let midY = ($(window).height() / 4)
+  let midX = ($(window).width() / 4)
+  document.querySelector(".game-container").scroll({ top: (player.posY * 50) - midY, left: player.posX * 50 - midX, behavior: 'smooth' });
+}
+
 export function focusOnGameWindow() {
-  document.getElementById("game-window").focus();
+  let el = document.getElementById("game-window");
+  if (el) {el.focus();}
 }
 
 export function prepareDungeonLevel(dungeonLevel, currentState) {
@@ -142,7 +150,7 @@ export function prepareResetGame(currentState) {
 
 export function throwDice(text, color, svg_name) {
   let die = document.createElement('span');
-  let max_move = 20;
+  let max_move = 25;
   die.setAttribute('class', 'thrown-dice ' + color);
   document.getElementById('game-window').appendChild(die);
   die.innerHTML = getSvg(svg_name, 'none', '60px');

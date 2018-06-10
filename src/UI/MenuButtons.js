@@ -5,6 +5,9 @@ class MenuButtons extends Component {
     return (
       <div>
         <div className="MenuButtons">
+          <button className="btn btn-menu" onClick={this.props.toggleBattleSim}>
+            Battle Simulation <i className="fas fa-calculator" aria-hidden="true"></i>
+          </button>
           <button className="btn btn-menu" onClick={this.props.handleToggleDijkstraMap}>
             Toggle Dijkstra <i className="fa fa-map" aria-hidden="true"></i>
           </button>
@@ -17,11 +20,15 @@ class MenuButtons extends Component {
         </div>
 
         <div className="MenuButtons-mobile">
+          <button className="btn btn-menu" onClick={this.props.toggleBattleSim}>
+            <i className="fas fa-calculator" aria-hidden="true"></i>
+          </button>
           <button className="btn btn-menu" onClick={this.props.handleToggleDijkstraMap}>
             <i className="fa fa-map" aria-hidden="true"></i>
           </button>
           <button className="btn btn-menu" onClick={() => {this.props.toggleInventoryCard()}}>
             <i className="fa fa-flask" aria-hidden="true"></i>
+            <span className="new badge red" data-badge-caption="">{this.props.inventoryCount}</span>
           </button>
           <button
             className="btn btn-menu"

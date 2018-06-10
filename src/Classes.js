@@ -139,7 +139,7 @@ export const CreateActor = ({
       return this[stat] + statFromEquipment;
     },
 
-    rollStatDice(stat) {
+    rollStatDice(stat, renderDice) {
       let color = 'black';
       if (this.id !== 'player') {
         color = 'purple darken-4'
@@ -149,7 +149,7 @@ export const CreateActor = ({
 
       let dice = [];
       for (let i = 0; i < dice_count; i++){
-        let die = CreateDie().roll(color, stat);
+        let die = CreateDie().roll(color, stat, renderDice);
         dice.push(die)
       }
       let result = dice.reduce((acc, curr) => acc + curr, 0);
@@ -171,14 +171,16 @@ export const CreateActor = ({
       this.defense = newDefenseValue;
     },
 
-    takeHit(attack) {
-      let defense = this.rollStatDice('defense');
+    takeHit(attack, renderDice = true) {
+      let defense = this.rollStatDice('defense', renderDice);
       let calculatedAttack = (attack - defense) > 0 ? (attack - defense) : 0;
       this.life -= calculatedAttack;
-      if (this.id === 'player') {
-        Materialize.toast('You were attacked and took ' + calculatedAttack + ' damage!', 4000)
-      } else {
-        Materialize.toast('You attacked this creature and dealt ' + calculatedAttack + ' damage!', 4000)
+      if (renderDice) {
+        if (this.id === 'player') {
+          Materialize.toast('You were attacked and took ' + calculatedAttack + ' damage!', 4000)
+        } else {
+          Materialize.toast('You attacked this creature and dealt ' + calculatedAttack + ' damage!', 4000)
+        }
       }
     },
 });
@@ -194,21 +196,21 @@ export const CreateDie = ({
   criticals,
 
   // Method
-  roll(color, stat) {
+  roll(color, stat, renderDice) {
     let result = getRandomIntInclusive(1, this.sides);
 
     if (result <= this.criticals) {
       let svg_name = 'electric';
-      throwDice('Critical', color, svg_name);
+      if (renderDice) { throwDice('Critical', color, svg_name) };
       return 2;
     } else if (result <= this.criticals + this.hits) {
       let svg_name = 'revolt';
       if (stat === 'defense') { svg_name = 'round_shield'}
-      throwDice('Hit', color, svg_name);
+      if (renderDice) { throwDice('Hit', color, svg_name) };
       return 1;
     } else {
       let svg_name = 'cross_mark';
-      throwDice('Miss', color, svg_name);
+      if (renderDice) { throwDice('Miss', color, svg_name) };
       return 0;
     }
   }

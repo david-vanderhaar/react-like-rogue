@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
-import { getRandomIntInclusive, focusOnGameWindow, prepareDungeonLevel, prepareResetGame, clearDice } from './Helper';
+import { getRandomIntInclusive, focusOnGameWindow, prepareDungeonLevel, prepareResetGame, clearDice, findPlayer } from './Helper';
 import uuid from 'uuid';
 import MenuButtons from './UI/MenuButtons';
 import StatBar from './UI/StatBar';
@@ -10,6 +10,7 @@ import EndDungeonSummary from './UI/EndDungeonSummary';
 import EndGame from './UI/EndGame';
 import SessionStats from './UI/SessionStats';
 import { CreateTile, CreateActor, CreatePickUp, CreateEquipmentItem } from './Classes';
+import BattleSim from './BattleSim';
 import Map from './Map';
 import DijkstraMap from './DijkstraMap';
 import Player from './Player';
@@ -47,7 +48,7 @@ class App extends Component {
     const pickUps = 10;
     const equipmentItems = 5;
 
-    const player = CreateActor({id: 'player', life: 5, attack: 3});
+    const player = CreateActor({id: 'player', life: 3, attack: 1});
 
     const levelTypes = [
       'balanced',
@@ -64,6 +65,7 @@ class App extends Component {
     let equipmentItemList = generateEquipment(equipmentItems, 0, currentLevelType);
 
     this.state = {
+      showBattleSim: true,
       dungeonLevel: 1,
       currentLevelType: currentLevelType,
       mapKey: mapKey,
@@ -87,7 +89,7 @@ class App extends Component {
       showEquipmentCompare: false,
       showEndDungeonSummary: false,
       showEndGame: false,
-      showHelpMenu: false,
+      showHelpMenu: true,
       showInventoryCard: false,
       enemyPosX: 0,
       enemyPosY: 0,
@@ -97,7 +99,8 @@ class App extends Component {
         LEFT: 37,
         RIGHT: 39,
         UP: 38,
-        DOWN: 40
+        DOWN: 40,
+        STAY: 32
       },
     }
   }
@@ -110,7 +113,7 @@ class App extends Component {
       }
     }
 
-    if (this.state.canMove) {
+    if (this.state.canMove && Object.values(this.state.playerControls).indexOf(event.keyCode) > -1) {
       let state = {...this.state};
       let playerControls = state.playerControls;
       let player = {...state.player};
@@ -164,7 +167,7 @@ class App extends Component {
           enemyList[i] = {...enemyList[i]}; //copy the Object
           if (enemyList[i].id === tileToCheck.destructibleId) {
             clearDice();
-            enemyList[i].takeHit(player.rollStatDice('attack'));
+            enemyList[i].takeHit(player.rollStatDice('attack', true));
           }
         }
       }
@@ -211,12 +214,6 @@ class App extends Component {
       this.moveEnemies(tileTypes, player, enemyList);
       this.updatePickUps(tileTypes, pickUpList);
       this.updateEquipmentItems(tileTypes, equipmentItemList);
-
-      // console.log(document.getElementById("player").position)
-      // document.getElementById("player").scrollIntoView(false);
-      // document.getElementById("player").scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
-      document.querySelector(".game-container").scroll({ top: (player.posY * 50) - 100, left: player.posX * 50 - 100, behavior: 'smooth' });
-
 
     }
   } // end handlePlayerMove (MAIN TURN LOOP)
@@ -309,7 +306,7 @@ class App extends Component {
 
         // this snippet targets only the player
         if (neighbors[0].posX === player.posX && neighbors[0].posY === player.posY) {
-          player.takeHit(enemyList[i].rollStatDice('attack'));
+          player.takeHit(enemyList[i].rollStatDice('attack', true));
         }
 
         if (tileToCheck.canPass === true) { // check that the tile is passable
@@ -416,10 +413,16 @@ class App extends Component {
 
   goToDungeonLevel(level, currentState) {
     this.setState(prepareDungeonLevel(level, currentState));
+    setTimeout(() => {
+      findPlayer(this.state.player)
+    }, 1000);
   }
 
   resetGame(currentState) {
     this.setState(prepareResetGame(currentState));
+    setTimeout(() => {
+      findPlayer(this.state.player)
+    }, 1000);
   }
 
   toggleHelpMenu() {
@@ -440,184 +443,201 @@ class App extends Component {
     });
   }
 
-  componentDidMount() {
-    focusOnGameWindow();
-    // document.getElementById("player").scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
-    setTimeout(() => {
-      // document.getElementById("player").scrollIntoView(false);
-      document.getElementById("player").scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
-    }, 1000)
-
+  toggleBattleSim() {
+    this.setState({
+      showBattleSim: !this.state.showBattleSim
+    });
   }
 
   render() {
-    // Generate enemies
-    let enemyCount = 0;
-    const enemies = this.state.enemyList.map((enemy) => {
-      enemyCount++
-      return (
-        <Enemy
-          key = {enemyCount}
-          enemy = {enemy}
-          enemyPosX = {enemy.posX}
-          enemyPosY = {enemy.posY}
-          cellSize = {this.state.cellSize}
-          cellGutter = {this.state.cellGutter}
+    let Game = null
+    let BattleSimComponent = this.state.showBattleSim && (
+      <div>
+        <BattleSim
+          toggleBattleSim = {this.toggleBattleSim.bind(this)}
+          resetGame = {this.resetGame.bind(this)}
+          currentState = {this.state}
         />
-      );
-    });
-
-    // Generate pickUps
-    let pickUpCount = 0;
-    const pickUps = this.state.pickUpList.map((pickUp) => {
-      pickUpCount++
-      return (
-        <PickUp
-          key = {pickUpCount}
-          pickUp = {pickUp}
-          cellSize = {this.state.cellSize}
-          cellGutter = {this.state.cellGutter}
-        />
-      );
-    });
-
-    // Generate equipmentItems
-    let equipmentItemCount = 0;
-    const equipmentItems = this.state.equipmentItemList.map((equipmentItem) => {
-      equipmentItemCount++
-      return (
-        <EquipmentItem
-          key = {equipmentItemCount}
-          equipmentItem = {equipmentItem}
-          cellSize = {this.state.cellSize}
-          cellGutter = {this.state.cellGutter}
-        />
-      );
-    });
-
-    let endDungeonSummary = this.state.showEndDungeonSummary && (
-      <EndDungeonSummary
-        goToDungeonLevel={this.goToDungeonLevel.bind(this, this.state.dungeonLevel + 1, this.state)}
-        dungeonLevel={this.state.dungeonLevel}
-      />
+      </div>
     )
+    if (!this.state.showBattleSim) {
+      // Generate enemies
+      let enemyCount = 0;
+      const enemies = this.state.enemyList.map((enemy) => {
+        enemyCount++
+        return (
+          <Enemy
+            key = {enemyCount}
+            enemy = {enemy}
+            enemyPosX = {enemy.posX}
+            enemyPosY = {enemy.posY}
+            cellSize = {this.state.cellSize}
+            cellGutter = {this.state.cellGutter}
+          />
+        );
+      });
 
-    let endGame = this.state.showEndGame && (
-      <EndGame
-        resetGame={this.resetGame.bind(this, this.state)}
-        dungeonLevel={this.state.dungeonLevel}
-        defeatedEnemyList={this.state.defeatedEnemyList}
-      />
-    )
+      // Generate pickUps
+      let pickUpCount = 0;
+      const pickUps = this.state.pickUpList.map((pickUp) => {
+        pickUpCount++
+        return (
+          <PickUp
+            key = {pickUpCount}
+            pickUp = {pickUp}
+            cellSize = {this.state.cellSize}
+            cellGutter = {this.state.cellGutter}
+          />
+        );
+      });
+
+      // Generate equipmentItems
+      let equipmentItemCount = 0;
+      const equipmentItems = this.state.equipmentItemList.map((equipmentItem) => {
+        equipmentItemCount++
+        return (
+          <EquipmentItem
+            key = {equipmentItemCount}
+            equipmentItem = {equipmentItem}
+            cellSize = {this.state.cellSize}
+            cellGutter = {this.state.cellGutter}
+          />
+        );
+      });
+
+      let endDungeonSummary = this.state.showEndDungeonSummary && (
+        <EndDungeonSummary
+          goToDungeonLevel={this.goToDungeonLevel.bind(this, this.state.dungeonLevel + 1, this.state)}
+          dungeonLevel={this.state.dungeonLevel}
+        />
+      )
+
+      let endGame = this.state.showEndGame && (
+        <EndGame
+          resetGame={this.resetGame.bind(this, this.state)}
+          dungeonLevel={this.state.dungeonLevel}
+          defeatedEnemyList={this.state.defeatedEnemyList}
+        />
+      )
+
+      Game = (
+          <div id="game-window" className="App" tabIndex="0" onKeyUp={this.handlePlayerMove.bind(this)}>
+            <HelpMenu
+              showHelpMenu={this.state.showHelpMenu}
+              toggleHelpMenu = {this.toggleHelpMenu.bind(this)}
+            />
+            { endGame }
+            { endDungeonSummary }
+            <SessionStats currentState={{...this.state}} />
+            <StatBar
+              name="life"
+              color="red"
+              icon="fa fa-heart stat-icon"
+              stat={this.state.player.life}
+              statMax={10}
+              position={{top: 10, left: 2, width: 6, height: 25, gutter: 1, iconSize: 6}}
+            />
+            <StatBar
+              name="defense"
+              color="blue"
+              icon="fa fa-shield-alt stat-icon"
+              stat={this.state.player.calculateStat('defense')}
+              statMax={10}
+              position={{top: 40, left: 2, width: 6, height: 25, gutter: 1, iconSize: 6}}
+            />
+            <StatBar
+              name="attack"
+              color="green"
+              icon="fa fa-gavel stat-icon"
+              stat={this.state.player.calculateStat('attack')}
+              statMax={10}
+              position={{top: 70, left: 2, width: 6, height: 25, gutter: 1, iconSize: 6}}
+            />
+
+            <Inventory
+              player = {this.state.player}
+              inventory = {this.state.player.inventory}
+              handlePlayerUpdate = {this.handlePlayerUpdate.bind(this)}
+              showInventoryCard={this.state.showInventoryCard}
+              toggleInventoryCard = {this.toggleInventoryCard.bind(this)}
+            />
+
+            {
+              this.state.showEquipmentCompare && (
+                <EquipmentCompare
+                toggleEquipmentCompare = {this.handleToggleEquipmentCompare.bind(this)}
+                tileTypes = {this.state.tileTypes}
+                player = {this.state.player}
+                handlePlayerUpdate = {this.handlePlayerUpdate.bind(this)}
+                handleUpdateEquipmentItems = {this.updateEquipmentItems.bind(this)}
+                handleUpdateEquipmentCompareItemId = {this.updateEquipmentCompareId.bind(this)}
+                handlePlaceEquipmentItems = {this.placeEquipmentItems.bind(this)}
+                equipmentItemList = {this.state.equipmentItemList}
+                equipmentCompareItemId = {this.state.equipmentCompareItemId}
+              />
+            )
+            }
+
+            <div className="game-container">
+              <Map
+                key = {this.state.mapKey}
+                rooms = {this.state.rooms}
+                roomCount = {this.state.roomCount}
+                maxRoomSize = {this.state.maxRoomSize}
+                minRoomSize = {this.state.minRoomSize}
+                carveRooms = {this.carveRooms.bind(this)}
+                carveHalls = {this.carveHalls.bind(this)}
+                generateRooms = {this.generateRooms.bind(this)}
+                mapHeight = {this.state.mapHeight}
+                mapWidth = {this.state.mapWidth}
+                tileTypes = {this.state.tileTypes}
+                tileMap = {this.state.tileMap}
+                cellSize = {this.state.cellSize}
+                cellGutter = {this.state.cellGutter}
+                enemyList = {this.state.enemyList}
+                placeEnemies = {this.placeEnemies.bind(this)}
+                pickUpList = {this.state.pickUpList}
+                placePickUps = {this.placePickUps.bind(this)}
+                equipmentItemList = {this.state.equipmentItemList}
+                placeEquipmentItems = {this.placeEquipmentItems.bind(this)}
+              />
+              <Player
+                player = {this.state.player}
+                cellSize = {this.state.cellSize}
+                cellGutter = {this.state.cellGutter}
+                handlePlayerMove = {this.handlePlayerMove.bind(this)}
+              />
+              { enemies }
+              { pickUps }
+              { equipmentItems }
+              <DijkstraMap
+                ref={(dijkstraMap) => { this.dijkstraMap = dijkstraMap; }}
+                showDijkstraMap = {this.state.showDijkstraMap}
+                dijkstraMap = {this.state.dijkstraMap}
+                tileTypes = {this.state.tileTypes}
+                goalPositions = {[{posX: this.state.player.posX, posY: this.state.player.posY}]}
+                handleGenerateDijkstraMap = {this.handleGenerateDijkstraMap.bind(this)}
+                handleToggleDijkstraMap = {this.handleToggleDijkstraMap.bind(this)}
+                cellSize = {this.state.cellSize}
+                cellGutter = {this.state.cellGutter}
+              />
+
+            </div>
+            <MenuButtons
+              toggleBattleSim = {this.toggleBattleSim.bind(this)}
+              handleToggleDijkstraMap = {this.handleToggleDijkstraMap.bind(this)}
+              toggleHelpMenu = {this.toggleHelpMenu.bind(this)}
+              toggleInventoryCard = {this.toggleInventoryCard.bind(this)}
+              inventoryCount = {this.state.player.inventory.length}
+            />
+          </div>
+        )
+      }
 
     return (
-      <div id="game-window" className="App" tabIndex="0" onKeyUp={this.handlePlayerMove.bind(this)}>
-        <HelpMenu
-          showHelpMenu={this.state.showHelpMenu}
-          toggleHelpMenu = {this.toggleHelpMenu.bind(this)}
-        />
-        { endGame }
-        { endDungeonSummary }
-        <SessionStats currentState={{...this.state}} />
-        <StatBar
-          name="life"
-          color="red"
-          icon="fa fa-heart stat-icon"
-          stat={this.state.player.life}
-          statMax={10}
-          position={{top: 10, left: 2, width: 6, height: 25, gutter: 1, iconSize: 6}}
-        />
-        <StatBar
-          name="defense"
-          color="blue"
-          icon="fa fa-shield-alt stat-icon"
-          stat={this.state.player.calculateStat('defense')}
-          statMax={10}
-          position={{top: 40, left: 2, width: 6, height: 25, gutter: 1, iconSize: 6}}
-        />
-        <StatBar
-          name="attack"
-          color="green"
-          icon="fa fa-gavel stat-icon"
-          stat={this.state.player.calculateStat('attack')}
-          statMax={10}
-          position={{top: 70, left: 2, width: 6, height: 25, gutter: 1, iconSize: 6}}
-        />
-
-        <Inventory
-          player = {this.state.player}
-          inventory = {this.state.player.inventory}
-          handlePlayerUpdate = {this.handlePlayerUpdate.bind(this)}
-          showInventoryCard={this.state.showInventoryCard}
-          toggleInventoryCard = {this.toggleInventoryCard.bind(this)}
-        />
-
-        {
-          this.state.showEquipmentCompare && (
-            <EquipmentCompare
-            toggleEquipmentCompare = {this.handleToggleEquipmentCompare.bind(this)}
-            tileTypes = {this.state.tileTypes}
-            player = {this.state.player}
-            handlePlayerUpdate = {this.handlePlayerUpdate.bind(this)}
-            handleUpdateEquipmentItems = {this.updateEquipmentItems.bind(this)}
-            handleUpdateEquipmentCompareItemId = {this.updateEquipmentCompareId.bind(this)}
-            handlePlaceEquipmentItems = {this.placeEquipmentItems.bind(this)}
-            equipmentItemList = {this.state.equipmentItemList}
-            equipmentCompareItemId = {this.state.equipmentCompareItemId}
-          />
-        )
-        }
-
-        <div className="game-container">
-          <Map
-            key = {this.state.mapKey}
-            rooms = {this.state.rooms}
-            roomCount = {this.state.roomCount}
-            maxRoomSize = {this.state.maxRoomSize}
-            minRoomSize = {this.state.minRoomSize}
-            carveRooms = {this.carveRooms.bind(this)}
-            carveHalls = {this.carveHalls.bind(this)}
-            generateRooms = {this.generateRooms.bind(this)}
-            mapHeight = {this.state.mapHeight}
-            mapWidth = {this.state.mapWidth}
-            tileTypes = {this.state.tileTypes}
-            tileMap = {this.state.tileMap}
-            cellSize = {this.state.cellSize}
-            cellGutter = {this.state.cellGutter}
-            enemyList = {this.state.enemyList}
-            placeEnemies = {this.placeEnemies.bind(this)}
-            pickUpList = {this.state.pickUpList}
-            placePickUps = {this.placePickUps.bind(this)}
-            equipmentItemList = {this.state.equipmentItemList}
-            placeEquipmentItems = {this.placeEquipmentItems.bind(this)}
-          />
-          <Player
-            player = {this.state.player}
-            cellSize = {this.state.cellSize}
-            cellGutter = {this.state.cellGutter}
-            handlePlayerMove = {this.handlePlayerMove.bind(this)}
-          />
-          { enemies }
-          { pickUps }
-          { equipmentItems }
-          <DijkstraMap
-            ref={(dijkstraMap) => { this.dijkstraMap = dijkstraMap; }}
-            showDijkstraMap = {this.state.showDijkstraMap}
-            dijkstraMap = {this.state.dijkstraMap}
-            tileTypes = {this.state.tileTypes}
-            goalPositions = {[{posX: this.state.player.posX, posY: this.state.player.posY}]}
-            handleGenerateDijkstraMap = {this.handleGenerateDijkstraMap.bind(this)}
-            handleToggleDijkstraMap = {this.handleToggleDijkstraMap.bind(this)}
-            cellSize = {this.state.cellSize}
-            cellGutter = {this.state.cellGutter}
-          />
-
-        </div>
-        <MenuButtons
-          handleToggleDijkstraMap = {this.handleToggleDijkstraMap.bind(this)}
-          toggleHelpMenu = {this.toggleHelpMenu.bind(this)}
-          toggleInventoryCard = {this.toggleInventoryCard.bind(this)}
-        />
+      <div>
+        {Game}
+        {BattleSimComponent}
       </div>
     );
   }

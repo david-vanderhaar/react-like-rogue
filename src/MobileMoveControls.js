@@ -17,6 +17,9 @@ class MobileMoveControls extends Component {
         <span id="mobile-move-down" onClick={() => {this.props.onDown()}}>
           <i className="fas fa-caret-down" aria-hidden="true"></i>
         </span>
+        <span id="mobile-move-stay" onClick={() => {this.props.onStay()}}>
+          <i className="far fa-circle" aria-hidden="true"></i>
+        </span>
       </div>
     );
   }

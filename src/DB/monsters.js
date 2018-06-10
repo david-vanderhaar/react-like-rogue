@@ -13,6 +13,10 @@ export function getMonster(dungeonLevel, type) {
   return CreateActor({...actorStats, ...selectedMonster})
 }
 
+export function getAllMonsterData() {
+  return [...monsters['balanced'], ...monsters['defense'], ...monsters['attack']]
+}
+
 let monsters = {
   // BALANCED
   balanced: [
