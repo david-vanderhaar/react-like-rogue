@@ -44,7 +44,7 @@ class ActorDisplay extends Component {
     let life = this.state.life
     let defense = this.state.defense
     let attack = this.state.attack
-    let actor = CreateActor({id: this.props.actor.id, life: parseInt(life), defense: parseInt(defense), attack: parseInt(attack) })
+    let actor = CreateActor({id: this.props.actor.id, name: 'Custom', life: parseInt(life), defense: parseInt(defense), attack: parseInt(attack) })
     console.table(actor)
     this.props.updateActorStats(actor);
   }
@@ -131,8 +131,8 @@ class BattleSim extends Component {
     super();
 
     const simCount = 1000
-    const actor_1 = CreateActor({id: 'actor_1', name: 'Player', life: 5, attack: 3});
-    const actor_2 = CreateActor({id: 'actor_2', name: 'Player', life: 5, attack: 3});
+    const actor_1 = CreateActor({id: 'actor_1', name: 'Player'});
+    const actor_2 = CreateActor({id: 'actor_2', name: 'Player'});
 
     this.state = {
       simCount: simCount,

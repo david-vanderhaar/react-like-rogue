@@ -48,7 +48,7 @@ class App extends Component {
     const pickUps = 10;
     const equipmentItems = 5;
 
-    const player = CreateActor({id: 'player', life: 3, attack: 1});
+    const player = CreateActor({id: 'player'});
 
     const levelTypes = [
       'balanced',

@@ -128,7 +128,7 @@ export function prepareResetGame(currentState) {
 
   let newState = {
     currentLevelType: currentLevelType,
-    player: CreateActor({id: 'player', life: 5, attack: 3}),
+    player: CreateActor({id: 'player'}),
     dungeonLevel: 1,
     mapKey: uuid(),
     defeatedEnemyList: [],
