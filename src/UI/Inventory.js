@@ -65,7 +65,7 @@ class Inventory extends Component {
           actions={cardActions}
         >
           <div className="row">
-            <h1 className="title">Inventory!</h1>
+            <h1 className="title">Inventory</h1>
             {inventory}
           </div>
         </Card>

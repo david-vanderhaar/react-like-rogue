@@ -45,7 +45,6 @@ class ActorDisplay extends Component {
     let defense = this.state.defense
     let attack = this.state.attack
     let actor = CreateActor({id: this.props.actor.id, name: 'Custom', life: parseInt(life), defense: parseInt(defense), attack: parseInt(attack) })
-    console.table(actor)
     this.props.updateActorStats(actor);
   }
 
@@ -58,7 +57,6 @@ class ActorDisplay extends Component {
       name: this.props.monsterData[event.target.value].stats.name,
       svgReference: this.props.monsterData[event.target.value].stats.svgReference,
     })
-    console.table(actor)
     this.props.updateActorStats(actor);
   }
 

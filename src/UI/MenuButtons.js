@@ -17,6 +17,12 @@ class MenuButtons extends Component {
           >
             Help <i className="fa fa-question-circle" aria-hidden="true"></i>
           </button>
+          <button
+            className="btn btn-menu"
+            onClick={() => {this.props.toggleSaveLoad()}}
+          >
+            Load <i className="fa fa-load" aria-hidden="true"></i>
+          </button>
         </div>
 
         <div className="MenuButtons-mobile">
@@ -35,6 +41,12 @@ class MenuButtons extends Component {
             onClick={() => {this.props.toggleHelpMenu()}}
           >
             <i className="fa fa-question-circle" aria-hidden="true"></i>
+          </button>
+          <button
+            className="btn btn-menu"
+            onClick={() => {this.props.toggleSaveLoad()}}
+          >
+            <i className="fa fa-load" aria-hidden="true"></i>
           </button>
         </div>
       </div>

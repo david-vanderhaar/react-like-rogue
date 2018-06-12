@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
-import { getRandomIntInclusive, focusOnGameWindow, prepareDungeonLevel, prepareResetGame, clearDice, findPlayer } from './Helper';
+import { getRandomIntInclusive, focusOnGameWindow, prepareDungeonLevel, prepareResetGame, prepareLoadGame, clearDice, findPlayer } from './Helper';
 import uuid from 'uuid';
 import MenuButtons from './UI/MenuButtons';
 import StatBar from './UI/StatBar';
@@ -11,6 +11,7 @@ import EndGame from './UI/EndGame';
 import SessionStats from './UI/SessionStats';
 import { CreateTile, CreateActor, CreatePickUp, CreateEquipmentItem } from './Classes';
 import BattleSim from './BattleSim';
+import SaveLoad from './SaveLoad';
 import Map from './Map';
 import DijkstraMap from './DijkstraMap';
 import Player from './Player';
@@ -65,7 +66,7 @@ class App extends Component {
     let equipmentItemList = generateEquipment(equipmentItems, 0, currentLevelType);
 
     this.state = {
-      showBattleSim: true,
+      showBattleSim: false,
       dungeonLevel: 1,
       currentLevelType: currentLevelType,
       mapKey: mapKey,
@@ -91,6 +92,7 @@ class App extends Component {
       showEndGame: false,
       showHelpMenu: true,
       showInventoryCard: false,
+      showSaveLoad: false,
       enemyPosX: 0,
       enemyPosY: 0,
       canMove: true,
@@ -449,6 +451,33 @@ class App extends Component {
     });
   }
 
+  toggleSaveLoad() {
+    this.setState({
+      showSaveLoad: !this.state.showSaveLoad
+    });
+  }
+
+  handleLoadGame(saveState) {
+    this.setState(prepareLoadGame(saveState));
+    setTimeout(() => {
+      findPlayer(this.state.player)
+    }, 1000);
+  }
+
+  handleSaveGame() {
+    let previousSaves = JSON.parse(localStorage.getItem('react-like-rogue-game-saves'));
+    let newSave = {
+      date: new Date(),
+      state: this.state,
+    }
+
+    if (previousSaves) {
+      localStorage.setItem('react-like-rogue-game-saves', JSON.stringify([...previousSaves, newSave]));
+    } else {
+      localStorage.setItem('react-like-rogue-game-saves', JSON.stringify([newSave]));
+    }
+  }
+
   render() {
     let Game = null
     let BattleSimComponent = this.state.showBattleSim && (
@@ -508,6 +537,7 @@ class App extends Component {
       let endDungeonSummary = this.state.showEndDungeonSummary && (
         <EndDungeonSummary
           goToDungeonLevel={this.goToDungeonLevel.bind(this, this.state.dungeonLevel + 1, this.state)}
+          saveGame={this.handleSaveGame.bind(this)}
           dungeonLevel={this.state.dungeonLevel}
         />
       )
@@ -520,12 +550,22 @@ class App extends Component {
         />
       )
 
+      let saveLoad = this.state.showSaveLoad && (
+        <SaveLoad
+          state = {this.state}
+          showSaveLoad = {this.state.showSaveLoad}
+          toggleSaveLoad = {this.toggleSaveLoad.bind(this)}
+          handleLoadGame = {this.handleLoadGame.bind(this)}
+        />
+      )
+
       Game = (
           <div id="game-window" className="App" tabIndex="0" onKeyUp={this.handlePlayerMove.bind(this)}>
             <HelpMenu
-              showHelpMenu={this.state.showHelpMenu}
+              showHelpMenu = {this.state.showHelpMenu}
               toggleHelpMenu = {this.toggleHelpMenu.bind(this)}
             />
+            { saveLoad }
             { endGame }
             { endDungeonSummary }
             <SessionStats currentState={{...this.state}} />
@@ -627,6 +667,7 @@ class App extends Component {
               toggleBattleSim = {this.toggleBattleSim.bind(this)}
               handleToggleDijkstraMap = {this.handleToggleDijkstraMap.bind(this)}
               toggleHelpMenu = {this.toggleHelpMenu.bind(this)}
+              toggleSaveLoad = {this.toggleSaveLoad.bind(this)}
               toggleInventoryCard = {this.toggleInventoryCard.bind(this)}
               inventoryCount = {this.state.player.inventory.length}
             />

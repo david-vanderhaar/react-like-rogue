@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Card } from 'react-materialize';
 import { dungeonDescriptionGenerator } from '../Generators/Dungeons/generator';
+import SaveLoad from '../SaveLoad';
 
 class EndDungeonSummary extends Component {
   render() {
@@ -10,7 +11,10 @@ class EndDungeonSummary extends Component {
 
     let cardActions = [];
     cardActions.push(<button key="1" className="btn" onClick={() => {this.props.goToDungeonLevel()}}>Next Dungeon</button>);
-    cardActions.push(<button key="2" className="btn" onClick={() => {this.props.goToDungeonLevel()}}>Save</button>);
+    cardActions.push(<button key="2" className="btn" onClick={() => {
+      this.props.saveGame();
+      this.props.goToDungeonLevel();
+    }}>Save</button>);
     cardActions.push(
       <a
         key="3"

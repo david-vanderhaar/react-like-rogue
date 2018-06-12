@@ -148,6 +148,81 @@ export function prepareResetGame(currentState) {
   return newState;
 }
 
+export function prepareLoadGame(currentState) {
+  const dungeonLevel = currentState.dungeonLevel + 1
+  const enemies = 1 + (dungeonLevel * 2);
+  const pickUps = 10;
+  const equipmentItems = 5;
+  const levelTypes = [
+    'balanced',
+    'attack',
+    'defense'
+  ];
+
+  let currentLevelType = levelTypes[getRandomIntInclusive(0, 2)];
+
+  let enemyList = Enemy.generateEnemies(enemies, 0, currentLevelType);
+
+  let pickUpList = PickUp.generatePickUps(pickUps, 0, currentLevelType);
+
+  let equipmentItemList = EquipmentItem.generateEquipment(equipmentItems, 0, currentLevelType);
+
+  let playerClone = {}
+  for (let key in currentState.player) {
+    playerClone[key] = currentState.player[key];
+  }
+
+  playerClone.equipment.map((item, i) => {
+    let itemClone = {}
+    for (let key in item) {
+      itemClone[key] = item[key];
+    }
+    playerClone.equipment[i] = CreateEquipmentItem(itemClone)
+  })
+
+  playerClone.inventory.map((item, i) => {
+    let itemClone = {}
+    for (let key in item) {
+      itemClone[key] = item[key];
+    }
+    playerClone.inventory[i] = CreatePickUp(itemClone)
+  })
+
+  // Load Map
+  // currentState.tileTypes.map((row, i) => {
+  //   currentState.tileTypes.map((col, j) => {
+  //     let tileClone = {}
+  //     for (let key in currentState.tileTypes[i][j]) {
+  //       tileClone[key] = currentState.tileTypes[i][j][key];
+  //     }
+  //     currentState.tileTypes[i][j] = CreateTile(tileClone);
+  //   })
+  // })
+  // Load Map
+
+
+  let newState = {
+    currentLevelType: currentLevelType,
+    player: CreateActor(playerClone),
+    dungeonLevel: dungeonLevel,
+    mapKey: uuid(),
+    defeatedEnemyList: currentState.defeatedEnemyList,
+    showEndDungeonSummary: false,
+    showEndGame: false,
+    canMove: true,
+    tileMap: Array(currentState.mapHeight).fill(Array(currentState.mapWidth).fill('')),
+    tileTypes: Array(currentState.mapHeight).fill(Array(currentState.mapWidth).fill(CreateTile({type: 'WALL', canPass: false, containsDestructible: false}))),
+    dijkstraMap: Array(currentState.mapHeight).fill(Array(currentState.mapWidth).fill(100)),
+    enemyList: enemyList,
+    pickUpList: pickUpList,
+    equipmentItemList: equipmentItemList,
+  }
+
+  focusOnGameWindow();
+  clearDice();
+  return newState;
+}
+
 export function throwDice(text, color, svg_name) {
   let die = document.createElement('span');
   let max_move = 25;
