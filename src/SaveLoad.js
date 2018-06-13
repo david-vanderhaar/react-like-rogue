@@ -16,12 +16,20 @@ class SaveLoad extends Component {
     this.props.handleLoadGame(previousSave.state);
   }
 
+  deleteSave(index) {
+    let saves = this.state.saves.concat().splice(index - 1 , 1);
+    this.setState({
+      saves
+    }, () => {
+      localStorage.setItem('react-like-rogue-game-saves', JSON.stringify(this.state.saves));
+    });
+  }
+
   render() {
     let cardActions = [];
     cardActions.push(<button key="1" className="btn" onClick={() => {this.props.toggleSaveLoad()}}>Close</button>);
 
-    console.log(this.state.saves && this.state.saves.length > 0)
-    console.log(this.state.saves)
+    let dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
 
     let saves = this.state.saves && this.state.saves.length > 0 ? this.state.saves.map((save, index) => {
        return (
@@ -29,7 +37,14 @@ class SaveLoad extends Component {
           <button key={index} className="btn" onClick={() => {
             this.loadGame(save);
             this.props.toggleSaveLoad();
-          }}>Save {index + 1} {save.date}</button>
+          }}>
+            {new Date(save.date).toLocaleDateString('en-EN', dateOptions)}
+          </button>
+          <button key={index.toString() + 'delete'} className="btn red" onClick={() => {
+            this.deleteSave(index);
+          }}>
+            <i className="fas fa-trash-alt" aria-hidden="true"></i>
+          </button>
         </div>
       )
     }) :  (

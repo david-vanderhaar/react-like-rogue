@@ -1,13 +1,15 @@
 # To Do
 
 1. Add Monsters and Equipment
-1. Add key commands to prompt options
 1. Add music and SFX
-1. Add Save Option
+  - add soundtrack
+  - add open/close for card
+1. Clean up menu buttons
 1. Add fog of war
-1. add Real-time mode
+1. Add Real-time mode
 
 # Done
+1. ~~Add Save Option~~
 1. ~~Add Help/Tutorial Component~~
 1. ~~Re-factor Combat Mechanic~~
 1. ~~Add and implement SVG images for items and actors~~

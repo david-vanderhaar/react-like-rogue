@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
+import * as SoundPlayer from './SoundPlayer';
 import { getRandomIntInclusive, focusOnGameWindow, prepareDungeonLevel, prepareResetGame, prepareLoadGame, clearDice, findPlayer } from './Helper';
 import uuid from 'uuid';
 import MenuButtons from './UI/MenuButtons';
@@ -32,6 +33,7 @@ class App extends Component {
 
   constructor() {
     super();
+    SoundPlayer.play('nextDungeon');
     // Map width/height control determine number of cells across/down the page
     const mapWidth = 48;
     const mapHeight = 26;
@@ -169,6 +171,7 @@ class App extends Component {
           enemyList[i] = {...enemyList[i]}; //copy the Object
           if (enemyList[i].id === tileToCheck.destructibleId) {
             clearDice();
+            SoundPlayer.play('hitEnemy');
             enemyList[i].takeHit(player.rollStatDice('attack', true));
           }
         }
@@ -181,6 +184,7 @@ class App extends Component {
           pickUpList[i] = {...pickUpList[i]}; //copy the Object
           if (pickUpList[i].id === tileToCheck.pickUpId) {
             pickUpList[i].taken = true;
+            SoundPlayer.play('pickUpPotion');
             player.inventory.push({...pickUpList[i]})
           }
         }
@@ -308,6 +312,7 @@ class App extends Component {
 
         // this snippet targets only the player
         if (neighbors[0].posX === player.posX && neighbors[0].posY === player.posY) {
+          SoundPlayer.play('hitPlayer');
           player.takeHit(enemyList[i].rollStatDice('attack', true));
         }
 
@@ -338,11 +343,13 @@ class App extends Component {
     });
 
     if (enemyList.length === 0) { // check if we should move to the next dungeon
+      SoundPlayer.play('nextDungeon');
       showEndDungeonSummary = true;
       canMove = false;
     }
 
     if (player.life <=0 ) {
+      SoundPlayer.play('death');
       showEndGame = true;
       canMove = false;
     }

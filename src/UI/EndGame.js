@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import * as SoundPlayer from '../SoundPlayer';
 import { Card } from 'react-materialize';
 
 class EndGame extends Component {
@@ -8,7 +9,18 @@ class EndGame extends Component {
     tweetText += "I made it to dungeon level " + this.props.dungeonLevel + ". How far can you go?".split(' ').join('%20')
 
     let cardActions = [];
-    cardActions.push(<button key="1" className="btn" onClick={() => {this.props.resetGame()}}>Restart</button>);
+    cardActions.push(
+      <button
+        key="1"
+        className="btn"
+        onClick={() => {
+          this.props.resetGame();
+          SoundPlayer.play('nextDungeon');
+        }}
+      >
+        Restart
+      </button>
+  );
     cardActions.push(
       <a
         key="2"

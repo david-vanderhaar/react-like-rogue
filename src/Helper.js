@@ -190,7 +190,7 @@ export function prepareLoadGame(currentState) {
 
   // Load Map
   // currentState.tileTypes.map((row, i) => {
-  //   currentState.tileTypes.map((col, j) => {
+  //   row.map((col, j) => {
   //     let tileClone = {}
   //     for (let key in currentState.tileTypes[i][j]) {
   //       tileClone[key] = currentState.tileTypes[i][j][key];
@@ -199,7 +199,6 @@ export function prepareLoadGame(currentState) {
   //   })
   // })
   // Load Map
-
 
   let newState = {
     currentLevelType: currentLevelType,

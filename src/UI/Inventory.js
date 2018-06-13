@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import * as SoundPlayer from '../SoundPlayer';
 import { Card } from 'react-materialize';
 import { getSvg } from '../SVGGenerator';
 import Parser from 'html-react-parser';
@@ -9,6 +10,7 @@ class InventoryItem extends Component {
     let item = {...this.props.item};
     let player = {...this.props.player};
 
+    SoundPlayer.play('consumePotion');
     item.usePickUp(player);
 
     player.inventory = player.inventory.filter((inventoryItem) => {

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import * as SoundPlayer from '../SoundPlayer';
 import { focusOnGameWindow, cloneTiles } from '../Helper';
 import { getSvg } from '../SVGGenerator';
 import { Card } from 'react-materialize';
@@ -36,7 +37,6 @@ class EquipmentCompare extends Component {
   }
 
   onSwapHandler(tileTs, equipmentItemList, player, currentItem) {
-    console.log('swap')
     tileTs = cloneTiles(tileTs);
     equipmentItemList = equipmentItemList.concat();
     player = {...player};
@@ -89,9 +89,15 @@ class EquipmentCompare extends Component {
     let cardActions = [];
 
     if (currentItem === null) {
-      cardActions.push(<button key="1" className="btn" onClick={() => {this.onEquipHandler(this.props.tileTypes, this.props.equipmentItemList, this.props.player)}}>Equip</button>)
+      cardActions.push(<button key="1" className="btn" onClick={() => {
+        this.onEquipHandler(this.props.tileTypes, this.props.equipmentItemList, this.props.player);
+        SoundPlayer.play('equip');
+      }}>Equip</button>)
     } else {
-      cardActions.push(<button key="2" className="btn" onClick={() => {this.onSwapHandler(this.props.tileTypes, this.props.equipmentItemList, this.props.player, currentItem)}}>Swap</button>)
+      cardActions.push(<button key="2" className="btn" onClick={() => {
+        this.onSwapHandler(this.props.tileTypes, this.props.equipmentItemList, this.props.player, currentItem);
+        SoundPlayer.play('equip');
+      }}>Swap</button>)
     }
 
     cardActions.push(<button key="3" className="btn" onClick={() => {this.props.toggleEquipmentCompare(false)}}>Ignore</button>);
