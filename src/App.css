@@ -141,6 +141,23 @@ html {
   border-radius: 5px;
 }
 
+.EquipmentCard {
+  background-color: #555;
+  border-radius: 10px;
+  padding-bottom: 10px;
+  box-shadow: inset 0 0 20px black;
+  min-height: 50px;
+}
+
+.EquipmentCard .slot-name {
+  float: left;
+}
+
+.equipment-stats {
+  float: left;
+  font-size: 20px;
+}
+
 .card-prompt .card {
   position: fixed;
   top: 10vh;
@@ -189,6 +206,10 @@ html {
 
 .stat-icon-background {
   background-color: hsl(210,12%,30%);
+}
+
+.btn-menu svg {
+  vertical-align: middle;
 }
 
 .ctrl-btn {
@@ -319,15 +340,46 @@ html {
   float: left;
 }
 
+.VolumeControl {
+  /* position: absolute;
+  z-index: 5;
+  right: 10px;
+  top: 30px; */
+}
+
+.VolumeControl input {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 25px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.VolumeControl input:hover {
+    opacity: 1;
+}
+
+.VolumeControl input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background: #26a69a;
+    cursor: pointer;
+}
+
+.VolumeControl input::-moz-range-thumb {
+    background: #26a69a;
+    cursor: pointer;
+}
+
 .SessionStats-mobile {
   position: absolute;
   background-color: rgba(0, 0, 0, .7);
   z-index: 4;
   border-radius: 10px;
   width: 20%;
-  /* left: -30%; */
-  /* bottom: 0; */
-  /* width: 100vw; */
   font-size: 180%;
 }
 

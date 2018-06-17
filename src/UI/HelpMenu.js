@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Card, Collapsible, CollapsibleItem } from 'react-materialize';
+import VolumeControl from './VolumeControl';
 
 class HelpMenu extends Component {
   render() {
@@ -56,6 +57,16 @@ class HelpMenu extends Component {
               Click items to use them.
               <br />
               You may only have one of each type of equipment at a time.
+            </CollapsibleItem>
+            <CollapsibleItem header='Sounds'>
+              <VolumeControl
+                masterVolume={this.props.masterVolume}
+                updateMasterVolume={this.props.updateMasterVolume.bind(this)}
+                soundtrackVolume={this.props.soundtrackVolume}
+                updateSoundtrackVolume={this.props.updateSoundtrackVolume.bind(this)}
+                playSoundTrack = {this.props.playSoundTrack.bind(this)}
+                pauseSoundTrack = {this.props.pauseSoundTrack.bind(this)}
+              />
             </CollapsibleItem>
           </Collapsible>
           </div>

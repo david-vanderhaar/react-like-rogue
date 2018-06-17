@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { getSvg } from '../SVGGenerator';
+import Parser from 'html-react-parser';
 
 class MenuButtons extends Component {
   render() {
@@ -16,6 +18,12 @@ class MenuButtons extends Component {
             onClick={() => {this.props.toggleHelpMenu()}}
           >
             Help <i className="fa fa-question-circle" aria-hidden="true"></i>
+          </button>
+          <button
+            className="btn btn-menu"
+            onClick={() => {this.props.toggleEquipmentManagement()}}
+          >
+            Equipment {Parser(getSvg('equipment', 'none', '30px'))}
           </button>
           <button
             className="btn btn-menu"
@@ -38,6 +46,12 @@ class MenuButtons extends Component {
           </button>
           <button
             className="btn btn-menu"
+            onClick={() => {this.props.toggleEquipmentManagement()}}
+          >
+            {Parser(getSvg('equipment', 'none', '30px'))}
+          </button>
+          <button
+            className="btn btn-menu"
             onClick={() => {this.props.toggleHelpMenu()}}
           >
             <i className="fa fa-question-circle" aria-hidden="true"></i>
@@ -46,7 +60,7 @@ class MenuButtons extends Component {
             className="btn btn-menu"
             onClick={() => {this.props.toggleSaveLoad()}}
           >
-            <i className="fa fa-load" aria-hidden="true"></i>
+            <i className="fa fa-spinner" aria-hidden="true"></i>
           </button>
         </div>
       </div>

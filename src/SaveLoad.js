@@ -17,7 +17,8 @@ class SaveLoad extends Component {
   }
 
   deleteSave(index) {
-    let saves = this.state.saves.concat().splice(index - 1 , 1);
+    let saves = this.state.saves.concat();
+    saves.splice(index, 1);
     this.setState({
       saves
     }, () => {

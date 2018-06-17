@@ -84,17 +84,17 @@ class ActorDisplay extends Component {
         <div className="row">
           <div className="col s12">
             <div className="row">
-              <div className="input-field col s4">
+              <div className="input-field col s12 m4">
                 <i className="fa fa-heart red-text prefix"></i>
                 <input id="{this.props.actor.id}-life" type="number" onChange={this.handleLifeChange.bind(this)} value={this.props.actor.life} className="validate white-text" />
                 <label className="white-text" htmlFor="{this.props.actor.id}-life">Life</label>
               </div>
-              <div className="input-field col s4">
+              <div className="input-field col s12 m4">
                 <i className="fa fa-shield-alt blue-text prefix"></i>
                 <input id="{this.props.actor.id}-defense" type="number" onChange={this.handleDefenseChange.bind(this)} value={this.props.actor.defense} className="validate white-text" />
                 <label className="white-text" htmlFor="{this.props.actor.id}-defense">Defense</label>
               </div>
-              <div className="input-field col s4">
+              <div className="input-field col s12 m4">
                 <i className="fa fa-gavel green-text prefix"></i>
                 <input id="{this.props.actor.id}-attack" type="number" onChange={this.handleAttackChange.bind(this)} value={this.props.actor.attack} className="validate white-text" />
                 <label className="white-text" htmlFor="{this.props.actor.id}-attack">Attack</label>

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
+import { Howler } from 'howler';
 import * as SoundPlayer from './SoundPlayer';
 import { getRandomIntInclusive, focusOnGameWindow, prepareDungeonLevel, prepareResetGame, prepareLoadGame, clearDice, findPlayer } from './Helper';
 import uuid from 'uuid';
@@ -23,6 +24,7 @@ import { generatePickUps } from './PickUp';
 import EquipmentItem from './EquipmentItem';
 import { generateEquipment } from './EquipmentItem';
 import EquipmentCompare from './UI/EquipmentCompare';
+import EquipmentManagement from './UI/EquipmentManagement';
 import './App.css';
 import smoothscroll from 'smoothscroll-polyfill';
 
@@ -33,7 +35,8 @@ class App extends Component {
 
   constructor() {
     super();
-    SoundPlayer.play('nextDungeon');
+    const soundtrack = SoundPlayer.playSoundTrack();
+    // SoundPlayer.play('nextDungeon');
     // Map width/height control determine number of cells across/down the page
     const mapWidth = 48;
     const mapHeight = 26;
@@ -90,6 +93,7 @@ class App extends Component {
       equipmentItemList: equipmentItemList,
       equipmentCompareItemId: null,
       showEquipmentCompare: false,
+      showEquipmentManagement: false,
       showEndDungeonSummary: false,
       showEndGame: false,
       showHelpMenu: true,
@@ -106,6 +110,9 @@ class App extends Component {
         DOWN: 40,
         STAY: 32
       },
+      soundtrack: soundtrack,
+      masterVolume: 100,
+      soundtrackVolume: 100,
     }
   }
 
@@ -134,6 +141,7 @@ class App extends Component {
             player.posX -= 1;
           }
         }
+        SoundPlayer.playWalk();
         break;
         case playerControls['UP']:
         tileToCheck = tileTypes[player.posY - 1][player.posX];
@@ -142,6 +150,7 @@ class App extends Component {
             player.posY -= 1;
           }
         }
+        SoundPlayer.playWalk();
         break;
         case playerControls['RIGHT']:
         tileToCheck = tileTypes[player.posY][player.posX + 1];
@@ -150,6 +159,7 @@ class App extends Component {
             player.posX += 1;
           }
         }
+        SoundPlayer.playWalk();
         break;
         case playerControls['DOWN']:
         tileToCheck = tileTypes[player.posY + 1][player.posX];
@@ -158,9 +168,11 @@ class App extends Component {
             player.posY += 1;
           }
         }
+        SoundPlayer.playWalk();
         break;
         default:
         tileToCheck = tileTypes[player.posY][player.posX];
+        SoundPlayer.playBreath();
         break;
       }
 
@@ -416,8 +428,16 @@ class App extends Component {
     this.setState({
       showEquipmentCompare: value,
     })
+    SoundPlayer.playRandom(['inventoryOpen', 'inventoryClose']);
 
     focusOnGameWindow();
+  }
+
+  toggleEquipmentManagement() {
+    this.setState({
+      showEquipmentManagement: !this.state.showEquipmentManagement,
+    })
+    SoundPlayer.playRandom(['inventoryOpen', 'inventoryClose']);
   }
 
   goToDungeonLevel(level, currentState) {
@@ -441,6 +461,7 @@ class App extends Component {
     this.setState({
       showHelpMenu: !this.state.showHelpMenu
     });
+    SoundPlayer.playRandom(['inventoryOpen', 'inventoryClose']);
   }
 
   toggleInventoryCard() {
@@ -450,11 +471,44 @@ class App extends Component {
     this.setState({
       showInventoryCard: !this.state.showInventoryCard
     });
+    SoundPlayer.playRandom(['inventoryOpen', 'inventoryClose']);
   }
 
   toggleBattleSim() {
     this.setState({
       showBattleSim: !this.state.showBattleSim
+    });
+    SoundPlayer.playRandom(['inventoryOpen', 'inventoryClose']);
+  }
+
+  handlePauseSoundtack() {
+    this.state.soundtrack.map((sound) => {
+      sound.stop();
+    });
+  }
+
+  handlePlaySoundtack() {
+    this.handlePauseSoundtack();
+    let soundtrack = SoundPlayer.playSoundTrack();
+    this.setState({
+      soundtrack
+    })
+  }
+
+  updateSoundtrackVolume(value) {
+    this.state.soundtrack.map((sound) => {
+      sound.volume(value/100);
+    });
+
+    this.setState({
+      soundtrackVolume: value
+    });
+  }
+
+  updateMasterVolume(value) {
+    Howler.volume(value/100);
+    this.setState({
+      masterVolume: value
     });
   }
 
@@ -462,6 +516,8 @@ class App extends Component {
     this.setState({
       showSaveLoad: !this.state.showSaveLoad
     });
+    SoundPlayer.playRandom(['inventoryOpen', 'inventoryClose']);
+    focusOnGameWindow();
   }
 
   handleLoadGame(saveState) {
@@ -478,11 +534,35 @@ class App extends Component {
       state: this.state,
     }
 
+
     if (previousSaves) {
-      localStorage.setItem('react-like-rogue-game-saves', JSON.stringify([...previousSaves, newSave]));
+
+      let seen = [];
+      let toSave = JSON.stringify([...previousSaves, newSave], function(key, val) {
+        if (val != null && typeof val == "object") {
+          if (seen.indexOf(val) >= 0) {
+            return;
+          }
+          seen.push(val);
+        }
+        return val;
+      });
+      localStorage.setItem('react-like-rogue-game-saves', toSave);
     } else {
-      localStorage.setItem('react-like-rogue-game-saves', JSON.stringify([newSave]));
+
+      let seen = [];
+      let toSave = JSON.stringify([newSave], function(key, val) {
+        if (val != null && typeof val == "object") {
+          if (seen.indexOf(val) >= 0) {
+            return;
+          }
+          seen.push(val);
+        }
+        return val;
+      });
+      localStorage.setItem('react-like-rogue-game-saves', toSave);
     }
+
   }
 
   render() {
@@ -571,6 +651,12 @@ class App extends Component {
             <HelpMenu
               showHelpMenu = {this.state.showHelpMenu}
               toggleHelpMenu = {this.toggleHelpMenu.bind(this)}
+              masterVolume = {this.state.masterVolume}
+              soundtrackVolume = {this.state.soundtrackVolume}
+              updateMasterVolume = {this.updateMasterVolume.bind(this)}
+              updateSoundtrackVolume = {this.updateSoundtrackVolume.bind(this)}
+              playSoundTrack = {this.handlePlaySoundtack.bind(this)}
+              pauseSoundTrack = {this.handlePauseSoundtack.bind(this)}
             />
             { saveLoad }
             { endGame }
@@ -612,16 +698,30 @@ class App extends Component {
             {
               this.state.showEquipmentCompare && (
                 <EquipmentCompare
-                toggleEquipmentCompare = {this.handleToggleEquipmentCompare.bind(this)}
-                tileTypes = {this.state.tileTypes}
-                player = {this.state.player}
-                handlePlayerUpdate = {this.handlePlayerUpdate.bind(this)}
-                handleUpdateEquipmentItems = {this.updateEquipmentItems.bind(this)}
-                handleUpdateEquipmentCompareItemId = {this.updateEquipmentCompareId.bind(this)}
-                handlePlaceEquipmentItems = {this.placeEquipmentItems.bind(this)}
-                equipmentItemList = {this.state.equipmentItemList}
-                equipmentCompareItemId = {this.state.equipmentCompareItemId}
-              />
+                  toggleEquipmentCompare = {this.handleToggleEquipmentCompare.bind(this)}
+                  tileTypes = {this.state.tileTypes}
+                  player = {this.state.player}
+                  handlePlayerUpdate = {this.handlePlayerUpdate.bind(this)}
+                  handleUpdateEquipmentItems = {this.updateEquipmentItems.bind(this)}
+                  handleUpdateEquipmentCompareItemId = {this.updateEquipmentCompareId.bind(this)}
+                  handlePlaceEquipmentItems = {this.placeEquipmentItems.bind(this)}
+                  equipmentItemList = {this.state.equipmentItemList}
+                  equipmentCompareItemId = {this.state.equipmentCompareItemId}
+                />
+            )
+            }
+
+            {
+              this.state.showEquipmentManagement && (
+                <EquipmentManagement
+                  toggleEquipmentManagement = {this.toggleEquipmentManagement.bind(this)}
+                  tileTypes = {this.state.tileTypes}
+                  player = {this.state.player}
+                  handlePlayerUpdate = {this.handlePlayerUpdate.bind(this)}
+                  handleUpdateEquipmentItems = {this.updateEquipmentItems.bind(this)}
+                  handlePlaceEquipmentItems = {this.placeEquipmentItems.bind(this)}
+                  equipmentItemList = {this.state.equipmentItemList}
+                />
             )
             }
 
@@ -676,6 +776,7 @@ class App extends Component {
               toggleHelpMenu = {this.toggleHelpMenu.bind(this)}
               toggleSaveLoad = {this.toggleSaveLoad.bind(this)}
               toggleInventoryCard = {this.toggleInventoryCard.bind(this)}
+              toggleEquipmentManagement = {this.toggleEquipmentManagement.bind(this)}
               inventoryCount = {this.state.player.inventory.length}
             />
           </div>
