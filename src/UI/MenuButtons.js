@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom'
 import { getSvg } from '../SVGGenerator';
 import Parser from 'html-react-parser';
 
@@ -7,9 +8,7 @@ class MenuButtons extends Component {
     return (
       <div>
         <div className="MenuButtons">
-          <button className="btn btn-menu" onClick={this.props.toggleBattleSim}>
-            Battle Simulation <i className="fas fa-calculator" aria-hidden="true"></i>
-          </button>
+          <Link className="btn btn-menu" to="/battlesim">Battle Simulation <i className="fas fa-calculator" aria-hidden="true"></i> </Link>
           <button className="btn btn-menu" onClick={this.props.handleToggleDijkstraMap}>
             Toggle Dijkstra <i className="fa fa-map" aria-hidden="true"></i>
           </button>
@@ -34,9 +33,7 @@ class MenuButtons extends Component {
         </div>
 
         <div className="MenuButtons-mobile">
-          <button className="btn btn-menu" onClick={this.props.toggleBattleSim}>
-            <i className="fas fa-calculator" aria-hidden="true"></i>
-          </button>
+          <Link className="btn btn-menu" to="/"> <i className="fas fa-calculator" aria-hidden="true"></i> </Link>
           <button className="btn btn-menu" onClick={this.props.handleToggleDijkstraMap}>
             <i className="fa fa-map" aria-hidden="true"></i>
           </button>

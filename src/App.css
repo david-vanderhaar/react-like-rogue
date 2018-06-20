@@ -22,6 +22,112 @@ html {
   font-size: 1.5em;
 }
 
+:root {
+  --title-text-color: #d1c4e9;
+  --title-text-bd-color: #ef6c00;
+  --title-bg-color: #673ab7;
+}
+
+.switch-wrapper {
+  position: relative;
+}
+
+.switch-wrapper > div {
+  position: absolute;
+}
+
+.TitleScreen {
+  background-color: var(--title-bg-color);
+  width: 100vw;
+  height: 100vh;
+  text-align: center;
+}
+
+.TitleScreen .music-toggle {
+  position: absolute;
+  top: 10px;
+  right: 30px;
+  color: var(--title-text-color);
+  font-size: 30px;
+  cursor: pointer;
+}
+
+@keyframes tipsy {
+  0 {
+    transform: translateX(-50%) translateY(-50%) rotate(0deg);
+  }
+  100% {
+    transform: translateX(-50%) translateY(-50%) rotate(360deg);
+  }
+}
+
+.TitleScreen .game-name {
+  color: var(--title-text-color);
+  text-shadow: 0 20px 25px #2e2e31, 0 40px 60px #2e2e31;
+  font-size: 80px;
+  font-weight: bold;
+  text-decoration: none;
+  letter-spacing: -3px;
+  margin: 0;
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.TitleScreen .game-name:before,
+.TitleScreen .game-name:after {
+  content: '';
+  padding: .9em .4em;
+  position: absolute;
+  left: 50%;
+  width: 25%;
+  top: 50%;
+  display: block;
+  border: 15px solid red;
+  transform: translateX(-50%) translateY(-50%) rotate(0deg);
+  animation: 10s infinite alternate ease-in-out tipsy;
+}
+
+.TitleScreen .game-name:before {
+  border-color: var(--title-text-bd-color) var(--title-text-bd-color) rgba(0, 0, 0, 0) rgba(0, 0, 0, 0);
+  z-index: -1;
+}
+
+.TitleScreen .game-name:after {
+  border-color: rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) var(--title-text-bd-color) var(--title-text-bd-color);
+  box-shadow: 25px 25px 25px rgba(46, 46, 49, .8);
+}
+
+.TitleScreen .game-signature {
+  position: relative;
+  left: 35%;
+  display: flow-root;
+  letter-spacing: normal;
+  color: var(--title-text-color);
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.TitleScreen .key-prompt {
+  position: relative;
+  top: 60%;
+  left: 0;
+  display: block;
+  width: 25%;
+  margin: auto;
+  background-color: rgba(255, 0, 0, 0);
+  border: 6px solid var(--title-text-bd-color);
+  font-weight: bold;
+  color: var(--title-text-color);
+}
+
+.TitleScreen .key-prompt:hover {
+  background-color: #ef6c00 !important;
+  width: 50%;
+  transition: .2s ease-in;
+}
+
 #toast-container {
   top: 0 !important;
   right: auto !important;

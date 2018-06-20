@@ -10,7 +10,7 @@ class InventoryItem extends Component {
     let item = {...this.props.item};
     let player = {...this.props.player};
 
-    SoundPlayer.play('consumePotion');
+    SoundPlayer.playDrink();
     item.usePickUp(player);
 
     player.inventory = player.inventory.filter((inventoryItem) => {

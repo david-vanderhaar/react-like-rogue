@@ -2,7 +2,7 @@ import { Howl, Howler } from 'howler';
 import {getRandomIntInclusive } from './Helper'
 
 let soundtrack = {
-  title: './sounds/nextDungeon.wav',
+  title: './sounds/soundtrack/relapse.wav',
   repeat: [
     './sounds/soundtrack/commonBird.m4a',
     './sounds/soundtrack/ragnar.wav',
@@ -12,8 +12,19 @@ let soundtrack = {
   ],
 }
 
-export function playSoundTrack() {
+export function playTitle() {
+  Howler.unload();
+  const sound = new Howl({
+    src: [soundtrack.title],
+    volume: 0
+  });
+  sound.play();
+  sound.fade(0, .5, 2000);
+  return sound;
+}
 
+export function playSoundTrack() {
+  Howler.unload();
   let soundIds = [];
   let currentTrack = 0;
   let sounds = soundtrack.repeat.concat().map((track) => {
@@ -72,6 +83,12 @@ let sounds = {
   breath015: './sounds/breath015.wav',
   breath016: './sounds/breath016.wav',
   breath017: './sounds/breath017.wav',
+  drink00: './sounds/drink00.mp3',
+  drink01: './sounds/drink01.mp3',
+  drink02: './sounds/drink02.mp3',
+  drink03: './sounds/drink03.mp3',
+  drink04: './sounds/drink04.mp3',
+  drink05: './sounds/drink05.mp3',
   inventoryOpen: './sounds/inventoryOpen.wav',
   inventoryClose: './sounds/inventoryClose.wav',
 }
@@ -83,11 +100,12 @@ export function play(name) {
   sound.play();
 }
 
-export function playRandom(names) {
+export function playRandom(names, volume = 1) {
   let name = names[getRandomIntInclusive(0, names.length -1)];
-
+  console.log(volume)
   const sound = new Howl({
-    src: [sounds[name]]
+    src: [sounds[name]],
+    volume: volume,
   });
   sound.play();
 }
@@ -131,5 +149,16 @@ export function playBreath() {
     'breath015',
     'breath016',
     'breath017',
+  ]);
+}
+
+export function playDrink() {
+  playRandom([
+    'drink00',
+    'drink01',
+    'drink02',
+    'drink03',
+    'drink04',
+    'drink05',
   ]);
 }

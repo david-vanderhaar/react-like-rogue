@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { CreateActor } from './Classes';
 import { getSvg } from './SVGGenerator';
 import { getAllMonsterData } from './DB/monsters';
@@ -269,12 +270,8 @@ class BattleSim extends Component {
           <Results results={this.state.results.actor_2} actor={this.state.actor_2} battleCount={this.state.battleCount} />
         </div>
 
-        <button className="btn btn-menu" onClick={() => {
-          this.props.toggleBattleSim();
-          this.props.resetGame(this.props.currentState)
-        }}>
-          Back To Game
-        </button>
+        <Link className="btn btn-menu" to="/game">Back To Game</Link>
+
       </div>
     );
   }

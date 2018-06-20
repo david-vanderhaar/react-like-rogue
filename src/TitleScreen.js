@@ -1,0 +1,59 @@
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import { Howler } from 'howler';
+import * as SoundPlayer from './SoundPlayer';
+
+class TitleScreen extends Component {
+  constructor() {
+    super();
+    const sound = SoundPlayer.playTitle();
+    this.state = {
+      musicOn: true,
+      titleTrack: sound
+    }
+  }
+
+  toggleMusic() {
+    if (this.state.musicOn) {
+      this.state.titleTrack.mute(true);
+    } else {
+      this.state.titleTrack.mute(false);
+    }
+    this.setState({
+      musicOn: !this.state.musicOn
+    })
+  }
+
+  handleKey(event) {
+    if (event.keyCode === 32) {
+      window.location = '/game';
+    }
+  }
+
+  componentDidMount() {
+    let el = document.getElementById("title-screen");
+    if (el) {el.focus();}
+  }
+
+  render() {
+    const musicStatus = this.state.musicOn ? (<i className="fa fa-volume-up"></i>) : (<i className="fa fa-volume-off"></i>);
+
+    return (
+      <div id="title-screen" className="TitleScreen" tabIndex="0" onKeyUp={this.handleKey.bind(this)}>
+        <div className="game-name">
+          React Like Rogue
+          <div className="game-signature">A Game by Classic Wook</div>
+        </div>
+        <button className="key-prompt btn btn-large" onClick={() => {window.location = '/game';}}>Press Space</button>
+        <div
+          className="music-toggle"
+          onClick={this.toggleMusic.bind(this)}
+        >
+          { musicStatus }
+        </div>
+      </div>
+    );
+  }
+}
+
+export default TitleScreen

@@ -1,0 +1,308 @@
+<div class="checkout-spacing row">
+    <div class="col-md-8 col-md-offset-2">
+        <% if @order.totals_hash != ""
+          totals_hash = @order.totals_hash
+        %>
+        <% else
+          totals_hash = nil
+        %>
+        <% end %>
+        <%= link_to 'Back to Orders Page', admin_orders_path, class: 'btn btn-lg btn-default no-print' %>
+        <br/><br/>
+        <div class="row">
+          <div class="col-xs-6">
+            <div class="text-left">
+              <h2><b>Review Order <%= @order.id %></b></h2>
+            </div>
+          </div>
+          <div class="col-xs-6">
+            <div class="text-right">
+              <h2>
+                <b>Order Status</b>
+                <span id="admin-order-change-status">
+                  <%= bootstrap_form_for :change_status,
+                  url: admin_order_change_status_path(@order.id),
+                  layout: :inline,
+                  remote: true do |f| %>
+                  <%= f.select :status, Order.statuses.collect { |type, id| [type.titlecase, type] }, :selected => @order.status, hide_label: true  %>
+                  <button type="submit" class="btn btn-success">
+                    Change
+                  </button>
+                  <% end %>
+                </span>
+              </h2>
+            </div>
+          </div>
+        </div>
+        <div class="row m-v-2 no-print-margin">
+            <div class="col-md-12">
+                <div class="panel panel-default panel-table">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-3 confirmation-header">
+                                <h5>Shipping Address</h5>
+                                <p>
+                                    <% if @order.shipping_address.company != "" %>
+                                      <%= @order.shipping_address.company %>
+                                      <br/>
+                                    <% end %>
+                                    <%= @order.shipping_address.first_name %> <%= @order.shipping_address.last_name %>
+                                    <br/>
+                                    <%= @order.shipping_address.street %>
+                                    <br/>
+                                    <% if @order.shipping_address.street_opt && @order.shipping_address.street_opt.present? %>
+                                        <%= @order.shipping_address.street_opt %>
+                                        <br/>
+                                    <% end %>
+                                    <%= @order.shipping_address.city %>,
+                                    <%= @order.shipping_address.state %>
+                                    <%= @order.shipping_address.zip %>
+                                    <% if @order.po_number != "" %>
+                                      <br>
+                                      PO Number: <%= @order.po_number %>
+                                    <% end %>
+                                </p>
+                            </div>
+                            <div class="col-md-3 confirmation-header">
+                                <h5>Billing Address</h5>
+                                <p>
+                                    <% if @order.billing_address.company != "" %>
+                                      <%= @order.billing_address.company %>
+                                      <br/>
+                                    <% end %>
+                                    <%= @order.billing_address.first_name %> <%= @order.billing_address.last_name %>
+                                    <br/>
+                                    <%= @order.billing_address.street %>
+                                    <br/>
+                                    <% if @order.billing_address.street_opt && @order.billing_address.street_opt.present? %>
+                                        <%= @order.billing_address.street_opt %>
+                                        <br/>
+                                    <% end %>
+                                    <%= @order.billing_address.city %>,
+                                    <%= @order.billing_address.state %>
+                                    <%= @order.billing_address.zip %>
+                                </p>
+                            </div>
+                            <div class="col-md-3 confirmation-header">
+                                <h5>Shipping Method</h5>
+                                <p>
+                                  <% if @order.shipping_rates.any? %>
+                                      <%= @order.shipping_rates.find_by(selected: true).name %>
+                                  <% end %>
+                                </p>
+                                <p>
+                                  <% if @order.shipping_type.include?("collect") %>
+                                      <%= @order.shipping_type.to_s.titlecase %>: <%= @order.collect_id %>
+                                  <% end %>
+                                </p>
+                            </div>
+                            <div class="col-md-3 confirmation-header">
+                                <h5>Payment Method</h5>
+                                <%= @order.payment_type.to_s.titlecase %>
+                            </div>
+                        </div>
+                    </div>
+                    <%= bootstrap_form_for :add_line_item,
+                    url: admin_order_add_line_item_path(@order.id),
+                    remote: true do |f| %>
+                      <table class="table table-striped table-list table-admin-order-edit">
+                          <thead>
+                              <th>SKU</th>
+                              <th>Description</th>
+                              <th>Quantity</th>
+                              <th>Price</th>
+                              <th>Item Subtotal</th>
+                              <th></th>
+                          </thead>
+                          <tbody>
+                              <% @order.order_items.reverse.each do |oi| %>
+                                <tr id="line-item-row-<%= oi.id %>">
+                                    <td>
+                                        <%= image_tag oi.display_image, size: "25x25" %>
+                                        <%= oi.sku %>
+                                    </td>
+                                    <td><%= oi.name %></td>
+                                    <td><%= oi.quantity %></td>
+                                    <td>
+                                      <% if totals_hash && oi.product_price[:sale] %>
+                                        <del><%= number_to_currency(oi.product_price[:regular_price]) %></del>
+                                        <br>
+                                        <span class="promo-color"><%= number_to_currency(oi.product_price[:price]) %></span>
+                                      <% else %>
+                                        <%= number_to_currency(oi.product_price[:regular_price]) %>
+                                      <% end %>
+                                    </td>
+                                    <td>
+                                      <% if totals_hash && oi.product_price[:sale] %>
+                                        <del><%= number_to_currency(oi.product_price[:regular_price] * oi.quantity) %></del>
+                                        <br>
+                                        <span class="promo-color"><%= number_to_currency(oi.product_price[:price] * oi.quantity) %></span>
+                                      <% else %>
+                                        <%= number_to_currency(oi.product_price[:regular_price] * oi.quantity) %>
+                                      <% end %>
+                                    </td>
+                                    <td>
+                                      <div class="row">
+                                        <div class="col-xs-6">
+                                          <%= link_to admin_order_delete_line_item_path(:order_id => @order.id, :order_item_id => oi.id), method: :delete, class: 'btn btn-default', remote: true do %>
+                                              <%= glyph_for 'trash' %>
+                                          <% end %>
+                                        </div>
+                                        <div class="col-xs-6">
+                                          <button id="btn-edit-list-item-<%= oi.id %>" class="btn btn-default" type="button">
+                                              <%= glyph_for 'pencil' %>
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </td>
+                                </tr>
+                                <div class="edit-line-item-form">
+                                  <%= render 'admin/orders/edit_line_item', order: @order, oi: oi %>
+                                </div>
+                              <% end %>
+                              <div>
+                                <%= render 'admin/orders/add_line_item', order: @order, f: f %>
+                              </div>
+                          </tbody>
+                      </table>
+                    <% end %>
+                    <div class="panel-body">
+                        <div class="row p-h-3 no-print">
+                            <div class="col-md-12">
+                                <button class="btn btn-success" id="btn-add-line-item" type="button">
+                                  Add Line Item
+                                </button>
+                            </div>
+                        </div>
+                        <div id="order-comments" class="checkout-confirm">
+                            <% @order.descriptions.each do |d| %>
+                                <%= render 'admin/order_comments/order_comment', comment: d, order: @order %>
+                            <% end %>
+                        </div>
+                        <div class="row p-h-3 no-print" id="add-order-comment">
+                            <div class="col-md-12">
+                                <%= link_to 'Add Order Comment', nil, class: 'btn btn-success', id: 'add-order-comment-button' %>
+                            </div>
+                        </div>
+                        <div class="row p-h-3">
+                            <div class="col-md-4 col-xl-3 col-md-offset-8 col-xl-offset-9 m-v-2">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p>Subtotal:</p>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <p>
+                                          <%=
+                                            if totals_hash
+                                              number_to_currency totals_hash[:subtotal_initial]
+                                            else
+                                              number_to_currency @order.subtotal
+                                            end
+                                          %>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p>Tax:</p>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <p>
+                                          <%=
+                                            if totals_hash
+                                              number_to_currency totals_hash[:tax]
+                                            else
+                                              number_to_currency @order.tax
+                                            end
+                                          %>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p>Shipping:</p>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <% if current_cart.shipping_type.include?('collect') %>
+                                            <p>Collect</p>
+                                        <% else %>
+                                            <p>
+                                              <% if totals_hash %>
+                                                <span class="<% if totals_hash[:discounts].any? { |discount| discount[:type] == 'flat_rate_shipping' } %>promo-color<% end %>">
+                                                  <%= number_to_currency totals_hash[:shipping] %>
+                                                </span>
+                                              <% else %>
+                                                  <%= number_to_currency @order.shipping %>
+                                              <% end %>
+                                            </p>
+                                        <% end %>
+                                    </div>
+                                </div>
+                                <% if totals_hash && totals_hash[:discounts].reject { |discount| discount[:type] == 'flat_rate_shipping'}.any? {|discount| discount[:value] > 0} %>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="promo-color">Discount:</p>
+                                        </div>
+                                        <div class="col-md-6 text-right">
+                                            <% totals_hash[:discounts].reject { |discount| discount[:type] == 'flat_rate_shipping'}.each do |discount| %>
+                                              <p class="promo-color">
+                                                  -<%= number_to_currency discount[:value] %>
+                                              </p>
+                                            <% end %>
+                                        </div>
+                                    </div>
+                                <% end %>
+                                <hr/>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p>Total:</p>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <p>
+                                          <%=
+                                            if totals_hash
+                                              number_to_currency totals_hash[:total]
+                                            else
+                                              number_to_currency @order.total
+                                            end
+                                          %>
+                                        </p>
+                                    </div>
+                                </div>
+                                <% if totals_hash && totals_hash[:promo_codes].size > 0 %>
+                                  <hr>
+                                  <div class="promo-codes">
+                                    <div class="row">
+                                      <div class="col-xs-12">
+                                        <p>Promo Codes Applied:</p>
+                                      </div>
+                                    </div>
+                                    <div class="row">
+                                      <div class="col-xs-12 text-right">
+                                        <% totals_hash[:promo_codes].each do |promo_code| %>
+                                          <p class="promo-color"><%= promo_code %></p>
+                                        <% end %>
+                                      </div>
+                                    </div>
+                                  </div>
+                                <% end %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="no-display">
+    <div class="row p-h-3" id="add-order-comment-form">
+        <%= bootstrap_form_for :order_comment, url: admin_order_order_comments_path(@order), remote: true do |f| %>
+            <div class="col-md-10">
+                <%= f.text_area :text, hide_label: true %>
+            </div>
+            <div class="col-md-2">
+                <%= f.submit 'Save', id: 'submit-order-comment-button', class: "btn btn-success" %>
+            </div>
+        <% end %>
+    </div>
+</div>
