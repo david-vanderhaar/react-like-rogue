@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import $ from 'jquery';
 import { Howler } from 'howler';
 import * as SoundPlayer from './SoundPlayer';
-import { getRandomIntInclusive, focusOnGameWindow, prepareDungeonLevel, prepareResetGame, prepareLoadGame, clearDice, findPlayer } from './Helper';
+import { getRandomIntInclusive, focusOnGameWindow, prepareDungeonLevel, prepareResetGame, prepareLoadGame, clearDice, findPlayer, shakeTiles } from './Helper';
 import uuid from 'uuid';
 import MenuButtons from './UI/MenuButtons';
 import StatBar from './UI/StatBar';
@@ -325,6 +325,9 @@ class Game extends Component {
         if (neighbors[0].posX === player.posX && neighbors[0].posY === player.posY) {
           SoundPlayer.play('hitPlayer');
           player.takeHit(enemyList[i].rollStatDice('attack', true));
+          // tile shake
+          let neighborsToShake = this.dijkstraMap.getNeigbors(player, this.state.dijkstraMap);
+          shakeTiles(neighborsToShake, enemyList[i].rollStatDice('attack', false), tileTs, this.dijkstraMap.getNeigbors, this.state.dijkstraMap);
         }
 
         if (tileToCheck.canPass === true) { // check that the tile is passable

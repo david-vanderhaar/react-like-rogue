@@ -243,3 +243,21 @@ export function clearDice() {
     e.parentNode.removeChild(e);
   });
 }
+
+export function shakeTiles (neighborsToShake, strength, tileTs, getNeigbors, dijkstraMap) {
+  neighborsToShake.map((tile) => {
+    if (tileTs[tile.posY][tile.posX].type === 'GROUND') {
+      let tileId = '#tile-' + tile.posY.toString() + '-' + tile.posX.toString()
+      $(tileId).addClass('shake');
+      setTimeout(() => {
+        $(tileId).removeClass('shake');
+      }, 600);
+
+      strength--;
+      if (strength > 0) {
+        let newNeighbors = getNeigbors({posX: tile.posX, posY: tile.posY}, dijkstraMap);
+        shakeTiles(newNeighbors, strength, tileTs, getNeigbors, dijkstraMap)
+      }
+    }
+  });
+}

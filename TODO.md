@@ -3,11 +3,10 @@
 
 ## Polish
 1. Add Monsters and Equipment
-1. Title/Splash Screen
 1. Add Juice!
   - particle fx (sparks, blood splatter, dust)
   - foreground, midground particles
-  - tile-shake
+  - ~~tile-shake~~
 1. Performance Optimization
 
 ## Rainy Day

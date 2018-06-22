@@ -10,13 +10,13 @@ const App = () => (
   <Router>
   <div>
     <main>
-    <AnimatedSwitch
+      <Route exact path="/" component={TitleScreen} />
+      <AnimatedSwitch
       atEnter={{ opacity: 0 }}
       atLeave={{ opacity: 0 }}
       atActive={{ opacity: 1 }}
       className="fade"
-    >
-      <Route exact path="/" component={TitleScreen} />
+      >
       <Route exact path="/game" component={Game} />
       <Route exact path="/battlesim" component={BattleSim} />
     </AnimatedSwitch>

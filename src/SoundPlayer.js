@@ -102,7 +102,6 @@ export function play(name) {
 
 export function playRandom(names, volume = 1) {
   let name = names[getRandomIntInclusive(0, names.length -1)];
-  console.log(volume)
   const sound = new Howl({
     src: [sounds[name]],
     volume: volume,

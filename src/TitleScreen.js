@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Howler } from 'howler';
 import * as SoundPlayer from './SoundPlayer';
+import { getSvg } from './SVGGenerator';
+import Parser from 'html-react-parser';
 
 class TitleScreen extends Component {
   constructor() {
@@ -9,7 +11,9 @@ class TitleScreen extends Component {
     const sound = SoundPlayer.playTitle();
     this.state = {
       musicOn: true,
-      titleTrack: sound
+      titleTrack: sound,
+      overlayTransition: '',
+      transitionTime: 3000,
     }
   }
 
@@ -26,8 +30,17 @@ class TitleScreen extends Component {
 
   handleKey(event) {
     if (event.keyCode === 32) {
-      window.location = '/game';
+      this.goToGame();
     }
+  }
+
+  goToGame() {
+    this.setState({
+      overlayTransition: 'title-transition'
+    });
+    setTimeout(() => {
+      window.location = '/game';
+    }, this.state.transitionTime + 500);
   }
 
   componentDidMount() {
@@ -37,20 +50,20 @@ class TitleScreen extends Component {
 
   render() {
     const musicStatus = this.state.musicOn ? (<i className="fa fa-volume-up"></i>) : (<i className="fa fa-volume-off"></i>);
-
     return (
       <div id="title-screen" className="TitleScreen" tabIndex="0" onKeyUp={this.handleKey.bind(this)}>
         <div className="game-name">
           React Like Rogue
           <div className="game-signature">A Game by Classic Wook</div>
         </div>
-        <button className="key-prompt btn btn-large" onClick={() => {window.location = '/game';}}>Press Space</button>
+        <button className="key-prompt btn btn-large" onClick={() => {this.goToGame();}}>Press Space</button>
         <div
           className="music-toggle"
           onClick={this.toggleMusic.bind(this)}
         >
           { musicStatus }
         </div>
+        <div id="title-transition-overlay" className={this.state.overlayTransition} style={{transition: this.state.transitionTime.toString() + 'ms ease-out'}} />
       </div>
     );
   }

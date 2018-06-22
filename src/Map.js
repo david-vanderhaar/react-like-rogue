@@ -11,9 +11,7 @@ class TileDisplay extends Component {
     render() {
       console.log('rendering tile')
       return (
-        <span className={this.props.className} style={this.props.style}>
-          {this.props.value}
-        </span>
+        <span id={'tile-' + this.props.value} className={this.props.className} style={this.props.style} />
       );
     }
 }
@@ -209,7 +207,7 @@ class Map extends Component {
             height: this.props.cellSize
           }
           return (
-            <TileDisplay key={tileCount} className={this.props.tileTypes[i][j].cssClass()} value={col} isEndRow={isEndRow} style={style}/>
+            <TileDisplay key={tileCount} className={this.props.tileTypes[i][j].cssClass()} value={i.toString() + '-' + j.toString()} isEndRow={isEndRow} style={style}/>
           )
         })
       );
