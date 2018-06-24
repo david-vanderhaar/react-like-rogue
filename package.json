@@ -17,9 +17,11 @@
     "deploy": "gh-pages -d build"
   },
   "devDependencies": {
+    "animejs": "^2.2.0",
     "fantasy-names": "^1.1.2",
     "gh-pages": "^1.1.0",
     "howler": "^2.0.12",
+    "howler-plugin-effect-chain": "^0.1.2",
     "html-react-parser": "^0.4.6",
     "jquery": "^3.3.1",
     "materialize-css": "^0.100.2",
@@ -29,6 +31,7 @@
     "react-router-transition": "^1.2.1",
     "react-transition-group": "^2.3.1",
     "smoothscroll-polyfill": "^0.4.3",
+    "tunajs": "^1.0.1",
     "uuid4": "^1.0.0"
   }
 }

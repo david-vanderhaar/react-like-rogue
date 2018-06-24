@@ -8,7 +8,7 @@ class MenuButtons extends Component {
     return (
       <div>
         <div className="MenuButtons">
-          <Link className="btn btn-menu" to="/battlesim">Battle Simulation <i className="fas fa-calculator" aria-hidden="true"></i> </Link>
+          <Link className="btn btn-menu" to="/battlesim" onClick={() => {this.props.pauseGame(true)}}>Battle Simulation <i className="fas fa-calculator" aria-hidden="true"></i> </Link>
           <button className="btn btn-menu" onClick={this.props.handleToggleDijkstraMap}>
             Toggle Dijkstra <i className="fa fa-map" aria-hidden="true"></i>
           </button>

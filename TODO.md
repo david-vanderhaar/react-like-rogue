@@ -4,14 +4,13 @@
 ## Polish
 1. Add Monsters and Equipment
 1. Add Juice!
-  - particle fx (sparks, blood splatter, dust)
-  - foreground, midground particles
   - ~~tile-shake~~
-1. Performance Optimization
+  - SFX: hit, victory, defeat
 
 ## Rainy Day
 1. Add fog of war
-1. Add Real-time mode
+1. Add Real-time mode -> TRIED
+1. Performance Optimization
 
 # Done
 ## Features

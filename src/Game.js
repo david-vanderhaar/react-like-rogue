@@ -100,7 +100,9 @@ class Game extends Component {
       showSaveLoad: false,
       enemyPosX: 0,
       enemyPosY: 0,
-      canMove: true,
+      realTimer: null,
+      realTimeInterval: 3000,
+      gameIsPaused: false,
       player: player,
       playerControls: {
         LEFT: 37,
@@ -123,7 +125,7 @@ class Game extends Component {
       }
     }
 
-    if (this.state.canMove && Object.values(this.state.playerControls).indexOf(event.keyCode) > -1) {
+    if (!this.state.gameIsPaused && Object.values(this.state.playerControls).indexOf(event.keyCode) > -1) {
       let state = {...this.state};
       let playerControls = state.playerControls;
       let player = {...state.player};
@@ -221,11 +223,19 @@ class Game extends Component {
       tileTypes[player.posY][player.posX].canPass = false;
       this.dijkstraMap.generateDijkstraMap(tileTypes, [{posX: player.posX, posY: player.posY}]);
 
+      // let realTimer = this.state.realTimer;
+      // if (realTimer === null) {
+      //   realTimer = setInterval(() => {
+      //     this.moveEnemiesRealTime(enemyList);
+      //   }, this.state.realTimeInterval)
+      // }
+
       this.setState({
         player,
         tileTypes,
         showEquipmentCompare,
         equipmentCompareItemId,
+        // realTimer,
       });
 
       this.moveEnemies(tileTypes, player, enemyList);
@@ -301,7 +311,7 @@ class Game extends Component {
   moveEnemies(tileTs, player, enemyList) {
     let showEndGame = false;
     let showEndDungeonSummary = false;
-    let canMove = true;
+    let gameIsPaused = false;
     let defeatedEnemyList = this.state.defeatedEnemyList.concat();
     // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
     // let tileTs = cloneTiles(this.state.tileTypes);
@@ -359,19 +369,106 @@ class Game extends Component {
     if (enemyList.length === 0) { // check if we should move to the next dungeon
       SoundPlayer.play('nextDungeon');
       showEndDungeonSummary = true;
-      canMove = false;
+      gameIsPaused = true;
     }
 
     if (player.life <=0 ) {
       SoundPlayer.play('death');
       showEndGame = true;
-      canMove = false;
+      gameIsPaused = true;
     }
 
     this.setState({
       showEndGame,
       showEndDungeonSummary,
-      canMove,
+      gameIsPaused,
+      player,
+      enemyList,
+      defeatedEnemyList,
+      tileTypes: tileTs,
+    });
+  }
+
+  moveEnemiesRealTime(enemyList) {
+    let state = {...this.state};
+    let player = {...state.player};
+    let tileTs = state.tileTypes; //tile objs still refering to state tiles
+    // let enemyList = this.state.enemyList.concat();
+
+
+    let defeatedEnemyList = this.state.defeatedEnemyList.concat();
+    enemyList = enemyList.filter((enemy) => {
+      if (enemy.life > 0) {
+        return true;
+      } else {
+        tileTs[enemy.posY][enemy.posX].canPass = true; //reset current tile to passable
+        tileTs[enemy.posY][enemy.posX].containsDestructible = false; //reset current tile
+        tileTs[enemy.posY][enemy.posX].destructibleId = null; //reset current tile
+
+        defeatedEnemyList.push({...enemy});
+        return false;
+      }
+    });
+    // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
+    // let tileTs = cloneTiles(this.state.tileTypes);
+
+    for (let i = 0; i < enemyList.length; i++) {
+      // enemyList[i] = {...enemyList[i]}; //copy the Object
+      let posX = enemyList[i].posX;
+      let posY = enemyList[i].posY;
+      tileTs[posY][posX].destructibleId = enemyList[i].id; //reset current tile
+      let neighbors = this.dijkstraMap.getNeigbors(enemyList[i], this.state.dijkstraMap);
+
+      if (neighbors.length > 0) {
+        let tileToCheck = tileTs[neighbors[0].posY][neighbors[0].posX];
+
+        // This snippet would allow enemies to damage each other
+        // if (tileToCheck.containsDestructible) {
+        //     tileToCheck.destructible.takeHit(enemyList[i].attack);
+        // }
+
+        // this snippet targets only the player
+        if (neighbors[0].posX === player.posX && neighbors[0].posY === player.posY) {
+          SoundPlayer.play('hitPlayer');
+          player.takeHit(enemyList[i].rollStatDice('attack', true));
+          // tile shake
+          let neighborsToShake = this.dijkstraMap.getNeigbors(player, this.state.dijkstraMap);
+          shakeTiles(neighborsToShake, enemyList[i].rollStatDice('attack', false), tileTs, this.dijkstraMap.getNeigbors, this.state.dijkstraMap);
+        }
+
+        if (tileToCheck.canPass === true) { // check that the tile is passable
+          tileTs[posY][posX].canPass = true; //reset current tile to passable
+          tileTs[posY][posX].containsDestructible = false; //reset current tile
+          tileTs[posY][posX].destructibleId = null; //reset current tile
+          enemyList[i].posX = neighbors[0].posX;
+          enemyList[i].posY = neighbors[0].posY;
+          tileToCheck.canPass = false; //set new tile to impassable
+          tileToCheck.containsDestructible = true;
+          tileToCheck.destructibleId = enemyList[i].id;
+        }
+      }
+    }
+
+    let showEndDungeonSummary = this.state.showEndDungeonSummary;
+    let showEndGame = this.state.showEndGame;
+    let gameIsPaused = this.state.gameIsPaused;
+
+    if (enemyList.length === 0) { // check if we should move to the next dungeon
+      SoundPlayer.play('nextDungeon');
+      showEndDungeonSummary = true;
+      gameIsPaused = true;
+    }
+
+    if (player.life <=0 ) {
+      SoundPlayer.play('death');
+      showEndGame = true;
+      gameIsPaused = true;
+    }
+
+    this.setState({
+      showEndGame,
+      showEndDungeonSummary,
+      gameIsPaused,
       player,
       enemyList,
       defeatedEnemyList,
@@ -427,6 +524,7 @@ class Game extends Component {
   }
 
   handleToggleEquipmentCompare(value) {
+    this.pauseGame(value);
     this.setState({
       showEquipmentCompare: value,
     })
@@ -436,6 +534,7 @@ class Game extends Component {
   }
 
   toggleEquipmentManagement() {
+    this.pauseGame(!this.state.showEquipmentManagement);
     this.setState({
       showEquipmentManagement: !this.state.showEquipmentManagement,
     })
@@ -456,7 +555,16 @@ class Game extends Component {
     }, 1000);
   }
 
+  pauseGame(value) {
+    if (this.state.realTimer) {window.clearInterval(this.state.realTimer)}
+    this.setState({
+      gameIsPaused: value,
+      realTimer: null
+    })
+  }
+
   toggleHelpMenu() {
+    this.pauseGame(!this.state.showHelpMenu);
     if (!this.state.showHelpMenu === false) {
       focusOnGameWindow();
     }
@@ -467,6 +575,7 @@ class Game extends Component {
   }
 
   toggleInventoryCard() {
+    this.pauseGame(!this.state.showInventoryCard);
     if (!this.state.showInventoryCard === false) {
       focusOnGameWindow();
     }
@@ -508,6 +617,7 @@ class Game extends Component {
   }
 
   toggleSaveLoad() {
+    this.pauseGame(!this.state.showSaveLoad);
     this.setState({
       showSaveLoad: !this.state.showSaveLoad
     });
@@ -756,6 +866,7 @@ class Game extends Component {
 
           </div>
           <MenuButtons
+            pauseGame = {this.pauseGame.bind(this)}
             handleToggleDijkstraMap = {this.handleToggleDijkstraMap.bind(this)}
             toggleHelpMenu = {this.toggleHelpMenu.bind(this)}
             toggleSaveLoad = {this.toggleSaveLoad.bind(this)}
