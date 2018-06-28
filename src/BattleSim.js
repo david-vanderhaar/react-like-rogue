@@ -4,6 +4,7 @@ import { CreateActor } from './Classes';
 import { getSvg } from './SVGGenerator';
 import { getAllMonsterData } from './DB/monsters';
 import Parser from 'html-react-parser';
+import { publicUrl } from './Helper';
 
 class ActorDisplay extends Component {
   constructor(props) {
@@ -269,7 +270,7 @@ class BattleSim extends Component {
           <Results results={this.state.results.actor_2} actor={this.state.actor_2} battleCount={this.state.battleCount} />
         </div>
 
-        <Link className="btn btn-menu" to="/game">Back To Game</Link>
+        <Link className="btn btn-menu" to={publicUrl() + "/game"}>Back To Game</Link>
 
       </div>
     );

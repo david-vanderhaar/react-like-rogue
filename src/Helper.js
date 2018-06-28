@@ -264,3 +264,8 @@ export function shakeTiles (neighborsToShake, strength, tileTs, getNeigbors, dij
     return null
   });
 }
+
+export function publicUrl() {
+  let BASE_URL = process.env.NODE_ENV === 'development' ? '' : '/react-like-rogue';
+  return BASE_URL;
+}

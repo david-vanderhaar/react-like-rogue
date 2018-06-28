@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
 import { getSvg } from '../SVGGenerator';
+import { publicUrl } from '../Helper';
 import Parser from 'html-react-parser';
 
 class MenuButtons extends Component {
@@ -8,7 +9,7 @@ class MenuButtons extends Component {
     return (
       <div>
         <div className="MenuButtons">
-          <Link className="btn btn-menu" to="/battlesim" onClick={() => {this.props.pauseGame(true)}}>Battle Simulation <i className="fas fa-calculator" aria-hidden="true"></i> </Link>
+          <Link className="btn btn-menu" to={publicUrl() + "/battlesim"} onClick={() => {this.props.pauseGame(true)}}>Battle Simulation <i className="fas fa-calculator" aria-hidden="true"></i> </Link>
           <button className="btn btn-menu" onClick={this.props.handleToggleDijkstraMap}>
             Toggle Dijkstra <i className="fa fa-map" aria-hidden="true"></i>
           </button>
@@ -33,7 +34,7 @@ class MenuButtons extends Component {
         </div>
 
         <div className="MenuButtons-mobile">
-          <Link className="btn btn-menu" to="/"> <i className="fas fa-calculator" aria-hidden="true"></i> </Link>
+          <Link className="btn btn-menu" to={publicUrl() + "/"}> <i className="fas fa-calculator" aria-hidden="true"></i> </Link>
           <button className="btn btn-menu" onClick={this.props.handleToggleDijkstraMap}>
             <i className="fa fa-map" aria-hidden="true"></i>
           </button>
