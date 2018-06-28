@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import * as SoundPlayer from '../SoundPlayer';
 import { focusOnGameWindow, cloneTiles } from '../Helper';
 import { getSvg } from '../SVGGenerator';
 import { Card } from 'react-materialize';
-import Materialize from 'materialize-css';
 import Parser from 'html-react-parser';
 
 class EquipmentCard extends Component {

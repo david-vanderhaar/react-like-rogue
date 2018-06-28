@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
 import $ from 'jquery';
 import { Howler } from 'howler';
 import * as SoundPlayer from './SoundPlayer';
@@ -12,7 +11,7 @@ import HelpMenu from './UI/HelpMenu';
 import EndDungeonSummary from './UI/EndDungeonSummary';
 import EndGame from './UI/EndGame';
 import SessionStats from './UI/SessionStats';
-import { CreateTile, CreateActor, CreatePickUp, CreateEquipmentItem } from './Classes';
+import { CreateTile, CreateActor } from './Classes';
 import SaveLoad from './SaveLoad';
 import Map from './Map';
 import DijkstraMap from './DijkstraMap';
@@ -36,7 +35,7 @@ class Game extends Component {
   constructor() {
     super();
     const soundtrack = SoundPlayer.playSoundTrack();
-    // SoundPlayer.play('nextDungeon');
+    // SoundPlayer.playNextDungeon();
     // Map width/height control determine number of cells across/down the page
     const mapWidth = 48;
     const mapHeight = 26;
@@ -95,7 +94,7 @@ class Game extends Component {
       showEquipmentManagement: false,
       showEndDungeonSummary: false,
       showEndGame: false,
-      showHelpMenu: true,
+      showHelpMenu: false,
       showInventoryCard: false,
       showSaveLoad: false,
       enemyPosX: 0,
@@ -184,7 +183,7 @@ class Game extends Component {
           enemyList[i] = {...enemyList[i]}; //copy the Object
           if (enemyList[i].id === tileToCheck.destructibleId) {
             clearDice();
-            SoundPlayer.play('hitEnemy');
+            SoundPlayer.playGrunt();
             enemyList[i].takeHit(player.rollStatDice('attack', true));
           }
         }
@@ -230,6 +229,8 @@ class Game extends Component {
       //   }, this.state.realTimeInterval)
       // }
 
+      this.FOV(tileTypes, player, 5);
+
       this.setState({
         player,
         tileTypes,
@@ -244,6 +245,59 @@ class Game extends Component {
 
     }
   } // end handlePlayerMove (MAIN TURN LOOP)
+
+  FOV(tileTypes, player, viewRadius, doComplexFov = false) {
+    tileTypes.map((row, i) => {
+      return row.map((col, j) => {
+        let tileId = '#tile-' + i.toString() + '-' + j.toString()
+        let x = j - player.posX
+        let y = i - player.posY
+        let l = Math.sqrt((x * x) + (y * y))
+        if (l < viewRadius) {
+          if (tileTypes[i][j].containsDestructible) {
+            $('#' + tileTypes[i][j].destructibleId).css('opacity', 1);
+          }
+          if (tileTypes[i][j].containsPickUp) {
+            $('#' + tileTypes[i][j].pickUpId).css('opacity', 1);
+          }
+          $(tileId).css('opacity', 1);
+          if (doComplexFov && this.DoFov(j, i, player, tileTypes)) {
+            $(tileId).css('opacity', 1);
+          }
+        } else {
+          $(tileId).css('opacity', 0);
+          if (tileTypes[i][j].containsDestructible) {
+            $('#' + tileTypes[i][j].destructibleId).css('opacity', 0);
+          }
+          if (tileTypes[i][j].containsPickUp) {
+            $('#' + tileTypes[i][j].pickUpId).css('opacity', 0);
+          }
+        }
+        return null
+      })
+    })
+  } // end FOV
+
+  DoFov(x, y, player, tileTypes) {
+    let vx = x - player.posX;
+    let vy = y - player.posY;
+    let ox = x + 0.5;
+    let oy = y + 0.5;
+    let l = Math.sqrt((vx * vx) + (vy * vy))
+    vx = vx/l;
+    vy = vy/l;
+
+    for ( let i = 0; i < l; i++) {
+      ox = Math.floor(ox)
+      oy = Math.floor(oy)
+      if(!tileTypes[oy][ox].canPass) {
+        return false;
+      }
+      ox += vx;
+      oy += vy;
+    };
+    return true;
+  };
 
   placeEnemies(enemyList, tileTypes) {
     this.setState({
@@ -367,13 +421,13 @@ class Game extends Component {
     });
 
     if (enemyList.length === 0) { // check if we should move to the next dungeon
-      SoundPlayer.play('nextDungeon');
+      SoundPlayer.playNextDungeon();
       showEndDungeonSummary = true;
       gameIsPaused = true;
     }
 
     if (player.life <=0 ) {
-      SoundPlayer.play('death');
+      SoundPlayer.play('death01');
       showEndGame = true;
       gameIsPaused = true;
     }
@@ -454,13 +508,13 @@ class Game extends Component {
     let gameIsPaused = this.state.gameIsPaused;
 
     if (enemyList.length === 0) { // check if we should move to the next dungeon
-      SoundPlayer.play('nextDungeon');
+      SoundPlayer.playNextDungeon();
       showEndDungeonSummary = true;
       gameIsPaused = true;
     }
 
     if (player.life <=0 ) {
-      SoundPlayer.play('death');
+      SoundPlayer.play('death01');
       showEndGame = true;
       gameIsPaused = true;
     }
@@ -587,7 +641,7 @@ class Game extends Component {
 
   handlePauseSoundtack() {
     this.state.soundtrack.map((sound) => {
-      sound.stop();
+      return sound.stop();
     });
   }
 
@@ -601,7 +655,7 @@ class Game extends Component {
 
   updateSoundtrackVolume(value) {
     this.state.soundtrack.map((sound) => {
-      sound.volume(value/100);
+      return sound.volume(value/100);
     });
 
     this.setState({
@@ -644,7 +698,7 @@ class Game extends Component {
 
       let seen = [];
       let toSave = JSON.stringify([...previousSaves, newSave], function(key, val) {
-        if (val != null && typeof val == "object") {
+        if (val != null && typeof val === "object") {
           if (seen.indexOf(val) >= 0) {
             return;
           }
@@ -657,7 +711,7 @@ class Game extends Component {
 
       let seen = [];
       let toSave = JSON.stringify([newSave], function(key, val) {
-        if (val != null && typeof val == "object") {
+        if (val != null && typeof val === "object") {
           if (seen.indexOf(val) >= 0) {
             return;
           }

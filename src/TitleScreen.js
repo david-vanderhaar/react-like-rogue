@@ -1,9 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Howler } from 'howler';
 import * as SoundPlayer from './SoundPlayer';
-import { getSvg } from './SVGGenerator';
-import Parser from 'html-react-parser';
 
 class TitleScreen extends Component {
   constructor() {

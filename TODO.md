@@ -3,12 +3,8 @@
 
 ## Polish
 1. Add Monsters and Equipment
-1. Add Juice!
-  - ~~tile-shake~~
-  - SFX: hit, victory, defeat
 
 ## Rainy Day
-1. Add fog of war
 1. Add Real-time mode -> TRIED
 1. Performance Optimization
 
@@ -26,6 +22,9 @@
 1. ~~Add Battle Simulator for Dice Probabilities~~
 
 ## Polish
+1. ~~Add Juice!~~
+  - ~~tile-shake~~
+  - ~~SFX: hit, victory, defeat~~
 1. ~~Add music and SFX~~
   - ~~add volume control~~
   - ~~add soundtrack~~
@@ -36,3 +35,4 @@
 1. ~~Fix Keyboard input handler (only use arrow and awsd, only when game screen is active)~~
 
 ## Rainy Day
+1. ~~Add fog of war~~

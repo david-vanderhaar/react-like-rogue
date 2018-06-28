@@ -178,6 +178,7 @@ export function prepareLoadGame(currentState) {
       itemClone[key] = item[key];
     }
     playerClone.equipment[i] = CreateEquipmentItem(itemClone)
+    return null
   })
 
   playerClone.inventory.map((item, i) => {
@@ -186,6 +187,7 @@ export function prepareLoadGame(currentState) {
       itemClone[key] = item[key];
     }
     playerClone.inventory[i] = CreatePickUp(itemClone)
+    return null
   })
 
   // Load Map
@@ -259,5 +261,6 @@ export function shakeTiles (neighborsToShake, strength, tileTs, getNeigbors, dij
         shakeTiles(newNeighbors, strength, tileTs, getNeigbors, dijkstraMap)
       }
     }
+    return null
   });
 }

@@ -186,6 +186,7 @@ class Map extends Component {
   componentDidMount() {
     this.generateRooms();
   }
+
   render() {
     let tileCount = 0;
     let isEndRow = false;
@@ -207,7 +208,13 @@ class Map extends Component {
             height: this.props.cellSize
           }
           return (
-            <TileDisplay key={tileCount} className={this.props.tileTypes[i][j].cssClass()} value={i.toString() + '-' + j.toString()} isEndRow={isEndRow} style={style}/>
+            <TileDisplay
+              key={tileCount}
+              className={this.props.tileTypes[i][j].cssClass()}
+              value={i.toString() + '-' + j.toString()}
+              isEndRow={isEndRow}
+              style={style}
+            />
           )
         })
       );

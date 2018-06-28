@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import { getRandomIntInclusive } from './Helper';
-import { CreateActor } from './Classes';
 import { getSvg } from './SVGGenerator';
 import { getMonster } from './DB/monsters.js';
-import uuid from 'uuid';
 
 class Enemy extends Component {
 
@@ -21,7 +18,7 @@ class Enemy extends Component {
 
     return (
       <div className="Enemy">
-        <span id={this.props.enemy.id} className="player purple darken-4 white-text" style={style}>
+        <span id={this.props.enemy.id} className="monster player purple darken-4 white-text" style={style}>
           E
           <br/>
           {this.props.enemy.life}/{this.props.enemy.defense}/{this.props.enemy.attack}

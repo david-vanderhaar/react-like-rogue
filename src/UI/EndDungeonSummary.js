@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Card } from 'react-materialize';
 import { dungeonDescriptionGenerator } from '../Generators/Dungeons/generator';
-import SaveLoad from '../SaveLoad';
 
 class EndDungeonSummary extends Component {
   render() {

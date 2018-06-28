@@ -40,6 +40,7 @@ export function playSoundTrack() {
       if (currentTrack > sounds.length - 1) { currentTrack = 0; }
       sounds[currentTrack].play()
     });
+    return null
   });
 
   sounds[currentTrack].play();
@@ -49,11 +50,14 @@ export function playSoundTrack() {
 
 let sounds = {
   nextDungeon: './sounds/nextDungeon.wav',
+  nextDungeon01: './sounds/nextDungeon01.wav',
+  nextDungeon02: './sounds/nextDungeon02.wav',
   death: './sounds/death.wav',
+  death01: './sounds/death01.wav',
   pickUpPotion: './sounds/pickUpPotion.wav',
   equip: './sounds/equip.wav',
   consumePotion: './sounds/consumePotion.wav',
-  hitPlayer: './sounds/hitPlayer.wav',
+  hitPlayer: './sounds/hitPlayer01.wav',
   hitEnemy: './sounds/hitEnemy.wav',
   dirt00: './sounds/dirt00.wav',
   dirt01: './sounds/dirt01.wav',
@@ -91,6 +95,14 @@ let sounds = {
   drink05: './sounds/drink05.mp3',
   inventoryOpen: './sounds/inventoryOpen.wav',
   inventoryClose: './sounds/inventoryClose.wav',
+  grunt00: './sounds/grunt00.wav',
+  grunt01: './sounds/grunt01.wav',
+  grunt02: './sounds/grunt02.wav',
+  grunt03: './sounds/grunt03.wav',
+  grunt04: './sounds/grunt04.wav',
+  grunt05: './sounds/grunt05.wav',
+  grunt06: './sounds/grunt06.wav',
+  grunt07: './sounds/grunt07.wav',
 }
 
 export function play(name) {
@@ -102,11 +114,13 @@ export function play(name) {
 
 export function playRandom(names, volume = 1) {
   let name = names[getRandomIntInclusive(0, names.length -1)];
-  const sound = new Howl({
-    src: [sounds[name]],
-    volume: volume,
-  });
-  sound.play();
+  if (name !== '') {
+    const sound = new Howl({
+      src: [sounds[name]],
+      volume: volume,
+    });
+    sound.play();
+  }
 }
 
 export function playWalk() {
@@ -121,15 +135,38 @@ export function playWalk() {
     'dirt07',
     'dirt08',
     'dirt09',
+    'dirt00',
+    'dirt01',
+    'dirt02',
+    'dirt03',
+    'dirt04',
+    'dirt05',
+    'dirt06',
+    'dirt07',
+    'dirt08',
+    'dirt09',
+    'dirt00',
+    'dirt01',
+    'dirt02',
+    'dirt03',
+    'dirt04',
+    'dirt05',
+    'dirt06',
+    'dirt07',
+    'dirt08',
+    'dirt09',
     'breath01',
     'breath03',
     'breath04',
     'breath011',
+    'breath016',
+    'breath017',
   ]);
 }
 
 export function playBreath() {
   playRandom([
+    '','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',
     'breath00',
     'breath01',
     'breath02',
@@ -160,4 +197,21 @@ export function playDrink() {
     'drink04',
     'drink05',
   ]);
+}
+
+export function playGrunt() {
+  playRandom([
+    'grunt00',
+    'grunt01',
+    'grunt02',
+    'grunt03',
+    'grunt04',
+    'grunt05',
+    'grunt06',
+    'grunt07',
+  ]);
+}
+
+export function playNextDungeon() {
+  play('nextDungeon02');
 }

@@ -45,7 +45,7 @@ class ActorDisplay extends Component {
     let life = this.state.life
     let defense = this.state.defense
     let attack = this.state.attack
-    let actor = CreateActor({id: this.props.actor.id, name: 'Custom', life: parseInt(life), defense: parseInt(defense), attack: parseInt(attack) })
+    let actor = CreateActor({id: this.props.actor.id, name: 'Custom', life: parseInt(life, 10), defense: parseInt(defense, 10), attack: parseInt(attack, 10) })
     this.props.updateActorStats(actor);
   }
 
@@ -165,7 +165,6 @@ class BattleSim extends Component {
     // while iteration is less than simCount
     while (iteration < this.state.simCount) {
       let win = false;
-      let kill_count_2 = 100;
       while (!win) {
         // actor 2 takes hit from actor 1
         actor_2.takeHit(actor_1.attack, false);

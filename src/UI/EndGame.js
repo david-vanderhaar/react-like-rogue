@@ -15,7 +15,7 @@ class EndGame extends Component {
         className="btn"
         onClick={() => {
           this.props.resetGame();
-          SoundPlayer.play('nextDungeon');
+          SoundPlayer.playNextDungeon();
         }}
       >
         Restart
