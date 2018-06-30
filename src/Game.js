@@ -94,7 +94,7 @@ class Game extends Component {
       showEquipmentManagement: false,
       showEndDungeonSummary: false,
       showEndGame: false,
-      showHelpMenu: false,
+      showHelpMenu: true,
       showInventoryCard: false,
       showSaveLoad: false,
       enemyPosX: 0,
