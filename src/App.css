@@ -338,7 +338,7 @@ html {
   width: 60vw;
   height: 60vh;
   max-height: 60vh;
-  overflow-y: scroll;
+  overflow-y: visible;
   z-index: 10;
   color: lightgrey;
   box-shadow: 5px 10px 10px #333;
@@ -354,7 +354,7 @@ html {
 }
 
 .card-prompt .card {
-  background-color: grey;
+  background-color: var(--title-bg-dark-color);;
 }
 
 .card-prompt .title {

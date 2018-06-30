@@ -34,7 +34,7 @@ class MenuButtons extends Component {
         </div>
 
         <div className="MenuButtons-mobile">
-          <Link className="btn btn-menu" to={publicUrl() + "/"}> <i className="fas fa-calculator" aria-hidden="true"></i> </Link>
+          <Link className="btn btn-menu" to={publicUrl() + "/battlesim"}> <i className="fas fa-calculator" aria-hidden="true"></i> </Link>
           <button className="btn btn-menu" onClick={this.props.handleToggleDijkstraMap}>
             <i className="fa fa-map" aria-hidden="true"></i>
           </button>

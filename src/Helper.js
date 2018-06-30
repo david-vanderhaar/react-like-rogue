@@ -267,5 +267,6 @@ export function shakeTiles (neighborsToShake, strength, tileTs, getNeigbors, dij
 
 export function publicUrl() {
   let BASE_URL = process.env.NODE_ENV === 'development' ? '' : '/react-like-rogue';
+  return ''
   return BASE_URL;
 }
