@@ -35,7 +35,7 @@ class TitleScreen extends Component {
       overlayTransition: 'title-transition'
     });
     setTimeout(() => {
-      window.location.hash = process.env.PUBLIC_URL + '/game';
+      window.location.hash = '/game';
     }, this.state.transitionTime + 500);
   }
 
