@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import * as SoundPlayer from './SoundPlayer';
-import { publicUrl } from './Helper';
 
 class TitleScreen extends Component {
   constructor() {
@@ -36,7 +35,7 @@ class TitleScreen extends Component {
       overlayTransition: 'title-transition'
     });
     setTimeout(() => {
-      window.location = publicUrl() + '/game';
+      window.location.hash = process.env.PUBLIC_URL + '/game';
     }, this.state.transitionTime + 500);
   }
 
