@@ -5,21 +5,19 @@ import Game from './Game';
 import TitleScreen from './TitleScreen';
 import BattleSim from './BattleSim';
 
-console.log(process.env)
-
 const App = () => (
   <HashRouter>
   <div>
     <main>
-      <Route exact path={process.env.PUBLIC_URL + '/'} component={TitleScreen} />
+      <Route exact path={'/'} component={TitleScreen} />
       <AnimatedSwitch
       atEnter={{ opacity: 0 }}
       atLeave={{ opacity: 0 }}
       atActive={{ opacity: 1 }}
       className="fade"
       >
-      <Route exact path={process.env.PUBLIC_URL + '/game'} component={Game} />
-      <Route exact path={process.env.PUBLIC_URL + '/battlesim'} component={BattleSim} />
+      <Route path={'/game'} component={Game} />
+      <Route path={'/battlesim'} component={BattleSim} />
     </AnimatedSwitch>
     </main>
   </div>

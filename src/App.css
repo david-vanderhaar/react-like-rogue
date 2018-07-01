@@ -345,6 +345,11 @@ html {
   margin: 0;
 }
 
+.card-content {
+  overflow-y: scroll;
+  max-height: 60vh;
+}
+
 .HelpMenu .collapsible-header {
   background-color: hsl(210,12%,30%);
 }
