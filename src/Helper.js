@@ -73,8 +73,8 @@ export function focusOnGameWindow() {
 
 export function prepareDungeonLevel(dungeonLevel, currentState) {
   const enemies = 1 + (dungeonLevel * 2);
-  const pickUps = 10;
-  const equipmentItems = 5;
+  const pickUps = 1;
+  const equipmentItems = 4;
   const levelTypes = [
     'balanced',
     'attack',
@@ -110,8 +110,8 @@ export function prepareDungeonLevel(dungeonLevel, currentState) {
 
 export function prepareResetGame(currentState) {
   const enemies = 1;
-  const pickUps = 10;
-  const equipmentItems = 5;
+  const pickUps = 1;
+  const equipmentItems = 4;
   const levelTypes = [
     'balanced',
     'attack',
@@ -151,8 +151,8 @@ export function prepareResetGame(currentState) {
 export function prepareLoadGame(currentState) {
   const dungeonLevel = currentState.dungeonLevel + 1
   const enemies = 1 + (dungeonLevel * 2);
-  const pickUps = 10;
-  const equipmentItems = 5;
+  const pickUps = 1;
+  const equipmentItems = 4;
   const levelTypes = [
     'balanced',
     'attack',

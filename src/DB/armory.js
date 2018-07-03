@@ -30,8 +30,8 @@ let equipments = {
       stats: {
         name: 'Chain Gang',
         type: 'weapon',
-        attack: 4,
-        defense: -3,
+        attack: 2,
+        defense: -2,
         svgReference: 'sickle_chain',
       },
       minimumDungeonLevel: 0
@@ -54,7 +54,7 @@ let equipments = {
         name: 'The Enforcer',
         type: 'weapon',
         attack: 1,
-        defense: 2,
+        defense: 1,
         svgReference: 'mace',
       },
       minimumDungeonLevel: 0

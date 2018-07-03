@@ -3,6 +3,9 @@
 
 ## Polish
 1. Add Monsters and Equipment
+1. Add player svg
+1. Add chance for monster to stay in current tile if all neighbors are closest to player
+1. add occasional monster grunts
 
 ## Rainy Day
 1. Add Real-time mode -> TRIED

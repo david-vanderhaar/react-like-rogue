@@ -50,8 +50,8 @@ class Game extends Component {
     const maxRoomSize = 8;
     const minRoomSize = 4;
     const enemies = 1;
-    const pickUps = 10;
-    const equipmentItems = 5;
+    const pickUps = 1;
+    const equipmentItems = 4;
 
     const player = CreateActor({id: 'player'});
 
