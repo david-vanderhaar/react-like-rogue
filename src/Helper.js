@@ -225,15 +225,24 @@ export function prepareLoadGame(currentState) {
 }
 
 export function throwDice(text, color, svg_name) {
+  let max_move = 250;
+  let playerPosX = document.getElementById('player').getBoundingClientRect().left
+  let playerPosY = document.getElementById('player').getBoundingClientRect().top
   let die = document.createElement('span');
-  let max_move = 25;
   die.setAttribute('class', 'thrown-dice ' + color);
+  die.style['top'] = playerPosY + 'px';
+  die.style['left'] = playerPosX + 'px';
   document.getElementById('game-window').appendChild(die);
-  die.innerHTML = getSvg(svg_name, 'none', '60px');
+  die.innerHTML = getSvg(svg_name, 'none', '20px');
+
+  console.log(playerPosX)
+  console.log(playerPosY)
 
   setTimeout(() => {
-    die.style.left = getRandomIntInclusive(50 - max_move, 50 + max_move).toString() + 'vw';
-    die.style.top = getRandomIntInclusive(50 - max_move, 50 + max_move).toString() + 'vh';
+    die.style.left = getRandomIntInclusive(playerPosX - max_move, playerPosX + max_move).toString() + 'px';
+    die.style.top = getRandomIntInclusive(playerPosY - max_move, playerPosY + max_move).toString() + 'px';;
+    // die.style.left = getRandomIntInclusive(50 - max_move, 50 + max_move).toString() + 'vw';
+    // die.style.top = getRandomIntInclusive(50 - max_move, 50 + max_move).toString() + 'vh';
   }, 100)
   setTimeout(() => {
     die.remove();
