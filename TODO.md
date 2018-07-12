@@ -3,9 +3,9 @@
 
 ## Polish
 1. Add Monsters and Equipment
-1. Add player svg
 1. Add chance for monster to stay in current tile if all neighbors are closest to player
 1. add occasional monster grunts
+1. add unique monster attack verbs in the attack message toast, stored in the monster.db
 
 ## Rainy Day
 1. Add Real-time mode -> TRIED
@@ -25,6 +25,7 @@
 1. ~~Add Battle Simulator for Dice Probabilities~~
 
 ## Polish
+1. ~~Add player svg~~
 1. ~~Add Juice!~~
   - ~~tile-shake~~
   - ~~SFX: hit, victory, defeat~~

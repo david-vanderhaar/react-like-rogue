@@ -413,15 +413,22 @@ html {
   border-color: #106f77;
   opacity: 0;
   transition: .1s;
+  /* transform: skewX(30deg); */
+}
+
+.player {
+  transform: matrix(.9, 0, 0, .9, 3, -3);
 }
 
 /* SET background colors and images here*/
 .tile-GROUND {
   background-color: #009688;
+  box-shadow: 6px -6px 0px #344b5e inset;
 }
 
 .tile-WALL {
   background-color: #106f77;
+  box-shadow: 6px -6px 0px #312d44 inset;
 }
 
 .shake {
@@ -496,11 +503,6 @@ html {
 
 .monster {
   opacity: 0;
-}
-
-.tile:hover {
-  transition: .1s;
-  border-width: 5px;
 }
 
 @keyframes fade {

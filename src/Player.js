@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { findPlayer } from './Helper';
 import MobileMoveControls from './MobileMoveControls';
+import { getSvg } from './SVGGenerator';
+import Parser from 'html-react-parser';
 
 class Player extends Component {
   componentWillReceiveProps() {
@@ -25,9 +27,7 @@ class Player extends Component {
             onDown={() => {this.props.handlePlayerMove(40)}}
             onStay={() => {this.props.handlePlayerMove(32)}}
           />
-          P
-          <br/>
-          {this.props.player.life}/{this.props.player.calculateStat('defense')}
+          {Parser(getSvg('player', 'none', '50px'))}
         </span>
       </div>
     );
