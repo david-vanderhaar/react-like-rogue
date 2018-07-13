@@ -2,14 +2,16 @@
 ## Features
 
 ## Polish
-1. Add Monsters and Equipment
+1. add and balance Equipment
 1. Add chance for monster to stay in current tile if all neighbors are closest to player
 1. add occasional monster grunts
 1. add unique monster attack verbs in the attack message toast, stored in the monster.db
+1. add hover information for monsters
 
 ## Rainy Day
-1. Add Real-time mode -> TRIED
+1. convert stat system to die system where each stat IS a die rather than represents a die
 1. Performance Optimization
+1. Add Real-time mode -> TRIED
 
 # Done
 ## Features
