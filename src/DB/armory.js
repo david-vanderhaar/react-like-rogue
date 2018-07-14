@@ -44,7 +44,7 @@ let equipments = {
         defense: 1,
         svgReference: 'helm_cloth',
       },
-      minimumDungeonLevel: 2
+      minimumDungeonLevel: 1
     },
     {
       stats: {
@@ -67,7 +67,7 @@ let equipments = {
         defense: 2,
         svgReference: 'boots_steel',
       },
-      minimumDungeonLevel: 4
+      minimumDungeonLevel: 3
     },
     {
       stats: {
@@ -107,7 +107,7 @@ let equipments = {
         name: 'The Good Knife',
         type: 'weapon',
         attack: 1,
-        defense: -1,
+        defense: 0,
         svgReference: 'bone_knife',
       },
       minimumDungeonLevel: 0
@@ -117,7 +117,7 @@ let equipments = {
         name: 'Tomahawk',
         type: 'weapon',
         attack: 3,
-        defense: -1,
+        defense: -2,
         svgReference: 'tomahawk',
       },
       minimumDungeonLevel: 3
@@ -126,11 +126,11 @@ let equipments = {
       stats: {
         name: 'Bo Bo',
         type: 'weapon',
-        attack: 2,
+        attack: 3,
         defense: -1,
         svgReference: 'tomahawk',
       },
-      minimumDungeonLevel: 3
+      minimumDungeonLevel: 4
     },
   ]
 }

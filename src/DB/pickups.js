@@ -8,7 +8,7 @@ export function getPickUp(dungeonLevel, type) {
   // filter pickUp out that are abouve required dungeon level,
   let availablePickUps = pickUps[type].filter(pickUp => pickUp.minimumDungeonLevel <= dungeonLevel);
   // grab random pickUp: balanced[Math.floor(Math.random()*balanced.length)];
-  let selectedPickUp = availablePickUps[Math.floor(Math.random()*pickUps[type].length)]['stats']
+  let selectedPickUp = availablePickUps[Math.floor(Math.random()*availablePickUps.length)]['stats']
   // merge pickUp stats with actor stats object
   return CreatePickUp({...pickUpStats, ...selectedPickUp})
 }

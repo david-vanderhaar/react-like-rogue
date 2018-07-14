@@ -124,125 +124,129 @@ class Game extends Component {
       }
     }
 
-    if (!this.state.gameIsPaused && Object.values(this.state.playerControls).indexOf(event.keyCode) > -1) {
-      let state = {...this.state};
-      let playerControls = state.playerControls;
-      let player = {...state.player};
-      let tileTypes = state.tileTypes; //tile objs still refering to state tiles
-      let tileToCheck;
+    try {
+      if (!this.state.gameIsPaused && Object.values(this.state.playerControls).indexOf(event.keyCode) > -1) {
+        let state = {...this.state};
+        let playerControls = state.playerControls;
+        let player = {...state.player};
+        let tileTypes = state.tileTypes; //tile objs still refering to state tiles
+        let tileToCheck;
 
-      tileTypes[player.posY][player.posX].canPass = true;
+        tileTypes[player.posY][player.posX].canPass = true;
 
-      switch (event.keyCode) {
-        case playerControls['LEFT']:
-        tileToCheck = tileTypes[player.posY][player.posX - 1];
-        if (player.posX > 0) {
-          if (tileToCheck.canPass) {
-            player.posX -= 1;
+        switch (event.keyCode) {
+          case playerControls['LEFT']:
+            tileToCheck = tileTypes[player.posY][player.posX - 1];
+            if (player.posX > 0) {
+              if (tileToCheck.canPass) {
+                player.posX -= 1;
+              }
+            }
+            SoundPlayer.playWalk();
+            break;
+          case playerControls['UP']:
+            tileToCheck = tileTypes[player.posY - 1][player.posX];
+            if (player.posY > 0) {
+              if (tileToCheck.canPass) {
+                player.posY -= 1;
+              }
+            }
+            SoundPlayer.playWalk();
+            break;
+          case playerControls['RIGHT']:
+            tileToCheck = tileTypes[player.posY][player.posX + 1];
+            if (player.posX < state.mapWidth - 1) {
+              if (tileToCheck.canPass) {
+                player.posX += 1;
+              }
+            }
+            SoundPlayer.playWalk();
+            break;
+          case playerControls['DOWN']:
+            tileToCheck = tileTypes[player.posY + 1][player.posX];
+            if (player.posY < state.mapHeight - 1) {
+              if (tileToCheck.canPass) {
+                player.posY += 1;
+              }
+            }
+            SoundPlayer.playWalk();
+            break;
+          default:
+            tileToCheck = tileTypes[player.posY][player.posX];
+            SoundPlayer.playBreath();
+            break;
+        }
+
+        // Check for Enemies
+        let enemyList = this.state.enemyList.concat();
+        if (tileToCheck.containsDestructible) {
+          for (let i = 0; i < enemyList.length; i++) {
+            enemyList[i] = {...enemyList[i]}; //copy the Object
+            if (enemyList[i].id === tileToCheck.destructibleId) {
+              clearDice();
+              SoundPlayer.playGrunt();
+              enemyList[i].takeHit(player.rollStatDice('attack', true));
+            }
           }
         }
-        SoundPlayer.playWalk();
-        break;
-        case playerControls['UP']:
-        tileToCheck = tileTypes[player.posY - 1][player.posX];
-        if (player.posY > 0) {
-          if (tileToCheck.canPass) {
-            player.posY -= 1;
+
+        // Check for pick ups
+        let pickUpList = this.state.pickUpList.concat();
+        if (tileToCheck.containsPickUp) {
+          for (let i = 0; i < pickUpList.length; i++) {
+            pickUpList[i] = {...pickUpList[i]}; //copy the Object
+            if (pickUpList[i].id === tileToCheck.pickUpId) {
+              pickUpList[i].taken = true;
+              SoundPlayer.play('pickUpPotion');
+              player.inventory.push({...pickUpList[i]})
+            }
           }
         }
-        SoundPlayer.playWalk();
-        break;
-        case playerControls['RIGHT']:
-        tileToCheck = tileTypes[player.posY][player.posX + 1];
-        if (player.posX < state.mapWidth - 1) {
-          if (tileToCheck.canPass) {
-            player.posX += 1;
+
+        // Check for equipment items
+        let showEquipmentCompare = false;
+        let equipmentItemList = this.state.equipmentItemList.concat();
+        let equipmentCompareItemId = this.state.equipmentCompareItemId;
+        if (tileToCheck.containsPickUp) {
+          for (let i = 0; i < equipmentItemList.length; i++) {
+            equipmentItemList[i] = {...equipmentItemList[i]}; //copy the Object
+            if (equipmentItemList[i].id === tileToCheck.pickUpId) {
+
+              //trigger modal prompt that shows stat compare, and asks if player will equip or leave
+              showEquipmentCompare = true;
+              equipmentCompareItemId = equipmentItemList[i].id;
+
+            }
           }
         }
-        SoundPlayer.playWalk();
-        break;
-        case playerControls['DOWN']:
-        tileToCheck = tileTypes[player.posY + 1][player.posX];
-        if (player.posY < state.mapHeight - 1) {
-          if (tileToCheck.canPass) {
-            player.posY += 1;
-          }
-        }
-        SoundPlayer.playWalk();
-        break;
-        default:
-        tileToCheck = tileTypes[player.posY][player.posX];
-        SoundPlayer.playBreath();
-        break;
+
+        tileTypes[player.posY][player.posX].canPass = false;
+        this.dijkstraMap.generateDijkstraMap(tileTypes, [{posX: player.posX, posY: player.posY}]);
+
+        // let realTimer = this.state.realTimer;
+        // if (realTimer === null) {
+        //   realTimer = setInterval(() => {
+        //     this.moveEnemiesRealTime(enemyList);
+        //   }, this.state.realTimeInterval)
+        // }
+
+        this.FOV(tileTypes, player, 5);
+
+        this.setState({
+          player,
+          tileTypes,
+          showEquipmentCompare,
+          equipmentCompareItemId,
+          // realTimer,
+        });
+
+        this.moveEnemies(tileTypes, player, enemyList);
+        this.updatePickUps(tileTypes, pickUpList);
+        this.updateEquipmentItems(tileTypes, equipmentItemList);
+
       }
-
-      // Check for Enemies
-      let enemyList = this.state.enemyList.concat();
-      if (tileToCheck.containsDestructible) {
-        for (let i = 0; i < enemyList.length; i++) {
-          enemyList[i] = {...enemyList[i]}; //copy the Object
-          if (enemyList[i].id === tileToCheck.destructibleId) {
-            clearDice();
-            SoundPlayer.playGrunt();
-            enemyList[i].takeHit(player.rollStatDice('attack', true));
-          }
-        }
-      }
-
-      // Check for pick ups
-      let pickUpList = this.state.pickUpList.concat();
-      if (tileToCheck.containsPickUp) {
-        for (let i = 0; i < pickUpList.length; i++) {
-          pickUpList[i] = {...pickUpList[i]}; //copy the Object
-          if (pickUpList[i].id === tileToCheck.pickUpId) {
-            pickUpList[i].taken = true;
-            SoundPlayer.play('pickUpPotion');
-            player.inventory.push({...pickUpList[i]})
-          }
-        }
-      }
-
-      // Check for equipment items
-      let showEquipmentCompare = false;
-      let equipmentItemList = this.state.equipmentItemList.concat();
-      let equipmentCompareItemId = this.state.equipmentCompareItemId;
-      if (tileToCheck.containsPickUp) {
-        for (let i = 0; i < equipmentItemList.length; i++) {
-          equipmentItemList[i] = {...equipmentItemList[i]}; //copy the Object
-          if (equipmentItemList[i].id === tileToCheck.pickUpId) {
-
-            //trigger modal prompt that shows stat compare, and asks if player will equip or leave
-            showEquipmentCompare = true;
-            equipmentCompareItemId = equipmentItemList[i].id;
-
-          }
-        }
-      }
-
-      tileTypes[player.posY][player.posX].canPass = false;
-      this.dijkstraMap.generateDijkstraMap(tileTypes, [{posX: player.posX, posY: player.posY}]);
-
-      // let realTimer = this.state.realTimer;
-      // if (realTimer === null) {
-      //   realTimer = setInterval(() => {
-      //     this.moveEnemiesRealTime(enemyList);
-      //   }, this.state.realTimeInterval)
-      // }
-
-      this.FOV(tileTypes, player, 5);
-
-      this.setState({
-        player,
-        tileTypes,
-        showEquipmentCompare,
-        equipmentCompareItemId,
-        // realTimer,
-      });
-
-      this.moveEnemies(tileTypes, player, enemyList);
-      this.updatePickUps(tileTypes, pickUpList);
-      this.updateEquipmentItems(tileTypes, equipmentItemList);
-
+    } catch(err) {
+      console.log(err);
     }
   } // end handlePlayerMove (MAIN TURN LOOP)
 
@@ -377,7 +381,10 @@ class Game extends Component {
       tileTs[posY][posX].destructibleId = enemyList[i].id; //reset current tile
       let neighbors = this.dijkstraMap.getNeigbors(enemyList[i], this.state.dijkstraMap);
 
-      if (neighbors.length > 0) {
+      let moveChance = Math.random() * 100;
+      let shouldMove = moveChance <= 80 ? true : false;
+      console.log(shouldMove);
+      if (neighbors.length > 0 && shouldMove) {
         let tileToCheck = tileTs[neighbors[0].posY][neighbors[0].posX];
 
         // This snippet would allow enemies to damage each other

@@ -97,7 +97,7 @@ let monsters = {
     {
       stats: {
         name: 'Fat Cave Dweller',
-        life: 3,
+        life: 2,
         defense: 2,
         attack: 1,
         svgReference: 'fat_cave_dweller',
@@ -152,20 +152,20 @@ let monsters = {
         name: 'Fierce Cave Dweller',
         life: 2,
         defense: 0,
-        attack: 4,
+        attack: 3,
         svgReference: 'fierce_cave_dweller',
       },
-      minimumDungeonLevel: 2
+      minimumDungeonLevel: 3
     },
     {
       stats: {
         name: 'Fierce Wyrm',
         life: 3,
-        defense: 0,
+        defense: 1,
         attack: 4,
         svgReference: 'fierce_wyrm',
       },
-      minimumDungeonLevel: 3
+      minimumDungeonLevel: 4
     },
     {
       stats: {
@@ -175,7 +175,7 @@ let monsters = {
         attack: 5,
         svgReference: 'fierce_dark_spawn',
       },
-      minimumDungeonLevel: 4
+      minimumDungeonLevel: 5
     },
   ]
 }
