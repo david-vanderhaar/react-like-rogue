@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import { getSvg } from './SVGGenerator';
+import Parser from 'html-react-parser';
 import { getMonster } from './DB/monsters.js';
+import ReactTooltip from 'react-tooltip'
 
 class Enemy extends Component {
-
-  componentDidUpdate() {
-    document.getElementById(this.props.enemy.id).innerHTML = getSvg(this.props.enemy.svgReference, 'none', this.props.cellSize);
-  }
 
   render() {
     const style = {
@@ -18,11 +16,14 @@ class Enemy extends Component {
 
     return (
       <div className="Enemy">
-        <span id={this.props.enemy.id} className="monster player purple darken-4 white-text" style={style}>
-          E
-          <br/>
-          {this.props.enemy.life}/{this.props.enemy.defense}/{this.props.enemy.attack}
+        <span data-tip data-for={'tip-' + this.props.enemy.id} id={this.props.enemy.id} className="monster player purple darken-4 white-text" style={style}>
+          {Parser(getSvg(this.props.enemy.svgReference, 'none', this.props.cellSize))}
         </span>
+        <ReactTooltip id={'tip-' + this.props.enemy.id} place="left" type="dark" effect="solid" >
+          <div>Life: {this.props.enemy.life}</div>
+          <div>Defense: {this.props.enemy.defense}</div>
+          <div>Attack: {this.props.enemy.attack}</div>
+        </ReactTooltip>
       </div>
     );
   }

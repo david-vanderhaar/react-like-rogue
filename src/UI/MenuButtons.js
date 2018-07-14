@@ -8,8 +8,8 @@ class MenuButtons extends Component {
     return (
       <div>
         <div className="MenuButtons">
-          <Link className="btn btn-menu" to={"/battlesim"} onClick={() => {this.props.pauseGame(true)}}>Battle Simulation <i className="fas fa-calculator" aria-hidden="true"></i> </Link>
-          <button className="btn btn-menu" onClick={this.props.handleToggleDijkstraMap}>
+          <Link style={{display: 'none'}} className="btn btn-menu" to={"/battlesim"} onClick={() => {this.props.pauseGame(true)}}>Battle Simulation <i className="fas fa-calculator" aria-hidden="true"></i> </Link>
+          <button style={{display: 'none'}} className="btn btn-menu" onClick={this.props.handleToggleDijkstraMap}>
             Toggle Dijkstra <i className="fa fa-map" aria-hidden="true"></i>
           </button>
           <button
@@ -33,8 +33,8 @@ class MenuButtons extends Component {
         </div>
 
         <div className="MenuButtons-mobile">
-          <Link className="btn btn-menu" to={"/battlesim"}> <i className="fas fa-calculator" aria-hidden="true"></i> </Link>
-          <button className="btn btn-menu" onClick={this.props.handleToggleDijkstraMap}>
+          <Link style={{display: 'none'}} className="btn btn-menu" to={"/battlesim"}> <i className="fas fa-calculator" aria-hidden="true"></i> </Link>
+          <button style={{display: 'none'}} className="btn btn-menu" onClick={this.props.handleToggleDijkstraMap}>
             <i className="fa fa-map" aria-hidden="true"></i>
           </button>
           <button className="btn btn-menu" onClick={() => {this.props.toggleInventoryCard()}}>

@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import { getSvg } from './SVGGenerator';
+import Parser from 'html-react-parser';
 import { getEquipment } from './DB/armory.js';
 
 class EquipmentItem extends Component {
-
-  componentDidUpdate() {
-    document.getElementById(this.props.equipmentItem.id).innerHTML = getSvg(this.props.equipmentItem.svgReference, 'none', this.props.cellSize);
-  }
 
   render() {
     const style = {
@@ -18,7 +15,7 @@ class EquipmentItem extends Component {
     return (
       <div className="EquipmentItem">
         <span id={this.props.equipmentItem.id} className="item grey white-text" style={style}>
-          {this.props.equipmentItem.type}
+          {Parser(getSvg(this.props.equipmentItem.svgReference, 'none', this.props.cellSize))}
         </span>
       </div>
     );

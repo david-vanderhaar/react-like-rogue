@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import { getSvg } from './SVGGenerator';
+import Parser from 'html-react-parser';
 import { getPickUp } from './DB/pickups.js';
 
 class PickUp extends Component {
-
-  componentDidUpdate() {
-    document.getElementById(this.props.pickUp.id).innerHTML = getSvg(this.props.pickUp.svgReference, 'none', this.props.cellSize);
-  }
 
   render() {
     const style = {
@@ -18,9 +15,7 @@ class PickUp extends Component {
     return (
       <div className="PickUp">
         <span id={this.props.pickUp.id} className="item amber darken-4 white-text" style={style}>
-          Pi
-          <br/>
-          {this.props.pickUp.boostValue}
+          {Parser(getSvg(this.props.pickUp.svgReference, 'none', this.props.cellSize))}
         </span>
       </div>
     );
