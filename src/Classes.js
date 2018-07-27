@@ -22,6 +22,7 @@ export const CreateTile = ({
     id = null,
     type = 'WALL',
     canPass = false,
+    isExit = false,
     containsDestructible = false,
     destructibleId = null,
     containsPickUp = false,
@@ -30,6 +31,7 @@ export const CreateTile = ({
   id,
   type,
   canPass,
+  isExit,
   containsDestructible,
   destructibleId,
   containsPickUp,
@@ -66,7 +68,7 @@ export const CreatePickUp = ({
 
     usePickUp(user) {
       user[this.statName] += this.boostValue;
-      Materialize.toast('Gained ' + this.boostValue + ' ' + this.statName + '!', 4000)
+      Materialize.toast('Gained ' + this.boostValue + ' ' + this.statName + '!', 500)
     }
 });
 
@@ -177,9 +179,9 @@ export const CreateActor = ({
       this.life -= calculatedAttack;
       if (renderDice) {
         if (this.id === 'player') {
-          Materialize.toast('You were attacked and took ' + calculatedAttack + ' damage!', 4000)
+          Materialize.toast('You were attacked and took ' + calculatedAttack + ' damage!', 500)
         } else {
-          Materialize.toast('You attacked this creature and dealt ' + calculatedAttack + ' damage!', 4000)
+          Materialize.toast('You attacked this creature and dealt ' + calculatedAttack + ' damage!', 500)
         }
       }
     },

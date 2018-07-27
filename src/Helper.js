@@ -235,9 +235,6 @@ export function throwDice(text, color, svg_name) {
   document.getElementById('game-window').appendChild(die);
   die.innerHTML = getSvg(svg_name, 'none', '20px');
 
-  console.log(playerPosX)
-  console.log(playerPosY)
-
   setTimeout(() => {
     die.style.left = getRandomIntInclusive(playerPosX - max_move, playerPosX + max_move).toString() + 'px';
     die.style.top = getRandomIntInclusive(playerPosY - max_move, playerPosY + max_move).toString() + 'px';;

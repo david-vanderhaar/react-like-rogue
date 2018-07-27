@@ -131,6 +131,8 @@ class Game extends Component {
         let player = {...state.player};
         let tileTypes = state.tileTypes; //tile objs still refering to state tiles
         let tileToCheck;
+        let showEndDungeonSummary = false;
+        let gameIsPaused = false;
 
         tileTypes[player.posY][player.posX].canPass = true;
 
@@ -184,7 +186,8 @@ class Game extends Component {
             enemyList[i] = {...enemyList[i]}; //copy the Object
             if (enemyList[i].id === tileToCheck.destructibleId) {
               clearDice();
-              SoundPlayer.playGrunt();
+              // SoundPlayer.playGrunt();
+              SoundPlayer.playWeaponHit();
               enemyList[i].takeHit(player.rollStatDice('attack', true));
             }
           }
@@ -220,6 +223,12 @@ class Game extends Component {
           }
         }
 
+        if (!tileToCheck.containsPickUp && tileToCheck.isExit) {
+          SoundPlayer.playNextDungeon();
+          showEndDungeonSummary = true;
+          gameIsPaused = true;
+        }
+
         tileTypes[player.posY][player.posX].canPass = false;
         this.dijkstraMap.generateDijkstraMap(tileTypes, [{posX: player.posX, posY: player.posY}]);
 
@@ -237,10 +246,12 @@ class Game extends Component {
           tileTypes,
           showEquipmentCompare,
           equipmentCompareItemId,
+          showEndDungeonSummary,
+          gameIsPaused,
           // realTimer,
         });
 
-        this.moveEnemies(tileTypes, player, enemyList);
+        this.moveEnemies(tileTypes, player, enemyList, showEndDungeonSummary, gameIsPaused);
         this.updatePickUps(tileTypes, pickUpList);
         this.updateEquipmentItems(tileTypes, equipmentItemList);
 
@@ -366,10 +377,10 @@ class Game extends Component {
     });
   }
 
-  moveEnemies(tileTs, player, enemyList) {
+  moveEnemies(tileTs, player, enemyList, showEndDungeonSummary, gameIsPaused) {
     let showEndGame = false;
-    let showEndDungeonSummary = false;
-    let gameIsPaused = false;
+    // let showEndDungeonSummary = false;
+    // let gameIsPaused = false;
     let defeatedEnemyList = this.state.defeatedEnemyList.concat();
     // Reinitializing tiletypes, not sure why this is needed yet, but the grid id thrown off if not done
     // let tileTs = cloneTiles(this.state.tileTypes);
@@ -383,7 +394,6 @@ class Game extends Component {
 
       let moveChance = Math.random() * 100;
       let shouldMove = moveChance <= 80 ? true : false;
-      console.log(shouldMove);
       if (neighbors.length > 0 && shouldMove) {
         let tileToCheck = tileTs[neighbors[0].posY][neighbors[0].posX];
 

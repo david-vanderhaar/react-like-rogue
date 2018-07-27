@@ -2,7 +2,6 @@
 ## Features
 
 ## Polish
-1. Add chance for monster to stay in current tile if all neighbors are closest to player
 1. add occasional monster grunts
 1. add unique monster attack verbs in the attack message toast, stored in the monster.db
 1. convert toasts to log
@@ -28,6 +27,7 @@
 1. ~~Add Battle Simulator for Dice Probabilities~~
 
 ## Polish
+1. ~~Add chance for monster to stay in current tile if all neighbors are closest to player~~
 1. ~~add hover information for monsters~~
 1. ~~add and balance Equipment~~
 1. ~~Add player svg~~

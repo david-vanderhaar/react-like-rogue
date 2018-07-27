@@ -19,11 +19,19 @@ class HelpMenu extends Component {
         </div>
         <div className="row">
           <div className="col s12 flow-text">
-          <Collapsible accordion defaultActiveKey={false}>
+          <Collapsible accordion defaultActiveKey={0}>
+          <CollapsibleItem header='Goal'>
+            <p>
+              Explore the dungeon to reach the lowest level possible while defeating as many monsters as you can.
+              <br />
+              How <span className="teal-text text-lighten-2">far down</span> will you go? How many <span className="teal-text text-lighten-2">foes</span> will you <span className="teal-text text-lighten-2">fell</span>?
+            </p>
+          </CollapsibleItem>
             <CollapsibleItem header='Controls'>
               <div className="row">
                 <div className="col s12 center">
-                  Movement - with arrow keys
+                  Move with arrow keys <br />
+                  Spacebar to rest
                 </div>
               </div>
               <div className="row">
@@ -37,7 +45,7 @@ class HelpMenu extends Component {
                       </tr>
                       <tr>
                         <td className="right"><span className="fa fa-arrow-left"></span></td>
-                        <td className="center"><span className="fa fa-circle"></span></td>
+                        <td className="center"><span className="fa fa-genderless"></span></td>
                         <td className="left"><span className="fa fa-arrow-right"></span></td>
                       </tr>
                       <tr>
@@ -67,6 +75,14 @@ class HelpMenu extends Component {
                 playSoundTrack = {this.props.playSoundTrack.bind(this)}
                 pauseSoundTrack = {this.props.pauseSoundTrack.bind(this)}
               />
+            </CollapsibleItem>
+            <CollapsibleItem header='Tips'>
+              <div className="left-align">
+                - Every level contains a powerful potion.<br/>
+                - Don't get cornered!<br/>
+                - Find the best equipment from each level.<br/>
+                - Use the stairs to skip ahead to the next level.<br/>
+              </div>
             </CollapsibleItem>
           </Collapsible>
           </div>

@@ -9,7 +9,6 @@ class TileDisplay extends Component {
   }
 
     render() {
-      console.log('rendering tile')
       return (
         <span id={'tile-' + this.props.value} className={this.props.className} style={this.props.style} />
       );
@@ -66,6 +65,20 @@ class Map extends Component {
           }
         }
       }
+
+      let noExit = true;
+
+      while (noExit) {
+        let y = getRandomIntInclusive(0, tileTs.length - 1)
+        let x = getRandomIntInclusive(0, tileTs[y].length - 1)
+
+        if (tileTs[y][x].type === 'GROUND') {
+          tileTs[y][x].type = 'EXIT';
+          tileTs[y][x].isExit = true;
+          noExit = false;
+        }
+      }
+
       this.props.carveRooms(tileTs, playerPosX, playerPosY);
 
       this.carveHalls(rooms, tileTs);

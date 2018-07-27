@@ -103,6 +103,12 @@ let sounds = {
   grunt05: './sounds/grunt05.wav',
   grunt06: './sounds/grunt06.wav',
   grunt07: './sounds/grunt07.wav',
+  sword01: './sounds/sword01.wav',
+  sword02: './sounds/sword02.wav',
+  sword03: './sounds/sword03.wav',
+  sword04: './sounds/sword04.wav',
+  sword05: './sounds/sword05.wav',
+  sword06: './sounds/sword06.wav',
 }
 
 export function play(name) {
@@ -155,12 +161,12 @@ export function playWalk() {
     'dirt07',
     'dirt08',
     'dirt09',
-    'breath01',
-    'breath03',
-    'breath04',
-    'breath011',
-    'breath016',
-    'breath017',
+    // 'breath01',
+    // 'breath03',
+    // 'breath04',
+    // 'breath011',
+    // 'breath016',
+    // 'breath017',
   ]);
 }
 
@@ -209,6 +215,17 @@ export function playGrunt() {
     'grunt05',
     'grunt06',
     'grunt07',
+  ]);
+}
+
+export function playWeaponHit() {
+  playRandom([
+    'sword01',
+    'sword02',
+    'sword03',
+    'sword04',
+    'sword05',
+    'sword06',
   ]);
 }
 

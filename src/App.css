@@ -203,6 +203,12 @@ html {
   position: absolute;
 }
 
+@-webkit-keyframes greenPulseBackground {
+  from { color: #749a02; background-color: #333; box-shadow: 0 0 18px #91bd09; }
+  50% { color: #91bd09; background-color: #91bd09; box-shadow: 0 0 9px #333; }
+  to { color: #749a02; background-color: #333; box-shadow: 0 0 18px #91bd09; }
+}
+
 @-webkit-keyframes greenPulseBorder {
   from { color: #749a02; box-shadow: 0 0 9px #333; }
   50% { color: #91bd09; box-shadow: 0 0 18px #91bd09; }
@@ -219,47 +225,6 @@ html {
   from { color: #bc330d; text-shadow: 0 0 9px #333; }
   50% { color: #e33100; text-shadow: 0 0 18px #e33100; }
   to { color: #bc330d; text-shadow: 0 0 9px #333; }
-}
-
-.MobileMoveControls span {
-  position: absolute;
-  z-index: 3;
-  font-size: 5em;
-  -webkit-animation-name: greenPulseText;
-  -webkit-animation-duration: 5s;
-  -webkit-animation-iteration-count: infinite;
-}
-
-.MobileMoveControls span:hover {
-  -webkit-animation-name: redPulseText;
-  -webkit-animation-duration: 1s;
-  -webkit-animation-iteration-count: infinite;
-}
-
-#mobile-move-left {
-  top: -29px;
-  left: -40px;
-}
-
-#mobile-move-right {
-  top: -29px;
-  left: 64px;
-}
-
-#mobile-move-up {
-  bottom: -30px;
-  left: 2px;
-}
-
-#mobile-move-down {
-  bottom: -130px;
-  left: 2px;
-}
-
-#mobile-move-stay {
-  top: -10px;
-  left: 0px;
-  font-size: 50px;
 }
 
 .game-container {
@@ -417,7 +382,7 @@ html {
 }
 
 .player {
-  transform: matrix(.9, 0, 0, .9, 3, -3);
+  /* transform: matrix(.9, 0, 0, .9, 3, -3); */
 }
 
 /* SET background colors and images here*/
@@ -429,6 +394,13 @@ html {
 .tile-WALL {
   background-color: #106f77;
   box-shadow: 6px -6px 0px #312d44 inset;
+}
+
+.tile-EXIT {
+  background-color: #312d44;
+  -webkit-animation-name: greenPulseBorder;
+  -webkit-animation-duration: 5s;
+  -webkit-animation-iteration-count: infinite;
 }
 
 .shake {
@@ -499,7 +471,7 @@ html {
   position: absolute;
   border-radius: 6px;
   transition: .2s;
-  z-index: 2;
+  /* z-index: 2; */
 }
 
 .monster {
@@ -613,6 +585,48 @@ html {
   .MobileMoveControls {
     display: none;
   }
+}
+
+
+.MobileMoveControls span {
+  position: absolute;
+  z-index: 3;
+  font-size: 5em;
+  -webkit-animation-name: greenPulseText;
+  -webkit-animation-duration: 5s;
+  -webkit-animation-iteration-count: infinite;
+}
+
+.MobileMoveControls span:hover {
+  -webkit-animation-name: redPulseText;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-iteration-count: infinite;
+}
+
+#mobile-move-left {
+  top: -29px;
+  left: -40px;
+}
+
+#mobile-move-right {
+  top: -29px;
+  left: 64px;
+}
+
+#mobile-move-up {
+  bottom: -30px;
+  left: 2px;
+}
+
+#mobile-move-down {
+  bottom: -130px;
+  left: 2px;
+}
+
+#mobile-move-stay {
+  top: -10px;
+  left: 0px;
+  font-size: 50px;
 }
 
 /*  BATTLE SIMULATOR */
